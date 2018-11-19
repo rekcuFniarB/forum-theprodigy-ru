@@ -1,0 +1,1956 @@
+<?php
+/*****************************************************************************/
+/* English.lng																 */
+/*****************************************************************************/
+/* YaBB: Yet another Bulletin Board											 */
+/* Open-Source Project started by Zef Hemel (zef@zefnet.com)				 */
+/* Software Version: YaBB SE												 */
+/* ========================================================================= */
+/* Software Distributed by: http://www.yabbse.org							 */
+/* Support, News, Updates at: http://www.yabbse.org/community				 */
+/* http://www.yabbforum.com/community										 */
+/* ========================================================================= */
+/* Copyright (c) 2001-2002 The YaBB SE Development Team						 */
+/* Software by: The YaBB SE Development Team								 */
+/*****************************************************************************/
+/* This program is free software; you can redistribute it and/or modify it	 */
+/* under the terms of the GNU General Public License as published by the	 */
+/* Free Software Foundation; either version 2 of the License, or (at your	 */
+/* option) any later version.												 */
+/* */
+/* This program is distributed in the hope that it will be useful, but		 */
+/* WITHOUT ANY WARRANTY; without even the implied warranty of				 */
+/* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General	 */
+/* Public License for more details.											 */
+/*																			 */
+/* The GNU GPL can be found in gpl.txt in this directory					 */
+/*****************************************************************************/
+
+$englishlngver = 'YaBB SE 1.5.2';
+
+$locale = 'en_US';
+$txt['postsper_day'] = 'per day';
+$txt['postsper_today'] = 'today';
+$txt['postsper_onlyday'] = 'Show average per day';
+$txt['postsper_onlytoday'] = 'Show posts made today';
+$txt['postsper_both'] = 'Show both average and today';
+$txt['postsper_none'] = 'Don\'t show posts per day';
+$txt['postsper_enable'] = 'Show Posts Per Day?';
+
+$txt['skins0'] = "Skin";
+$txt['QuickReply1'] = "Enable Quick-Reply Mod?";
+
+$txt['QuickReply2'] = "Show Quick-Reply box in messageview?";
+
+$txt['QuickReply3'] = "Quick-Reply";
+$txt['QuickReply4'] = "Use this form to post a quick reply. YaBB code and smilies are allowed.";
+$txt['QuickReply5'] = "Extended Quick-Reply for Admins & (Global) Moderators";
+
+/* Where are the images for the language file? */
+/* Set to "" if you want to use the standard images (english) */
+/* Set a relativ path to the imagesdir, to use own images. */
+/* With beginning /  (Example: "/german") */
+$langimages = "";
+
+$txt['newmessages0'] = 'is';
+$txt['newmessages1'] = 'are';
+$txt['newmessages2'] = 'new';
+$txt['newmessages3'] = 'New';
+$txt['newmessages4'] = ',';
+
+$txt['advdel1'] = 'Removing polls';
+$txt['advdel2'] = 'Cleaning up Log-Tables';
+$txt['advdel3'] = 'Removing calendar-events';
+
+$txt[1] = 'You are not allowed to access this section';
+$txt[2] = 'Admin';
+$txt[3] = 'Edit Categories (reorder/create/remove)';
+$txt[4] = 'Edit Boards (reorder/create/remove)';
+$txt[5] = 'View/Delete Members';
+$txt[6] = 'E-Mail Your Members';
+$txt[7] = 'Edit YaBB News';
+$txt[8] = 'Edit Member groups';
+$txt[9] = 'View all members';
+
+$txt[10] = 'Save';
+
+$txt[11] = 'YaBB Administrator';
+$txt[12] = 'Moderator';
+$txt[13] = 'YaBB Jr. Poster (over ' . $JrPostNum . ' posts)';
+$txt[14] = 'YaBB Full Poster (over ' . $FullPostNum . ' posts)';
+$txt[15] = 'YaBB Sr. Poster (over ' . $SrPostNum . ' posts)';
+$txt[16] = 'Additional member groups (one per line)';
+
+$txt[17] = 'Modify';
+$txt[18] = $mbname. ' - Index';
+$txt[19] = 'Members';
+$txt[20] = 'Forum name';
+$txt[21] = 'Posts';
+$txt[22] = 'Last post';
+
+$txt[23] = 'Unable to open';
+$txt[24] = '(No subject)';
+$txt[25] = 'Post reply';
+$txt[26] = 'Posts';
+$txt[27] = 'View Profile';
+$txt[28] = 'Guest';
+$txt[29] = 'Author';
+$txt[30] = 'on';
+$txt[31] = 'Remove';
+$txt[32] = 'Messages in this topic';
+$txt[33] = 'Start new topic';
+
+$txt[34] = 'Login';
+$txt[35] = 'Username';
+$txt[36] = 'Password';
+$txt[37] = 'You should fill in a username.';
+$txt[38] = 'Password field is empty';
+$txt[39] = 'Password incorrect';
+$txt[40] = 'Username does not exist.';
+
+$txt[41] = 'Manage Boards';
+$txt[42] = 'Action';
+$txt[43] = 'Order';
+$txt[44] = 'Full name';
+$txt[45] = 'Add board';
+$txt[46] = 'Reorder Boards';
+$txt[47] = 'Current boards';
+$txt[48] = 'Removing board';
+$txt[49] = 'Removing messages';
+$txt[50] = 'Removing topic';
+$txt[51] = 'Done.';
+$txt[52] = 'Manage Categories';
+$txt[53] = 'Current categories';
+$txt[54] = 'Change order';
+$txt[55] = 'Remove category';
+$txt[56] = 'Create new category';
+$txt[57] = 'Only access for membergroup(s)';
+$txt[58] = 'leave empty if none';
+$txt[59] = 'Create';
+$txt[60] = 'Removing category';
+$txt[61] = 'Removing category datafiles';
+$txt[62] = 'Board Moderator';
+$txt[63] = 'Remove Topic';
+$txt[64] = 'Topics:';
+$txt[65] = 'Next';
+$txt[66] = 'Modify message';
+$txt[67] = 'You are not allowed to change this message';
+$txt[68] = 'Name';
+$txt[69] = 'E-Mail';
+$txt[70] = 'Subject';
+$txt[71] = 'Message icon';
+$txt[72] = 'Message';
+$txt[73] = 'Only Moderators can use the direct remove function, please remove this message through the modify feature.';
+$txt[74] = 'This post has replies to it, you must first delete those...';
+
+$txt[75] = 'The Name field was not filled out. It is required.';
+$txt[76] = 'The E-Mail field was not filled out. It is required.';
+$txt[77] = 'The Subject field was not filled out. It is required.';
+$txt[78] = 'The Message Body was not filled out. It is required.';
+
+$txt[79] = 'Edit Profile';
+$txt[80] = 'You are not allowed to change this person\'s profile.';
+
+$txt[81] = 'Choose password';
+$txt[82] = 'Verify password';
+$txt[83] = 'Website title';
+$txt[84] = 'Website URL';
+$txt[85] = 'Signature';
+$txt[86] = 'Posts';
+$txt[87] = 'Position';
+$txt[88] = 'Change profile';
+$txt[89] = 'Delete user';
+
+$txt[90] = 'This topic is locked, you are not allow to post or modify messages...';
+$txt[91] = 'Password field empty';
+$txt[92] = 'View profile of';
+$txt[93] = 'You are not to lock or unlock this topic; you must be a moderator or administrator to do that...';
+$txt[94] = 'Total';
+$txt[95] = 'Posts:';
+$txt[96] = 'Website';
+$txt[97] = 'Register';
+$txt[98] = 'Choose username';
+$txt[99] = 'Username may only contain numbers and letters (example: yabber69)';
+$txt[100] = 'The username you tried to register already exists.';
+
+$txt[101] = 'Message Index';
+$txt[102] = 'News';
+$txt[103] = 'Home';
+
+$txt[104] = 'Lock/Unlock Topic';
+$txt[105] = 'Post';
+$txt[106] = 'An Error Has Occurred!';
+$txt[107] = 'at';
+$txt[108] = 'Logout';
+$txt[109] = 'Started by';
+$txt[110] = 'Replies';
+$txt[111] = 'Last post';
+$txt[112] = 'Keep current';
+$txt[113] = 'Current Status:';
+$txt[114] = 'Administration Login';
+$days = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
+$months = array('January','February','March','April','May','June','July','August','September','October','November','December');
+$days_short = array('Sun','Mon','Tue','Wed','Thu','Fri','Sat');
+$months_short = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+$txt[116] = 'Post+reply'; # + instead of spaces. Do not translate this line!!!
+$txt[117] = 'Quote this post';
+$txt[118] = 'Topic';
+$txt[119] = 'Help';
+$txt[120] = 'Remove topic older than number of days:';
+$txt[121] = 'Remove message';
+$txt[122] = 'days old';
+$txt[123] = 'REMOVED';
+$txt[124] = 'Remove posts older than';
+$txt[125] = 'Notify';
+$txt[126] = 'Do you want a notification e-mail if someone replies to this topic?';
+$txt[127] = 'Topic reply';
+$txt[128] = 'A reply';
+$txt[129] = "has been posted to a topic you are watching.\n\nView it at";
+$txt[130] = "Regards,\nThe $mbname team.";
+$txt[131] = 'Notify of replies';
+$txt[132] = 'Move Topic';
+$txt[133] = 'Move to';
+$txt[134] = 'You are not allowed to move topics...';
+$txt[135] = 'Set censored words';
+$txt[136] = 'One word per line in the form: fuck=f**ck';
+$txt[137] = 'Admin functions';
+$txt[138] = 'This service is only for members...';
+$txt[139] = 'Pages';
+$txt[140] = 'Users active in past 15 minutes';
+$txt[141] = 'Guests';
+$txt[142] = 'Users';
+$txt[143] = 'IM Messages Index';
+$txt[144] = 'Instant Message';
+$txt[145] = 'Reply with quote';
+$txt[146] = 'Reply';
+$txt[147] = 'Instant Messaging is only for members';
+$txt[148] = 'Send message';
+$txt[149] = 'The user you tried to send a message to does not exist...';
+$txt[150] = 'To username';
+
+$txt[151] = 'No messages...';
+$txt[152] = 'you have';
+$txt[153] = 'messages';
+$txt[154] = 'Remove this message';
+
+$txt[155] = 'Maintenance Mode';
+$txt[156] = 'Our Board is currently in maintenance-mode';
+$txt[157] = 'Our Forums are currently in maintenance-mode. Please try again later. Thank you.';
+$mtxt[1] = 'Subject for display:';
+$mtxt[2] = 'Message for display:';
+$mtxt[3] = 'This board is in Maintenance Mode.';
+$mtxt[4] = 'Under Construction.';
+$mtxt[5] = 'Our board is currently in Maintenance Mode. Please call back later.';
+
+$txt[158] = 'Users online';
+$txt[159] = 'Private Message';
+$txt[160] = 'Jump to';
+$txt[161] = 'go';
+$txt[162] = 'Are you sure you want to remove this topic?';
+$txt[163] = 'Yes';
+$txt[164] = 'No';
+$txt[165] = 'To post you must be logged in. If you don\'t have an account yet, please <a href="' . $cgi . ';action=register">register</a>.';
+
+$txt[166] = 'Search Results';
+$txt[167] = 'End of results';
+$txt[168] = 'Search Again';
+$txt[169] = 'Display Next Page';
+$txt[170] = 'Sorry, no matches were found';
+$txt[171] = 'Displaying Results';
+$txt[172] = 'to';
+$txt[173] = 'Search Completed for Topics started by';
+$txt[174] = 'matches were found';
+$txt[175] = 'Started by';
+$txt[176] = 'on';
+$txt[177] = 'Search Completed for posts posted in by';
+$txt[178] = 'Topic Title';
+$txt[179] = 'Message Snippet';
+$txt[180] = 'Searching for messages containing';
+$txt[181] = 'Word found';
+$txt[182] = 'Search';
+$txt[183] = 'Set Search Parameters';
+$txt[184] = 'Please choose <b>one</b> of the following';
+$txt[185] = 'Refine Parameters';
+$txt[186] = 'Search for topics started by someone';
+$txt[187] = 'Search for topics posted in by someone';
+$txt[188] = 'Search by Forum';
+$txt[189] = 'Choose a forum to search in, or search all';
+$txt[190] = 'All';
+$txt[191] = 'Display how many results?';
+
+$txt[192] = 'Email successfully sent';
+$txt[193] = 'Back';
+$txt[194] = 'reminder';
+$txt[195] = 'Message started by';
+$txt[196] = 'Title';
+$txt[197] = 'Post by';
+$txt[198] = 'End of Posts';
+$txt[199] = 'Post not found';
+$txt[200] = "List of registered Members and Top $TopAmmount Posters.";
+$txt[201] = 'Please welcome';
+$txt[202] = 'Clean active log';
+$txt[203] = 'Are you sure you want to clean the active log?';
+$txt[204] = 'Your version of YaBB is';
+$txt[205] = 'The current version of YaBB is';
+$txt[206] = 'Ban Members';
+$txt[207] = 'Set Reserved Names';
+$txt[208] = 'YaBB Admin Center';
+$txt[209] = 'I\'m a llama!';
+$txt[210] = 'ATTENTION! Your message couldn\'t be saved. Please try again.<br /><br />Your Message:<br /><br />';
+$txt[211] = 'Last Edit';
+$txt[212] = 'Would you like to deactivate Notification on this topic?';
+$txt[213] = 'Passwords aren\'t the same.';
+
+$txt[214] = 'Recent Posts';
+
+$txt[215] = 'browser not compatible with these buttons';
+$txt[216] = 'Edit Your Forum Template';
+$txt[217] = 'Layout/Board Settings';
+$txt[218] = 'Boards/Categories';
+$txt[219] = 'Members/Mailing';
+$txt[220] = 'Variable';
+$txt[221] = 'Messages/Actives';
+$txt[222] = 'Forum Preferences and Settings';
+$txt[223] = 'Sorry, you must register before using this feature.';
+
+$txt[224] = 'The username field does not accept / in the query string';
+$txt[225] = 'The username field does not accept \\ in the query string';
+$txt[226] = 'Optional Components';
+$txt[227] = 'Location';
+$txt[228] = 'Personal Text';
+$txt[229] = 'Personalized Picture';
+$txt[230] = 'Can\'t open directory';
+$txt[231] = 'Gender';
+$txt[232] = 'Picture/Text';
+$txt[233] = 'Date Registered';
+
+$txt[234] = 'View the 10 most recent posts on the board.';
+$txt[235] = 'is the most recently updated topic';
+$txt[236] = 'Return';
+$txt[237] = 'to the board index.';
+
+$txt[238] = 'Male';
+$txt[239] = 'Female';
+
+$txt[240] = 'Invalid character used in Username.';
+$txt[241] = 'Invalid character used in Password.';
+$txt[242] = 'Invalid character used in Name.';
+$txt[243] = 'Invalid character used in eMail.';
+
+$txt[244] = 'The username you tried to register contains a reserved name. Please try another username. Reserved name: ';
+$txt[245] = 'Registration successful';
+
+$txt[246] = 'About to remove topic';
+
+$txt[247] = 'Hey,';
+$txt[248] = 'Welcome,';
+$txt[249] = 'Please';
+$txt[250] = 'Back';
+$txt[251] = 'Please select a destination';
+
+$txt[252] = 'Add YABBC tags';
+$txt[253] = 'Bold';
+$txt[254] = 'Italicized';
+$txt[255] = 'Underline';
+$txt[256] = 'Centered';
+$txt[257] = 'Insert Hyperlink';
+$txt[258] = 'Insert Email';
+$txt[259] = 'Insert Code';
+$txt[260] = 'Insert Quote';
+$txt[261] = 'Insert List';
+
+$txt[262] = 'Black';
+$txt[263] = 'Red';
+$txt[264] = 'Yellow';
+$txt[265] = 'Pink';
+$txt[266] = 'Green';
+$txt[267] = 'Orange';
+$txt[268] = 'Purple';
+$txt[269] = 'Blue';
+$txt[270] = 'Beige';
+$txt[271] = 'Brown';
+$txt[272] = 'Teal';
+$txt[273] = 'Navy';
+$txt[274] = 'Maroon';
+$txt[275] = 'Lime Green';
+
+$txt[276] = 'Disable Smilies';
+$txt[277] = 'Check this if you\'ll be adding code (or don\'t like smilies).';
+$txt[278] = 'Reset Form';
+$txt[279] = 'Posted by';
+$txt[280] = 'Posted on';
+
+$txt[281] = 'Standard';
+$txt[282] = 'Thumb Up';
+$txt[283] = 'Thumb Down';
+$txt[284] = 'Exclamation point';
+$txt[285] = 'Question mark';
+$txt[286] = 'Lamp';
+$txt[287] = 'Smiley';
+$txt[288] = 'Angry';
+$txt[289] = 'Cheesy';
+$txt[290] = 'Laugh';
+$txt[291] = 'Sad';
+$txt[292] = 'Wink';
+$txt[293] = 'Grin';
+$txt[294] = 'Shocked';
+$txt[295] = 'Cool';
+$txt[296] = 'Huh';
+$txt[297] = 'Add Smilies';
+
+$txt[298] = 'Moderator';
+$txt[299] = 'Moderators';
+
+$txt[300] = 'Mark Topics as Read for this Board';
+$txt[301] = 'Views';
+$txt[302] = 'New';
+
+$txt[303] = 'View All Users';
+$txt[304] = 'View By Letter';
+$txt[305] = 'View';
+$txt[306] = 'Posters';
+$txt[307] = 'Email';
+
+$txt[308] = 'Viewing Members';
+$txt[309] = 'of';
+$txt[310] = 'total members';
+$txt[311] = 'to';
+$txt[312] = 'Viewing Members By Letter';
+$txt[313] = 'Viewing The';
+$txt[314] = 'Top Posters';
+$txt[315] = 'Forgot password?';
+
+$txt[316] = 'Inbox';
+$txt[317] = 'Date';
+$txt[318] = 'From';
+$txt[319] = 'Subject';
+$txt[320] = 'Outbox';
+$txt[321] = 'New Message';
+$txt[322] = 'Receive New Messages';
+$txt[323] = 'Preferences';
+$txt[324] = 'To';
+$txt[325] = 'Ignorelist';
+$txt[326] = 'Add one Username on each line.<br />Or enter * to ignore all messages.';
+$txt[327] = 'Notify by email';
+$txt[328] = 'Save Preferences';
+$txt[329] = 'Reset Form';
+
+$txt[330] = 'Topics';
+$txt[331] = 'Members';
+$txt[332] = 'Members List';
+$txt[333] = 'New Posts';
+$txt[334] = 'No New Posts';
+
+$txt[335] = 'Enter your name';
+$txt[336] = 'Enter your email address';
+
+$txt[337] = 'This field only accepts numbers from 0-9';
+
+$txt[338] = 'Send an email to the above email list';
+$txt[339] = 'Send';
+$txt[340] = 'Edit Ban List';
+$txt[341] = 'Set Reserved Names';
+$txt[342] = 'One word per line.';
+$txt[343] = 'Match all words';
+$txt[344] = 'Match any words';
+$txt[345] = 'Match as phrase';
+$txt[346] = 'Search -All- Members only';
+
+$txt[347] = 'This pages allows you to change every setting for your YaBB forum.  Be very careful with these settings, as they may render your YaBB dysfunctional.  Also note that some of these options are default options for guests only (such as time format).';
+$txt[348] = 'Maintenance Mode?';
+$txt[349] = 'Language Pack You Wish to Use';
+$txt[350] = 'Message Board Name';
+$txt[351] = 'Board URL';
+$txt[352] = 'Cookie Name';
+
+$txt[354] = 'Location of Sendmail Program';
+$txt[355] = 'Webmaster Email Address';
+$txt[356] = 'YaBB Directory';
+$txt[357] = 'Data Directory';
+$txt[358] = 'Members Directory';
+$txt[359] = 'Boards Directory';
+$txt[360] = 'Sources Directory';
+$txt[361] = 'Variables Directory';
+$txt[362] = 'Avatars Directory';
+$txt[363] = 'Images URL';
+$txt[364] = 'Help File';
+$txt[365] = 'Title BG Color';
+$txt[366] = 'Title Text Color';
+$txt[367] = 'Window BG Color';
+$txt[368] = 'Window BG Color #2';
+$txt[369] = 'Category BG Color';
+$txt[370] = 'Table Border Color';
+$txt[371] = 'Time Offset';
+$txt[372] = 'Number of Top Posters for Members List';
+$txt[373] = 'Members Per Page in Member List-All';
+$txt[374] = 'Maximum Topics to Display in the Message Index';
+$txt[375] = 'Maximum Messages to Display in a Topic Page';
+$txt[376] = 'Remove entries from user logs after _ days';
+$txt[377] = 'or';
+$txt[378] = 'Enable Bulletin Board Code?';
+$txt[379] = 'Enable News?';
+$txt[380] = 'Enable Guest Posting?';
+$txt[381] = 'Allow Email Notification?';
+$txt[382] = 'Show Latest Member on Board Index?';
+$txt[383] = 'Show Modification Date on Modified Posts?';
+$txt[384] = 'Show User Pics in Message View?';
+$txt[385] = 'Show User Text in Message View?';
+$txt[386] = 'Show Gender Image in Message View?';
+$txt[387] = 'Show News Fader on Board Index?';
+$txt[388] = 'News Fader Title Color';
+$txt[389] = 'News Fader News Color';
+$txt[390] = 'URL to News Fader file (fader.js)';
+$txt[391] = 'Use File-Locking?';
+$txt[392] = 'Lock EX';
+$txt[393] = 'Lock UN';
+
+$txt[394] = 'Mailprogram error.';
+$txt[395] = 'Send email to';
+$txt[396] = 'to ask for password';
+
+$txt[397] = 'The search field does not accept / or \\ in the query string';
+$txt[398] = 'Sorry, no matches were found';
+
+$txt[399] = 'The board field does not accept / in the query string';
+$txt[400] = 'The board field does not accept \\ in the query string';
+
+$txt[401] = 'no File-Locking';
+$txt[402] = 'Unix/Linux File-Locking';
+$txt[403] = 'Windows File-Locking';
+
+$txt[404] = 'Send Mails using';
+$txt[405] = 'sendmail';
+$txt[406] = 'SMTP';
+
+$txt[407] = 'SMTP-Server';
+
+$txt[408] = 'Minimum time between two postings from the same IP';
+$txt[409] = 'The last posting from your IP was less than';
+$txt[410] = 'seconds ago. Please try again later.';
+
+$txt[411] = 'Top';
+
+$txt[412] = 'Delete all messages in your IMBOX';
+$txt[413] = 'Are you sure you want to delete all messages?';
+
+$txt[414] = 'There are no topics with Notification marked.';
+$txt[415] = 'You are notified on replies in the following topics';
+$txt[416] = 'Activate checkboxes to <b><i>deactivate</i></b> Notification on Topic.';
+$txt[417] = 'Update Notifications';
+$txt[418] = 'Notification';
+$txt[419] = 'Show all Topics with Notification';
+
+$txt[420] = 'Age';
+$txt[421] = 'Use the <b>01/01/01 at 01:01:01<\/b> date\/time format.';
+$txt[422] = '(no pic)';
+$txt[423] = 'Avatars URL';
+$txt[424] = 'YaBB Admin Options';
+$txt[425] = 'Your Version/Current Version';
+$txt[426] = 'Member Controls';
+$txt[427] = 'Forum Controls';
+$txt[428] = 'Forum Configuration';
+$txt[429] = 'Detailed Version Check';
+$txt[430] = ', you are banned from using this forum';
+$txt[431] = 'Success! You are now a member of the Forum.';
+$txt[432] = 'Default Length for login cookies to last (in minutes)';
+
+$txt[433] = 'Insert Flash';
+$txt[434] = 'Insert Ftp Link';
+$txt[435] = 'Insert Image';
+$txt[436] = 'Insert Table';
+$txt[437] = 'Insert Table Column';
+$txt[438] = 'There are no topics with Notification.';
+$txt[439] = 'Marquee';
+$txt[440] = 'Teletype';
+$txt[441] = 'Strikethrough';
+$txt[442] = 'Glow';
+$txt[443] = 'Shadow';
+$txt[444] = 'Preformatted Text';
+$txt[445] = 'Left Align';
+$txt[446] = 'Right Align';
+$txt[447] = 'Superscript';
+$txt[448] = 'Subscript';
+$txt[449] = 'Insert Table Row';
+
+$txt[450] = 'Roll Eyes';
+$txt[451] = 'Tongue';
+
+$txt[452] = 'Mark ALL messages as read';
+
+$txt[453] = 'The user whose profile you are trying to view does not exist.';
+
+$txt[454] = 'Hot Topic (More than 15 Replies)';
+$txt[455] = 'Very Hot Topic (More than 25 Replies)';
+$txt[456] = 'Locked Topic';
+$txt[457] = 'Normal Topic';
+
+$txt[458] = 'Latest posts of: ';
+$txt[459] = 'Additional Information';
+$txt[460] = 'Show the last';
+$txt[461] = 'posts of this person';
+$txt[462] = 'GO';
+
+$txt[463] = 'All times are CST.  All dates are in MM-DD-YY format.';
+$txt[464] = 'Start+new+thread';
+$txt[465] = 'Print';
+$txt[466] = 'Message';
+$txt[467] = 'Profile';
+$txt[468] = 'Topic Summary';
+$txt[469] = 'Message';
+$txt[470] = 'N/A';
+$txt[471] = 'message';
+$txt[472] = 'This topic doesn\'t exist on this board.';
+
+$txt[473] = 'This name is already in use by another member.';
+
+$txt[474] = 'Select one or specify a web path (ex: <b>http://www.mypage.com/mypic.gif</b>) to your own image.';
+$txt[475] = 'I have my own pic:';
+$txt[476] = 'Userpic Width (0 = disable limit)';
+$txt[477] = 'Userpic Height (0 = disable limit)';
+$txt[478] = 'Text To Describe The Limits';
+
+$txt[479] = 'This selection will make dates throughout this Forum display in this format.';
+$txt[480] = '01/31/01 ' . $txt[107] . ' 13:15:17';
+$txt[481] = '31.01.01 ' . $txt[107] . ' 13:15:17';
+$txt[482] = '31.01.2001 ' . $txt[107] . ' 13:15:17';
+$txt[483] = 'January 12th, 2001, 1:15pm';
+$txt[484] = '01/31/01 ' . $txt[107] . ' 1:15pm';
+$txt[485] = '31. January ' . $txt[107] . ' 13:15';
+$txt[486] = 'Time Format';
+$txt[487] = 'Time Offset must be between -23.5 and 23.5.';
+
+$txt[488] = 'Total Members:';
+$txt[489] = 'Total Posts:';
+$txt[490] = 'Total Topics:';
+$txt[491] = 'P.S. Your username is';
+$txt[492] = 'and your password is';
+$txt[493] = 'YaBB Current Version';
+$txt[494] = 'Users Version';
+$txt[495] = 'YaBB File';
+$txt[496] = 'YaBB Package';
+
+$txt[497] = 'Session Length in Minutes';
+$txt[498] = 'Maximum Allowed Characters in Posts';
+$txt[499] = 'Your message is too long. Please go back and shorten it, then resubmit.';
+
+$txt[500] = 'Please enter a valid email address.';
+
+$txt[501] = 'Maintenance Controls';
+$txt[502] = 'Recount All Board Totals';
+$txt[503] = 'All Board Totals have been recounted.';
+$txt[504] = 'Recount Membership';
+$txt[505] = 'Membership Total has been recounted.';
+$txt[506] = 'URL to YBBC JavaScript file (ubbc.js)';
+$txt[507] = 'Preview';
+$txt[508] = 'Always stay logged in';
+
+$txt[509] = 'Show Recent Posts Bar on Board Index?';
+$txt[510] = 'Show Members List Bar on Board Index?';
+
+$txt[511] = 'Logged';
+$txt[512] = 'IP';
+
+$txt[513] = 'ICQ';
+$txt[514] = 'Pager';
+$txt[515] = 'WWW';
+$txt[516] = 'Write private message';
+$txt['lj'] = 'Blog';
+
+$txt[517] = 'Required Information';
+$txt[518] = 'This is the displayed name that people will see.';
+$txt[519] = 'Number hours to +/- to make displayed time in your local time.';
+$txt[520] = 'Used only for identification by YaBB. You can use special characters after logging in, by changing your displayed name in your profile.';
+
+$txt[521] = 'Use text menu instead of images?';
+$txt[522] = 'Show current position in forum as link instead of text?';
+$txt[523] = 'Show view profile button under post?';
+$txt[524] = 'Auto-link URLs?';
+
+$txt[525] = 'by';
+
+$txt[526] = 'embarrassed';
+$txt[527] = 'lips sealed';
+$txt[528] = 'undecided';
+$txt[529] = 'kiss';
+$txt[530] = 'cry';
+$txt[531] = 'Horizontal Rule';
+$txt[532] = 'Font Size';
+$txt[533] = 'Font Face';
+
+$txt[535] = 'Recipient';
+
+$txt[560] = 'You are not allowed to send IM to this user.';
+$txt[561] = "New $mbname-Message: (SUBJECT)";
+$txt[562] = "(DATE) SENDER has sent you the following Instant Message:\n\n->*<-\n\nMESSAGE\n\n->*<-";
+
+$txt[563] = 'Birthdate';
+$txt[564] = 'Month (MM)';
+$txt[565] = 'Day (DD)';
+$txt[566] = 'Year (YYYY)';
+$txt[567] = 'Invalid input in one or more of the Birthdate fields.';
+$txt[568] = 'Please shorten your name. It is too long ;)';
+
+$txt[569] = 'YaBB Newbie';
+$txt[570] = "YaBB God (over $GodPostNum posts)";
+
+$txt[571] = 'Credits';
+
+$txt[572] = 'Search -All- Guests only';
+$txt[573] = 'Fields to Search';
+$txt[574] = 'Age since last post';
+$txt[575] = 'Min';
+$txt[576] = 'Max';
+$txt[577] = 'Any poster';
+$txt[578] = 'hours';
+$txt[579] = 'days';
+
+$txt[580] = 'BAD post num';
+$txt[581] = 'our newest member';
+
+$txt[582] = 'Search for';
+$txt[583] = 'by user';
+
+$txt[584] = 'Show and require agreement letter when registering?';
+$txt[585] = 'I Agree';
+$txt[586] = 'I Do Not Agree';
+
+$txt[587] = 'Default Time Format';
+$txt[588] = '# Posts to become "Junior Member"';
+$txt[589] = '# Posts to become "Full Member"';
+$txt[590] = '# Posts to become "Senior Member"';
+$txt[591] = '# Posts to become "God Member"';
+
+$txt[592] = 'There are invalid Characters in your personal userpic url or picture name.';
+
+$txt[593] = 'Rebuild the members list';
+$txt[594] = 'The membership list (memberlist.txt) has been rebuilt.';
+$txt[595] = 'Note: this will sort the list and the newest member will be the last entry after sorting.';
+
+$txt[596] = 'We suggest that you use 6 or more characters with a combination of letters and numbers.';
+$txt[597] = 'Additional Information';
+$txt[598] = 'This must be included if you specify a URL below.';
+$txt[599] = 'This must be a complete URL.';
+$txt[600] = 'This is your ICQ number.';
+$txt[601] = 'This is your AOL Instant Messenger nickname.';
+$txt[602] = 'This is your Yahoo! Instant Messenger nickname.';
+$txt[603] = 'AIM';
+$txt[604] = 'YIM';
+$txt[605] = 'Preferences';
+$txt[606] = 'Signatures are displayed at the bottom of each post or instant message. YaBBC code may be be used in your signature.';
+
+$txt[607] = 'Lock SH';
+$txt[608] = 'Delete Selected Members';
+$txt[609] = 'For purposes of security, YaBB asks that you please always use absolute paths. The \'../\' (parent directory) symbol is illegal. Please change your Settings.pl to use absolute paths instead of the \'../\' symbol.';
+$txt[610] = 'Repair All Boards and Topics';
+$txt[611] = 'YaBB must be in maintenance mode before you can use this feature.';
+$txt[612] = 'Repairing All Boards';
+$txt[613] = 'Processing Category';
+$txt[614] = 'Repairing Board';
+$txt[615] = 'Use Temporary Files When Appropriate';
+
+$txt[616] = 'Remember, this forum is in \'Maintenance Mode\'.';
+
+
+$txt[617] = 'Are you sure you want to remove this board?';
+$txt[618] = 'Enable and Show \'Mark as Read\' Buttons?';
+$txt[619] = 'Send welcome email to users when you do not have mail password turned on?';
+
+$txt[630] = 'Use \'Fake\' File Truncation. This option should only be enabled if your server gives the error: \'truncate() not supported on this platform.\'';
+$txt[631] = "Please make sure you have 'fake truncation' turned on in your Settings.pl file.<br />$faketruncation = 1;<br />Could not truncate file";
+
+$txt[632] = 'Disallow guests from doing anything but login or register?';
+$txt[633] = 'Warning!';
+$txt[634] = 'Only registered members are allowed to access this forum.';
+$txt[635] = 'Please login below or click';
+$txt[636] = '-here-';
+$txt[637] = "to register an account with $mbname.";
+
+$txt[638] = 'You\'ve changed your email address. You will receive a new password by email.';
+$txt[639] = 'Email new password if a user changes his/her email address?';
+
+$txt[640] = 'Window BG Color #3';
+
+$txt[641] = 'Read';
+$txt[642] = 'times';
+
+$txt[643] = 'click to reorder the boards in this category';
+$txt[644] = 'This is your \'' . $txt[208] . '\'. You can modify your settings and template from here, as well as maintain your forum.<br /><br />Please read the manual before you contact any form of support, and please be careful with these functions. You may also find answers to your problems on the <a href="http://www.yabbse.org/community/" target="_blank">support forum</a> or the troubleshooting section of your manual.<br />You can also click the <img src="' . $imagesdir . '/helptopics.gif" border="0" alt="' . $txt[119] . '" title="' . $txt[119] . '"/> symbol to find out how to use some functions.';
+$txt[645] = 'YaBB SE Stats';
+$txt[656] = 'Latest Member:';
+$txt[657] = 'Miscellaneous';
+$txt[658] = 'Total Categories:';
+$txt[659] = 'Latest Post:';
+
+$txt[660] = 'You\'ve got';
+$txt[661] = 'Click';
+$txt[662] = 'here';
+$txt[663] = 'to view them.';
+
+$txt[664] = 'Max ' . $MaxSigLen . '; characters remaining: ';
+
+$txt[665] = 'Total Boards:';
+$txt[666] = 'Check this box if you experience errors on an MS IIS server';
+$txt[667] = 'Check this box if you experience blank pages after posting (usually on MS IIS servers)';
+
+$txt[668] = 'Print Page';
+$txt[669] = 'Password Reminder';
+
+$txt[670] = 'Please place one news item per line. Some YaBBC tags, such as [b], [i] and [u] are allowed in your news, as well as smilies.';
+$txt[671] = 'This ID is used internally by YaBB.';
+$txt[672] = 'This is the name that will be displayed.';
+$txt[673] = 'List the membergroups you wish to give access to this category (it *is* case-sensitive). List multiple groups like this: group1,group2';
+$txt[674] = 'A board with the id';
+$txt[675] = 'already exists.';
+$txt[676] = 'A category with the id';
+$txt[677] = 'Edit your boards here. List multiple moderators as \'mod1s_username,mod2s_username\' (these must be usernames and it *is* case-sensitive). Click the link on the category name and you can reorder the listing of the boards you see in that category. The board id is used internally by YaBB and to determine where posts are (see the url when viewing a board for an example).';
+
+$txt[678] = 'Sorry';
+
+$txt[679] = 'This must be a valid email address.';
+$txt[680] = 'The Administrator with username of \'admin\' cannot be set to a different membergroup.';
+
+$txt[681] = 'Please inform the administrator of this forum to fix the $facesdir setting immediately.';
+$txt[682] = 'This is your template for your YaBB forum.  You can change anything you like here, using HTML, and your Forum will automatically look different after you save the template.';
+
+$txt[683] = 'a whole lot';
+$txt[684] = 'Forum Administrators';
+$txt[685] = $mbname . ' - Info Center';
+
+$txt[686] = 'online';
+$txt[687] = 'offline';
+$txt[688] = 'Send this member a private message';
+
+$txt[689] = 'Maximum allowed characters in signatures';
+$txt[690] = 'Time in minutes to log each click in your forum';
+
+$txt[691] = 'Total Clicks';
+$txt[692] = 'in the last ' . $ClickLogTime . ' minutes';
+$txt[693] = 'View forum access log';
+$txt[694] = 'IP Access';
+$txt[695] = 'Browsers';
+$txt[696] = 'Operating System';
+$txt[697] = 'This is a simple system that analyzes the log YaBB creates with each click someone makes in your forum. Use this as a rough estimate of the traffic, browser and operating system of ' . $mbname . ' visitors. The numbers in parenthesis beside each item is the number of occurrences of that item in your log.<p>You currently have logging set for ' . $ClickLogTime . ' minutes.</p>';
+
+$txt[698] = 'This is your profile. You can choose which information to fill out, other than the required section. This information will be displayed in various places throughout ' . $mbname . '.';
+
+$txt[699] = 'Reserved names will keep members from registering certain usernames or using these words in their displayed names. Choose the options you wish to use from the bottom before submitting.';
+
+$txt[700] = 'Welcome to';
+$txt[701] = 'You may change it after you log in by going to the profile page, or by visiting this page after you log in:';
+$txt[702] = 'Email Random Password to New Member Upon Registration?';
+$txt[703] = 'Thank you for registering. You will receive an email soon with your password. You may change the password after you login for the first time.';
+
+##### do not translate these 3 lines except the words 'on', 'wrote', and 'code sample'
+$txt[704] = '<br /><i>on DATE, <a href="QUOTELINK">AUTHOR wrote</a>:</i><table bgcolor="' . $color['bordercolor'] . '" class="bordercolor" cellspacing="1" width="90%"><tr><td width="100%"><table cellpadding="2" cellspacing="0" class="quote" width="100%"><tr><td width="100%"><font face="Arial,Helvetica" class="quote" size="1">QUOTE</font></td></tr></table></td></tr></table>';
+$txt[705] = '<br /><i>Quote:</i><table bgcolor="' . $color['bordercolor'] . '" class="bordercolor" cellspacing="1" width="90%"><tr><td width="100%"><table cellpadding="2" cellspacing="0" class="quote" width="100%"><tr><td width="100%"><font face="Arial,Helvetica" class="quote" size="1">QUOTE</font></td></tr></table></td></tr></table>';
+$txt[706] = '<br /><b>Code:</b><br /><table bgcolor="' . $color['bordercolor'] . '" class="bordercolor" cellspacing="1"><tr><td><table cellpadding="2" cellspacing="0" class="code"><tr><td><font face="Courier New" class="code" size="1">CODE</font></td></tr></table></td></tr></table>';
+#####
+
+$txt[707] = 'Send the topic';
+$txt[708] = 'to a friend.';
+$txt[709] = 'The board is missing from the query.';
+$txt[710] = 'The topic is missing from the query.';
+$txt[711] = 'Dear';
+$txt[712] = 'I want you to check out the following topic';
+$txt[713] = 'To view it, please click the link below';
+$txt[714] = 'Thanks';
+$txt[715] = 'Your name';
+$txt[716] = 'Your email address';
+$txt[717] = 'Recipient\'s name';
+$txt[718] = 'Recipient\'s email address';
+
+$txt[719] = 'Your username is: ';
+
+$txt[721] = 'Hide E-Mail from public?';
+$txt[722] = 'hidden';
+$txt[723] = 'Allow users to hide their email from public (except admin)?';
+
+$txt[724] = 'IP banning: (e.g. 192.168.12.213 or 128.0.*.*) - one entry per line';
+$txt[725] = 'Email banning: (e.g. badguy@somewhere.com) - one entry per line';
+$txt[7252] = 'User name banning: (e.g. l33tuser) - one entry per line';
+
+$txt[726] = 'Match whole name only. If unchecked, will search for reserved words within name.';
+$txt[727] = 'Match case. If unchecked, search will be case insensitive.';
+$txt[728] = 'Check username.';
+$txt[729] = 'Check display name.';
+
+$txt[730] = 'That email address';
+$txt[731] = 'is being used by a registered member already. If you feel this is a mistake, go to the login page and use the password reminder with that address.';
+
+$txt[732] = 'Show Board Descriptions in the Message Index?';
+
+$txt[733] = 'Your password has been changed. It is now';
+$txt[734] = 'and your username is';
+$txt[735] = 'You can email anyone from this page. The email addresses of the selected membergroups should appear below, but you may remove or add any email addresses you wish. Be sure that each address is separated in this fashion: \'address1; address2\'.';
+
+$txt[736] = 'Are you sure you want to remove this category?';
+$txt[737] = 'Check all';
+$txt[738] = 'Below is a list of the category id\'s that you have. You may move them around (one per line) then submit to reorder them in that order. If you accidentally delete an id completely, you may type it back in and resubmit, and the category will reappear.';
+
+$txt[739] = 'Time in milliseconds to display each item in the news fader';
+$txt[740] = 'Show YaBBC Buttons on Posting and IM send Pages?';
+
+$txt[741] = 'Current forum time';
+
+$txt[742] = 'Total Clicks';
+$txt[743] = 'Total Unique Visitors';
+$txt[744] = 'Total Browsers';
+$txt[745] = 'Total Operating Systems';
+
+$txt[746] = 'Enable Members to Select Profile Avatars?';
+
+$txt[747] = 'could not be messaged. The usernames are either invalid, or they have you on their ignore list.';
+$txt[748] = '(multiple recipients as \'username1, username2\')';
+
+$txt[749] = 'The \'number of posts\' box can only contain digits.';
+$txt[888] = 'Most Online:';
+
+$txt[752] = 'Cancel';
+
+$txt[1000] = 'Changed, although the following user or users do not exist, and therefore can\'t be moderators:';
+
+$txt[1001] = 'Database Error';
+$txt[1002] = 'Please try again.  If you come back to this error screen, report the error to an administrator.';
+$txt[1003] = 'File';
+$txt[1004] = 'Line';
+
+$txt[1005] = 'Close window';
+
+$txt['main'] = 'Main';
+
+$txt['yse1'] = 'Failed to make backup of Settings.php';
+$txt['yse2'] = 'Installed \'Mods\' Settings and Options';
+$txt['yse3'] = 'This page allows you to change the settings of mods installed in your forum.';
+$txt['yse4'] = 'Enable Sticky Topics';
+$txt['yse5'] = 'Server on which the database resides';
+$txt['yse6'] = 'Database Username';
+$txt['yse7'] = 'Database Password';
+$txt['yse8'] = 'Database Name';
+$txt['yse9'] = 'Enable Today Mod';
+$txt['yse10'] = '<b>Today</b> at ';
+$txt['yse10b'] = '<b>Yesterday</b> at ';
+$txt['yse11'] = 'Edit Registration Agreement';
+$txt['yse12'] = 'This agreement is only displayed if you have toggled require agreement in your Forum Preferences and Settings.';
+$txt['yse13'] = 'Lock after Post';
+$txt['yse14'] = 'Check this if you wish to be notified of replies to this topic.';
+$txt['yse15'] = 'Check this if you wish to lock this thread after this post.';
+$txt['yse16'] = 'shortcuts (IE and NS6 only): hit alt+s to submit/post, alt+p to preview, or alt+r to reset';
+$txt['yse17'] = 'Enable Previous/Next Topic Mod';
+$txt['yse18'] = 'Previous Topic Link';
+$txt['yse19'] = 'Next Topic Link';
+$txt['yse20'] = 'Post New Poll';
+$txt['yse21'] = 'Question';
+$txt['yse22'] = 'Option';
+$txt['yse23'] = 'Submit Vote';
+$txt['yse24'] = 'Total Votes';
+$txt['yse25'] = 'shortcuts (IE and NS6 only): hit alt+s to submit/post, or alt+r to reset';
+$txt['yse26'] = 'You didn\'t select a vote option.';
+$txt['yse27'] = 'Either that poll doesn\'t exist, the poll has been locked, or you tried to vote twice.';
+$txt['yse28'] = 'This option is only available to registered members.';
+$txt['yse29'] = 'View results.';
+$txt['yse30'] = 'Lock Voting';
+$txt['yse30b'] = 'Unlock Voting';
+$txt['yse31'] = 'This was locked by an administrator.  You cannot unlock it.';
+$txt['yse32'] = 'Enable Polls';
+$txt['yse33'] = 'Show Polls as Topics';
+$txt['yse34'] = 'Disable Polls';
+$txt['yse35'] = 'Poll Mod Mode';
+$txt['yse36'] = 'Poll Posting Restrictions';
+$txt['yse37'] = 'Administrators Only';
+$txt['yse38'] = 'Any Registered Member';
+$txt['yse39'] = 'Edit Poll';
+$txt['yse40'] = 'Reset Vote Count';
+$txt['yse41'] = 'Check this if you want to reset all vote counts to 0.';
+$txt['yse42'] = 'votes';
+$txt['yse43'] = 'Poll';
+$txt['yse44'] = 'Poll Editing Restrictions';
+$txt['yse45'] = 'Administrators and Moderators';
+$txt['yse46'] = 'Administrators, Moderators and Poll Creator';
+$txt['yse47'] = '1 Day';
+$txt['yse48'] = '1 Week';
+$txt['yse49'] = '1 Month';
+$txt['yse50'] = 'Forever';
+$txt['yse51'] = 'Enable VB Style Login';
+$txt['yse52'] = 'Login with username, password and session length';
+$txt['yse53'] = '1 Hour';
+$txt['yse54'] = 'Database Tables Prefix';
+$txt['yse55'] = "Select the membergroups to whom you want to grant access to this category.  Hold down the ctrl key to select multiple entries.  Click the $txt[17] button when you are done.";
+$txt['yse56'] = 'MOVED';
+$txt['yse57'] = 'Please enter a brief description as to<br />why this topic is being moved.';
+$txt['yse58'] = 'Enable Compressed Output';
+$txt['yse59'] = 'This option will compress output to lower bandwidth<br />consumption, but it requires zlib to be installed.';
+$txt['yse60'] = 'Sorry, you don\'t have enough posts to modify karma - you need at least ';
+$txt['yse61'] = 'Sorry, you are not permitted to modify your own karma.';
+$txt['yse62'] = 'Sorry, you can\'t repeat an action within the wait time.  You must wait ';
+$txt['yse63'] = 'Sorry, this feature is disabled.';
+$txt['yse64'] = 'Disable Karma|Enable Karma Total|Enable Karma Positive/Negative';
+$txt['yse65'] = 'Restrict Admins to wait time';
+$txt['yse66'] = 'Set wait time in hours';
+$txt['yse67'] = 'Set the min # of posts needed to modify karma';
+$txt['yse68'] = 'Allowed membergroups (blank for all)';
+$txt['yse69'] = 'Karma Label|Karma Smite Label|Karma Applaud Label';
+$txt['yse70'] = 'Karma Mode';
+$txt['yse71'] = 'Inactive members for at least';
+$txt['yse72'] = 'days';
+$txt['yse73'] = 'Listing of board errors';
+$txt['yse74'] = 'The following errors are fouling up your board (blank if none)';
+$txt['yse75'] = 'has a bad first message';
+$txt['yse76'] = 'has a bad last message';
+$txt['yse78'] = 'Fatal Error';
+$txt['yse79'] = '\'s Board ID is';
+$txt['yse80'] = 'It, and any messages inside, will be deleted.';
+$txt['yse81'] = 'does not have a matching board';
+$txt['yse82'] = 'Board';
+$txt['yse83'] = 'does not have a matching category';
+$txt['yse84'] = 'Category';
+$txt['yse85'] = 'Would you like to fix these errors?';
+$txt['yse86'] = 'Fixing board errors';
+$txt['yse87'] = 'Error updating';
+$txt['yse88'] = 'in';
+$txt['yse89'] = 'Error creating a';
+$txt['yse90'] = 'the number of topics in ';
+$txt['yse91'] = 'the number of posts in ';
+$txt['yse92'] = 'All errors fixed! You will want to check on any created categories, boards, or topics to decide what to do with them.';
+$txt['yse93'] = 'Disable recent posts';
+$txt['yse94'] = 'Enable single post';
+$txt['yse95'] = 'Enable multiple posts';
+$txt['yse96'] = 'Sticky Topic';
+$txt['yse97'] = 'Locked Sticky Topic';
+$txt['yse98'] = 'Locked Poll';
+$txt['yse99'] = 'View All Inactive Members';
+$txt['yse100'] = 'Username/Email';
+$txt['yse101'] = 'by User:';
+$txt['yse102'] = 'by Email:';
+$txt['yse103'] = 'Disable output caching';
+$txt['yse104'] = 'Checking this box will make your board more secure.';
+$txt['yse105'] = 'Enable inline links';
+$txt['yse106'] = 'Enabling this will cause your current location to be down in a single line, as opposed to in a tree-like manner.';
+
+$txt['yse110'] = 'Attachments Mode';
+$txt['yse111'] = 'Disable Attachments|Enable All Attachments|Disable New Attachments';
+$txt['yse112'] = 'Display Attachment as Picture in Post';
+$txt['yse113'] = 'Check Attachment Extension';
+$txt['yse114'] = 'Allowed Attachment Extensions';
+$txt['yse115'] = 'Attachments Upload Path';
+$txt['yse116'] = 'Attachments URL';
+$txt['yse117'] = 'Max Attachment Size (in kB)';
+$txt['yse118'] = 'Max Attachment Folder Space (in kB)';
+$txt['yse119'] = 'Attach';
+$txt['yse120'] = 'Allowed file types';
+$txt['yse121'] = 'Maximum attachment size allowed';
+$txt['yse122'] = 'Your file is too large. The maximum attachment size allowed is';
+$txt['yse123'] = 'You cannot upload that type of file. The only allowed extensions are';
+$txt['yse124'] = 'There was an error saving your attachment, please try again.';
+$txt['yse125'] = 'Sorry! That filename is already taken. Please rename the file and try again.';
+$txt['yse126'] = "The upload folder is full. Please try a smaller file and contact the <a href=\"mailto:$webmaster_email\">administrator</a>.";
+$txt['yse127'] = 'Allow guests to post attachments?';
+$txt['yse128'] = 'Restrict attachments to member groups';
+$txt['yse129'] = 'To delete your attachment, leave this blank.';
+$txt['yse130'] = 'Check here to delete your attachment.';
+$txt['yse130b'] = 'That is a restricted filename. Please try a different filename.';
+
+$txt['yse138'] = 'Delete';
+$txt['yse152'] = '
+        Before you proceed you must be very sure that you want to do this. These mods come with no
+        warranty, and <b>might</b> screw up your board. Before proceeding make sure that:
+        <ul>
+                <li>The modification is compatible with the current version you\'re running</li>
+                <li>You have backed up your current YaBB sources</li>
+                <li>You have a recent database backup</li>
+                <li>You only apply mods from trusted sources</li>
+        </ul>';
+
+$txt['yse153'] = 'Apply mod';
+$txt['yse154'] = 'Proceed';
+$txt['yse155'] = 'Applying mod';
+$txt['yse156'] = 'Extracting archive';
+$txt['yse157'] = 'Modification file was extracted, now the modification file which came with it should be applied.';
+$txt['yse158'] = 'Test (recommended)';
+$txt['yse159'] = 'Apply';
+$txt['yse160'] = 'Modification file was extracted, but this modification also comes with a php script which should be executed before it will work';
+$txt['yse161'] = 'Run';
+$txt['yse162'] = 'Modification file was extracted, this modification also comes with a textfile with additional instructions/information, it\'s recommended that you read it.';
+$txt['yse163'] = 'Read';
+$txt['yse164'] = 'Modding was done successfully. Everything should work now.';
+$txt['yse166'] = 'backup is called ';
+$txt['yse167'] = 'We\'re going to look for:';
+$txt['yse168'] = 'String <b>found</b>, I will now add:';
+$txt['yse168b'] = 'String <b>found</b>, I will now add before it:';
+$txt['yse169'] = 'String <b>not found</b>, there\'s probably an error in your mod.';
+$txt['yse170'] = 'String <b>found</b>, I will now replace it with:';
+$txt['yse171'] = 'Modification would have completed if this weren\'t a test, so if there were no errors, the mod could be applied, hit the back button in your browser.';
+$txt['yse172'] = 'Modification file was applied, ';
+$txt['yse173'] = 'Script output:';
+$txt['yse174'] = 'Additional notes';
+$txt['yse175'] = 'Instruction/Additional notes file';
+$txt['yse180'] = 'List files in package';
+$txt['yse181'] = 'Files in archive';
+$txt['yse182'] = 'Package Get';
+$txt['yse183'] = 'Package servers';
+$txt['yse184'] = 'Browse';
+$txt['yse185'] = 'Add server';
+$txt['yse186'] = 'Server name';
+$txt['yse187'] = 'URL';
+$txt['yse189'] = 'No packages yet';
+$txt['yse190'] = 'Download';
+$txt['yse191'] = 'Could not connect to server or could not find file';
+$txt['yse192'] = 'Package downloaded successfully';
+$txt['yse193'] = 'Package has been downloaded successfully';
+$txt['yse198'] = 'Package Manager';
+$txt['yse159b'] = 'Apply Mod';
+$txt['yse162b'] = 'Modification file was extracted, this modification also comes with a SQL file with modifications the database needs.  It is a good idea to run it.';
+$txt['yse163b'] = 'Run';
+$txt['yse174b'] = 'SQL Queries';
+$txt['yse175b'] = 'The following SQL instructions were executed:';
+$txt['yse175c'] = 'The MySQL database returned this:';
+$txt['yse175d'] = 'ERROR: MySQL queries failed!  Please try to do the MySQL queries manually or the mod may not work.<br />\nMySQL returned this:<br />\n';
+$txt['yse175e'] = 'Success!';
+$txt['yse171b'] = 'Uninstallation would have completed if this weren\'t a test, so if there were no errors, the mod could be applied, hit the back button in your browser.';
+$txt['yse172b'] = 'Uninstallation Completed, ';
+$txt['yse189b'] = 'No mods currently installed';
+$txt['yse188b'] = 'Browse installed mods';
+$txt['yse198b'] = 'Uninstall';
+$txt['yse198c'] = 'Uninstalling Mod';
+$txt['yse198d'] = 'Delete Mod List';
+$txt['yse198e'] = 'Test Uninstallation';
+$txt['yse198f'] = 'That mod is already installed!';
+$txt['yse198g'] = 'I know it isn\'t installed, so install it anyway';
+$txt['yse198h'] = 'Sorry, you server has PHP set to SAFE MODE.  This feature is not compatible with SAFE MODE.  Sorry.';
+$txt['yse198i'] = 'Let me try anyway.';
+$txt['yse199'] = 'Your Instant Messages';
+$txt['yse200'] = 'Enable SP1 style statistics on board index';
+
+// attachment admin stuff
+$txt['yse201'] = 'Attachment Manager';
+$txt['yse202'] = 'From here you can administer the attached files on your system. You can delete attachments by size and by date from your system. Statistics on attachments are also displayed below.';
+$txt['yse203'] = 'File Attachment Statistics';
+$txt['yse204'] = 'Total Attachments';
+$txt['yse205'] = 'Total Size of Attachment Directory';
+$txt['yse206'] = 'Total Space Available in Attachment Directory';
+$txt['yse207'] = 'File Attachment Options';
+$txt['yse208'] = 'Attachment Log';
+$txt['yse209'] = 'Remove attachments older than';
+$txt['yse210'] = 'Remove attachments larger than';
+$txt['yse211'] = 'KB';
+$txt['yse212'] = 'Your current uploads';
+$txt['yse213'] = 'Attachment Name';
+$txt['yse214'] = 'File Size';
+$txt['yse215'] = 'No maximum directory size is currently set';
+$txt['yse216'] = '[attachment deleted by admin]';
+
+$txt['yse217'] = 'Live from www.yabbse.org...';
+$asmtxt['01'] = "Add more Smilies";
+$asmtxt['02'] = "Smiley Code";
+$asmtxt['03'] = "Name of the Smiley Pic";
+$asmtxt['04'] = "Linebreak?";
+$asmtxt['05'] = "Pic";
+$asmtxt['06'] = "Del?";
+$asmtxt['07'] = "Edit Added Smilies!";
+$asmtxt['08'] = "Submit Changes";
+$asmtxt['09'] = "Undo Changes";
+$asmtxt['10'] = "Smilies:";
+$asmtxt['11'] = "Smilies List";
+$asmtxt['12'] = "Click a smiley to insert it into your message.";
+$asmtxt['13'] = "Show vB Style Smiley Display?";
+$asmtxt['14'] = "Height of Smiley Popup Window:";
+$asmtxt['15'] = "Width of Smiley Popup Window:";
+$asmtxt['16'] = "Back to Mod Settings";
+$asmtxt['17'] = "Back to Admin Panel";
+$asmtxt['18'] = "Get More";
+$asmtxt['19'] = "Showing 16 of";
+$asmtxt['20'] = "close this window";
+$asmtxt['21'] = "Order";
+$asmtxt['22'] = "Enable Smiley Order Change?";
+$asmtxt['23'] = "Description";
+$asmtxt['24'] = "Enable Smiley Block?";
+$asmtxt['25'] = "View All Smilies";
+$asmtxt['26'] = "Enable Smileydir Reading?";
+
+$txt['yse218'] = 'Allow users to lock topics they start';
+$txt['yse219'] = 'Remove All';
+$txt['yse220'] = 'View Newest Messages First';
+$txt['yse221'] = 'Track Stats';
+$txt['yse222'] = 'Track Hits (must have stats enabled)';
+$txt['yse223'] = '[More Stats]';
+$txt['yse224'] = 'Enable User Selectable Language Support';
+$txt['yse225'] = 'Language';
+
+$txt['yse226'] = 'Please specify the URL of your avatar image';
+$txt['yse227'] = 'Avatar image is too big, please resize it and try again (max';
+$txt['yse228'] = 'In the specified URL couldn\'t be loaded an Image, please verify URL';
+$txt['yse229'] = 'Please click [Change Profile] button to validate Avatar';
+$txt['yse230'] = 'Please select a board to search.';
+$txt['yse231'] = 'Censor whole word checked';
+$txt['yse232'] = 'The board you specified doesn\'t exist';
+$txt['yse233'] = 'Invalid Date Registered value, valid example:';
+$txt['yse234'] = 'Enable Compact Topic Pages Mod';
+$txt['yse235'] = 'Contiguous pages to display:';
+$txt['yse236'] = 'to display';
+
+$txt['yse237'] = 'Your MSN messenger email address';
+$txt['yse238'] = 'Code';
+$txt['yse239'] = 'Quote from';
+$txt['yse240'] = 'Quote';
+
+$txt['yse241'] = 'Current Password';
+$txt['yse242'] = 'The current Password is invalid.';
+$txt['yse243'] = 'You haven\'t entered your current Password.';
+$txt['yse244'] = 'You have to enter your current Password to make any changes to your Profile.';
+
+$txt['yse245'] = 'Mail type';
+$txt['yse246'] = 'SMTP Server';
+$txt['yse247'] = 'SMTP Username';
+$txt['yse248'] = 'SMTP Password';
+
+$txt['yse249'] = 'Are you sure you want to delete all selected Instant Messages?';
+
+$txt['yse250'] = 'Please select the Member Group(s) you would like to send an email to.';
+
+$txt['yse251'] = 'Split Topic';
+$txt['yse252'] = 'Merge Topics';
+$txt['yse253'] = 'You are not allowed to split topics';
+$txt['yse254'] = 'Subject For New Topic:';
+$txt['yse255'] = 'Only split this post.';
+$txt['yse256'] = 'Split topic after and including this post.';
+$txt['yse257'] = 'Select posts to split.';
+$txt['yse258'] = 'New Topic';
+$txt['yse259'] = 'Topic successfully split into two topics.';
+$txt['yse260'] = 'Origin Topic';
+$txt['yse261'] = 'Please select which posts you wish to split.';
+$txt['yse262'] = 'You are not allowed to merge topics';
+$txt['yse263'] = 'You specified an invalid topic ID.';
+$txt['yse264'] = 'Topics successfully merged.';
+$txt['yse265'] = 'Newly Merged Topic';
+$txt['yse266'] = 'Topic to be merged:';
+$txt['yse267'] = 'Target board:';
+$txt['yse268'] = 'You cannot split a topic at the first post.';
+$txt['yse269'] = 'Target topic:';
+$txt['yse270'] = 'This topic only contains one message and cannot be split';
+$txt['yse271'] = 'no messages selected';
+$txt['yse271b'] = 'Unable to split. You have selected every message.';
+$txt['yse272'] = 'Unable to find messages';
+$txt['yse273'] = 'Unable to insert topic';
+$txt['yse274'] = 'Are you sure you want to merge';
+$txt['yse275'] = 'with';
+$txt['yse276'] = 'This function will merge the messages of two topics into one topic. The messages will be sorted according to the time of posting. Therefore the most early posted message will be the first message of the merged topic.';
+
+$txt['yse277'] = 'Set topic sticky';
+$txt['yse278'] = 'Set topic non-sticky';
+$txt['yse279'] = 'Lock topic';
+$txt['yse280'] = 'Unlock topic';
+
+$txt['yse281'] = 'Optimize Database';
+$txt['yse282'] = 'Your database contains ';
+$txt['yse282b'] = 'table(s)';
+$txt['yse283'] = 'Attempting to optimize your database...';
+$txt['yse284'] = ' kb optimized.';
+$txt['yse285'] = 'All of the tables were already optimized.';
+$txt['yse285b'] = 'It wasn\'t necessary to optimize any tables.';
+$txt['yse286'] = ' table(s) optimized.';
+
+$txt['yse286a'] = 'Dump Database';
+$txt['yse286b'] = 'Save Database - structure only';
+$txt['yse286c'] = 'Save Database - data only';
+$txt['yse286d'] = 'Save Database - data and structure';
+
+$txt['yse287'] = 'Warning: topic is currently locked!<br />Only admins and moderators can reply.';
+
+$txt['yse288'] = 'View By Membergroup';
+
+$txt['yse289'] = 'You have chosen a username of an already existing moderator. Please choose another username';
+
+$txt['yse290'] = 'Disabled';
+$txt['yse291'] = 'Only Today';
+$txt['yse292'] = 'Today & Yesterday';
+
+$txt['yse293'] = 'Karma';
+$txt['yse294'] = 'Attachments';
+$txt['yse295'] = 'Enable go back to topic after posting';
+$txt['yse296'] = 'Enable remove nested quotes';
+$txt['yse297'] = 'Enable simple search';
+$txt['yse298'] = 'Advanced search';
+
+$txt['yse299'] = 'MAJOR SECURITY RISK:';
+$txt['yse300'] = 'You have not removed ';
+
+$txt['yse301'] = 'Page created in ';
+$txt['yse302'] = ' seconds.';
+$txt['yse303'] = 'Display time taken to create every page';
+
+$txt['yse304'] = 'Failure in submission of form. Session timeout.';
+$txt['yse305'] = 'Session check failure. Please try again.';
+$txt['yse306'] = 'Invalid referring site.';
+
+$txt['yse307'] = "has a non-existent topic ID";
+$txt['yse308'] = 'contains no messages';
+$txt['yse309'] = 'has a wrong number of replies';
+$txt['yse310'] = 'has a non-existent member ID';
+$txt['yse311'] = 'Succesfully inserted salvaged messages in salvage category';
+$txt['yse312'] = 'topic(s) without messages have been removed successfully';
+
+$txt['yse313'] = '<b>Warning</b>: enabling the max width/height restriction might decrease speed significantly!';
+
+$txt['yse314'] = 'Enable local storage of cookies';
+
+$txt['yse315'] = 'Use this function to inform the moderators and administrators of an abusive or wrongly posted message.';
+
+$txt['yse316'] = 'Pages Visited';
+$txt['yse317'] = 'Referring Pages';
+$txt['yse318'] = 'There are currently no Inactive Members in your Database.';
+
+
+$txt['title1'] = 'Custom Title';
+$txt['title2'] = 'Title';
+$txt['title3'] = 'Enable Custom Titles';
+
+$txt['online1'] = 'Show Online/Offline in posts and IM';
+$txt['online2'] = '<img src="' . $imagesdir . '/useron.gif" alt="" title="" border="0" align="middle" /></a><font size="1"> Online</font>';
+$txt['online3'] = '<img src="' . $imagesdir . '/useroff.gif" alt="" title="" border="0" align="middle" /></a><font size="1"> Offline</font>';
+$txt['online4'] = 'Instant Message (Online)';
+$txt['online5'] = 'Instant Message (Offline)';
+$txt['online6'] = '<img src="' . $imagesdir . '/useron.gif" alt="Instant Message (Online)" title="Instant Message (Online)" border="0" align="middle" /></a>';
+$txt['online7'] = '<img src="' . $imagesdir . '/useroff.gif" alt="Instant Message (Offline)" title="Instant Message (Offline)" border="0" align="middle" /></a>';
+$txt['online8'] = 'Status';
+$txt['count'] = 'Posts count 0 here';
+
+$txt['rtm1'] = 'Report to moderator';
+$txt['rtm2'] = 'Enter comment:';
+$txt['rtm3'] = 'Reported post';
+$txt['rtm4'] = 'by';
+$txt['rtm5'] = 'The following post has been reported by a user:';
+$txt['rtm6'] = 'Comment by reporting user';
+$txt['rtm7'] = 'Subject';
+$txt['rtm8'] = 'Poster';
+$txt['rtm9'] = 'Reply # in thread';
+$txt['rtm10'] = 'Submit';
+$txt['rtm11'] = 'No moderators found!';
+$txt['rtm12'] = 'Enable post reporting';
+
+$txt['errlog1'] = 'View forum error log';
+$txt['errlog2'] = 'The error log tracks every error encountered by your board.  This listing is a chronological list of said errors.  To delete any errors from the database, mark the checkbox, and click the ' . $txt[31] . ' button at the bottom of the page.';
+$txt['errlog3'] = 'Enable error logging';
+
+$txt['dvc1'] = 'This function submits a query to a php script at yabbse.org containing the version information for your install.  The script at yabbse.org will compare your versions to the latest versions.  If any of your files are out of date, the script will point you to a location where you can download the latest versions.  The details that will be submitted are listed below.';
+$txt['dvc2'] = 'Submit Version Check';
+
+$txt['lfyi'] = 'You are unable to connect to yabbse.org\'s XML file.<br />To see what\'s new, please <a href="javascript:reqWin(\'http://www.yabbse.org/yabbxml.php\')">click here</a>.';
+
+$txt['announcement1'] = 'You are not allowed to create a new topic here - this is an announcement board.';
+$txt['announcement2'] = 'Only allow moderators and admin to post in this board';
+
+$txt['yse_im_1'] = 'Error! This Message doesn\'t exist!';
+$txt['yse_im_2'] = 'Message-Text';
+$txt['yse_im_3'] = 'Sent';
+$txt['yse_im_4'] = 'write eMail';
+$txt['yse_im_5'] = 'Display Message';
+$txt['yse_im_6'] = 'Storage';
+
+$txt['yse_maxwidth'] = 'Max width of posted pictures (0 = disable)';
+$txt['yse_maxheight'] = 'Max height of posted pictures (0 = disable)';
+
+$txt['yse_news_1'] = 'comment';
+$txt['yse_news_2'] = 'comments';
+$txt['yse_news_3'] = 'Write Comment';
+
+$txt['yse_stats_1'] = 'Statistics Center';
+$txt['yse_stats_2'] = 'General Statistics';
+$txt['yse_stats_3'] = 'Top 10 Posters';
+$txt['yse_stats_4'] = 'Top 10 Boards';
+$txt['yse_stats_5'] = 'Forum History (using forum time offset)';
+$txt['yse_stats_6'] = 'Date (dd/mm/yyyy)';
+$txt['yse_stats_7'] = 'New Topics';
+$txt['yse_stats_8'] = 'New Posts';
+$txt['yse_stats_9'] = 'New Members';
+$txt['yse_stats_10'] = 'Hits';
+$txt['yse_stats_11'] = 'Top 10 Topics (by Replies)';
+$txt['yse_stats_12'] = 'Top 10 Topics (by Views)';
+$txt['yse_stats_13'] = 'Monthly Summary';
+$txt['yse_stats_14'] = 'Most Online';
+
+$txt['flashembed_enable'] = 'Embed flash? (otherwise show as link)<br /><b>(may be a security risk)</b>';
+
+//Top - Bottom MOD
+$txt['topbottom1'] = $menusep . '<a href="#bot"><img src="' . $imagesdir . '/go_down.gif" alt="Page Bottom" title="Page Bottom" border="0" align="middle" /></a>';
+$txt['topbottom2'] = $menusep . '<a href="#top"><img src="' . $imagesdir . '/go_up.gif" alt="Page Top" title="Page Top" border="0" align="middle" /></a>';
+$txt['topbottom3'] = 'Enable Go Up/Go Down Buttons';
+$txt['topbottom4'] = 'Go Up';
+$txt['topbottom5'] = 'Go Down';
+// YaBBpak Center
+$txt['package1'] = 'YaBBpak Center';
+$txt['package2'] = 'Main Menu';
+$txt['package3'] = 'Browse YaBBpaks';
+$txt['package4'] = 'Create a new YaBBpak';
+$txt['package5'] = 'Download new YaBBpaks';
+$txt['package6'] = 'View Installed YaBBpaks / Uninstall YaBBpaks';
+$txt['package7'] = 'Modification YaBBpaks';
+$txt['package8'] = 'Avatar YaBBpaks';
+$txt['package9'] = 'Language YaBBpaks';
+$txt['package10'] = 'Unknown YaBBpaks';
+$txt['package11'] = 'Apply Mod';
+$txt['package12'] = 'Use Avatars';
+$txt['package13'] = 'Add Language';
+$txt['package14'] = 'List Files';
+$txt['package15'] = 'Remove';
+$txt['package16'] = 'YaBBpak Creator';
+$txt['package17'] = 'Create YaBBpak';
+$txt['package18'] = 'Directory to Pack';
+$txt['package19'] = 'relative to your YaBB root directory';
+$txt['package20'] = 'Root Directory';
+$txt['package21'] = 'the root directory, normally can be empty';
+$txt['package22'] = 'YaBBpak Filename';
+$txt['package23'] = 'without extension';
+$txt['package24'] = 'YaBBpak Type';
+$txt['package25'] = 'Modification YaBBpak';
+$txt['package26'] = 'Avatar YaBBpak';
+$txt['package27'] = 'Language YaBBpak';
+$txt['package28'] = 'Generic YaBBpak';
+$txt['package29'] = 'Go!';
+$txt['package30'] = 'Packing';
+$txt['package31'] = 'Wrote ';
+$txt['package32'] = 'You can download this package now from here';
+$txt['package33'] = 'Download';
+$txt['package34'] = 'Archiving';
+$txt['package35'] = 'Skipping ';
+$txt['package36'] = ' because it\'s a newer version or a version of the same age';
+$txt['package37'] = 'Extracting';
+$txt['package38'] = 'Extracting Avatars';
+$txt['package39'] = 'The avatars have been extracted, you can now use them.';
+$txt['package40'] = 'Extracting language pack';
+$txt['package41'] = 'The language pack has been extracted, you can now use it (by setting it in your settings).';
+
+$txt['pacman1'] = '<br /><br /><font color="red" size="+1"><b>WARNING</b></font><br />This mod has not been approved by the official YaBBSE Mod council.<br /><br />';
+$txt['pacman2'] = 'Mod Name';
+$txt['pacman3'] = 'Version of Mod';
+$txt['pacman4'] = 'Author of Mod';
+$txt['pacman5'] = 'Author\'s Email Address';
+$txt['pacman6'] = 'Author\'s Homepage';
+$txt['pacman7'] = 'Mod Information';
+$txt['pacman8'] = 'No Description Given';
+$txt['pacman9'] = 'Description';
+$txt['pacman10'] = 'Location of file';
+$txt['pacman11'] = 'Original String:';
+$txt['pacman12'] = 'String <b>found</b>, now erasing this (which was after the original string):';
+$txt['pacman13'] = 'String <b>found</b>, now erasing this (which was before the original string):';
+$txt['pacman14'] = 'String <b>not found</b>, there\'s probably an error in your mod, or, your have modified this file since installation.';
+$txt['pacman15'] = 'String <b>found</b>, it has replaced this (which replaced the original string):';
+$txt['pacman27'] = 'Uninstalling:';
+// End YaBBpak Center
+
+$txt['notifyX'] = 'Notification Settings:';
+$txt['notifyX1'] = 'Save settings';
+$txt['notifyXAnn1'] = 'Allow users to disable notification from Announcements Boards?';
+$txt['notifyXAnn2'] = 'New announcement';
+$txt['notifyXAnn3'] = 'View it at';
+$txt['notifyXAnn4'] = 'Receive email notification when new Announcements';
+$txt['notifyXAnn5'] = 'Send notification when new posts';
+$txt['notifyXOnce1'] = 'Receive topics email notification ONLY in 1st unread reply';
+$txt['notifyXOnce2'] = 'More replies may be posted, but you won\'t receive more email notifications until you read the replies';
+
+// Profile enhancements
+$txt['pswd0'] = 'Define Secret Question';
+$txt['pswd1'] = 'Secret Question';
+$txt['pswd2'] = 'Answer';
+$txt['pswd3'] = 'Ask me my question';
+$txt['pswd4'] = 'By default, we help you retrieve your password by randomly generating a new one, and emailing it to you.  If you want, however, you can try to answer your secret question (as you defined in your profile).  If you get the answer right, you can define your new password right away.';
+$txt['pswd5'] = 'Sorry, but you did not specify a valid combination of Secret Question and Answer in your profile.  Please click on the back button, and use the default method of obtaining your password.';
+$txt['pswd6'] = 'Please enter the answer to your question, and the password you would like to use.  Your password will be changed to the one you select provided you answer the question correctly.';
+$txt['pswd7'] = 'Sorry, but you did not answer your question correctly.  Please click back to try again, or click back twice to use the default method of obtaining your password.';
+$txt['pswd8'] = 'Your password was changed successfully.<br />Click <a href="' . $boardurl . '?action=login">here</a> to login.';
+
+$yycopyright = "<font face=\"Verdana, Arial\" size=\"1\"> $mbname | Powered by <a href=\"http://www.yabbse.org/index.php?affiliate=$mbname;l=$boardurl;v=$YaBBversion\" target=\"_blank\">YaBB SE</a><br />\n&copy; 2001-2003, YaBB SE Dev Team. All Rights Reserved.\n<br>&copy; 2002 - " . date('Y') . ", <a href=\"//www.theprodigy.ru\">theprodigy.ru</a> team.</font>";
+
+$img['im_config_small'] = '<img src="' . $imagesdir . '/im_sm_prefs.gif" alt="' . $txt[323] . '" title="' . $txt[323] . '" border="0" />';
+$img['im_new_small'] = '<img src="' . $imagesdir . '/im_sm_newmsg.gif" alt="' . $txt[321] . '" title="' . $txt[321] . '" border="0" />';
+
+$txt['profileConfirm'] = 'Do you really want to delete this user?';
+$txt['catConfirm'] = 'Do you really want to delete this category?';
+$txt['boardConfirm'] = 'Do you really want to delete this board?';
+
+$txt['delFirstPost'] = 'You are not allowed to delete the first post in a topic.<p>If you want to delete this topic, click on the Remove Topic link, or ask a moderator/administrator to do it for you.</p>';
+
+
+// Calendar.
+$txt['calendar1'] = 'Invalid month value.';
+$txt['calendar2'] = 'Invalid year value.';
+$txt['calendar3'] = 'Birthdays:';
+$txt['calendar4'] = 'Events:';
+$txt['calendar5'] = '';  // Prompt for holidays in the calendar, leave blank to just display the holiday's name.
+$txt['calendar6'] = 'You are not allowed to post events.';
+$txt['calendar7'] = 'Event month is missing.';
+$txt['calendar8'] = 'Event year is missing.';
+$txt['calendar9'] = 'Month:';
+$txt['calendar10'] = 'Year:';
+$txt['calendar11'] = 'Day:';
+$txt['calendar12'] = 'Event Title:';
+$txt['calendar13'] = 'Post In:';
+$txt['calendar14'] = 'Event day is missing.';
+$txt['calendar15'] = 'Event title is missing.';
+$txt['calendar16'] = 'Invalid date.';
+$txt['calendar17'] = 'No event title was entered.';
+$txt['calendar18'] = 'Missing event ID.';
+$txt['calendar19'] = 'You do not have permission to edit this event.';
+$txt['calendar20'] = 'Edit Event';
+$txt['calendar21'] = 'Delete this event?';
+$txt['calendar22'] = 'Delete Event';
+$txt['calendar23'] = 'Post Event';
+$txt['calendar24'] = 'Calendar';
+$txt['calendar25'] = 'Enabled';
+$txt['calendar26'] = 'Minimum Year';
+$txt['calendar27'] = 'Maximum Year';
+$txt['calendar28'] = 'Current Day Color';
+$txt['calendar29'] = 'Birthday Color';
+$txt['calendar30'] = 'Event Color';
+$txt['calendar31'] = 'Holiday Color';
+$txt['calendar32'] = 'Groups Allowed to Post';
+$txt['calendar33'] = 'All Members Can Post';
+$txt['calendar34'] = 'Show Days as Link to \'Post Event\'';
+$txt['calendar35'] = 'Start Week on Monday';
+$txt['calendar36'] = 'Default Board to Post In';
+$txt['calendar37'] = 'Link to Calendar';
+$txt['calendar38'] = 'Board ID is missing.';
+$txt['calendar39'] = 'Topic ID is missing.';
+$txt['calendar40'] = 'Topic doesn\'t exist.';
+$txt['calendar41'] = 'You are not the owner of this topic.';
+$txt['calendar42'] = 'The board does not exist.';
+$txt['calendar43'] = 'Link Event';
+$txt['calendar44'] = 'Show Events on Board Index';
+$txt['calendar45'] = 'Show Birthdays on Board Index';
+$txt['calendar46'] = 'Show Holidays on Board Index';
+$txt['calendar47'] = 'Calendar Today';
+$txt['calendar48'] = 'Caption Color';
+$txt['calendar49'] = 'Members Allowed to Post';
+$txt['calendar50'] = 'Show Week Numbers';
+$txt['calendar51'] = 'Week';
+$txt['calendar52'] = 'Allow Events to Span Multiple Days';
+$txt['calendar53'] = 'Max Number of Days an Event Can Span';
+$txt['calendar54'] = 'Number of Days:';
+$txt['calendar55'] = 'The span feature is currently disabled.';
+$txt['calendar56'] = 'Invalid number of days to span.';
+// Added by Hierarchical Categories MOD - begin
+$txt['Hierarchical1']  = "Expand All";
+$txt['Hierarchical2']  = "Collapse All";
+$txt['Hierarchical3']  = "Enable Collapsable Categories";
+$txt['Hierarchical4']  = "Show &#171; and &#187; around category titles";
+$txt['Hierarchical5']  = "Show blue/black diamond icon when category collapsed";
+$txt['Hierarchical6']  = "Show 'new' icon at end of category name when collapsed";
+$txt['Hierarchical7']  = "Show category expanded/collapsed arrow";
+$txt['Hierarchical8']  = "Enable Board Notifications";
+$txt['Hierarchical9']  = "&nbsp;&nbsp;&nbsp;Board Notify";
+$txt['Hierarchical10'] = "Enable";
+$txt['Hierarchical11'] = "Disable";
+$txt['Hierarchical12'] = "Hierarchical Categories";
+$txt['Hierarchical13'] = "Board notify:&nbsp;";
+$txt['Hierarchical14'] = "Off";
+$txt['Hierarchical15'] = "On";
+$txt['Hierarchical16'] = "Notification is OFF for this board, click to turn ON email notifications for any new posts in this board";
+$txt['Hierarchical17'] = "Email notifications will be sent for any new posts in this board, click to turn OFF";
+$txt['Hierarchical18'] = "Send Notification";
+$txt['Hierarchical19'] = "Uncheck this if you don't want notification emails to be sent after saving";
+$txt['Hierarchical20'] = "E-Mail Notifications Enabled";
+$txt['Hierarchical21'] = "Parent Category";
+$txt['Hierarchical22'] = "- No Parent -";
+$txt['Hierarchical23'] = "The immediate parent for this category, or select no parent for a top level category";
+$txt['Hierarchical24'] = "Notification for ";
+$txt['Hierarchical25'] = "There has been a post in the board ";
+$txt['Hierarchical26'] = "A post has been modified in the board ";
+$txt['Hierarchical27'] = " with the subject ";
+$txt['Hierarchical28'] = "Allow any user to modify posts when no moderator set";
+$txt['Hierarchical29'] = "Collapse or expand this category";
+$txt['Hierarchical30'] = "Enable email notification of any new posts in all boards in this category and subcategories";
+$txt['Hierarchical31'] = "Disable email notification of any new posts in all boards in this category and subcategories";
+$txt['Hierarchical32'] = "Show topic notifications in board view";
+$txt['Hierarchical33'] = " Board Statistics Center";
+$txt['Hierarchical34'] = 'Top 10 Topic Starters';
+$txt['Hierarchical35'] = 'Top 10 Message Posters';
+$txt['Hierarchical36'] = 'Board Usage';
+$txt['Hierarchical37'] = 'Users This Month';
+$txt['Hierarchical38'] = 'Users Last Month';
+$txt['Hierarchical39'] = 'Total Usage';
+$txt['Hierarchical40'] = 'Visits';
+$txt['Hierarchical41'] = 'Forum Usage';
+$txt['Hierarchical42'] = 'Boards This Month';
+$txt['Hierarchical43'] = 'Boards Last Month';
+$txt['Hierarchical44'] = 'Delete stats for this month in ALL boards';
+$txt['Hierarchical45'] = 'Are you sure you want to delete the stats for this month in ALL the boards?';
+$txt['Hierarchical46'] = 'Enable board usage stats';
+$txt['Hierarchical47'] = 'Number of seconds needed to register another visit';
+$txt['Hierarchical48'] = 'Only allow admin and moderators access to board usage stats';
+// Added by Hierarchical Categories MOD - end
+
+// Undelete mod
+$txt['undelete1'] = "Undelete Topics/Messages";
+$txt['undelete2'] = "Enable Undelete Mod";
+$txt['undelete3'] = "UnDelete attachments (if unchecked attachments will be deleted as normal)";
+$txt['undelete4'] = "Enable UnDelete for posts that are deleted by ordinary members (if unchecked only posts/topics deleted by mods/gmods/admins can be undeleted)";
+$txt['undelete5'] = "Undelete Mod - Viewing Deleted";
+$txt['undelete6'] = "View Deleted";
+$txt['undelete7'] = "Viewing Deleted";
+$txt['undelete8'] = "There are no deleted";
+$txt['undelete9'] = "Refresh";
+$txt['undelete10'] = "Board";
+$txt['undelete11'] = "Posted By";
+$txt['undelete12'] = "Posted At";
+$txt['undelete13'] = "Deleted By";
+$txt['undelete14'] = "Deleted At";
+$txt['undelete15'] = "Started By";
+$txt['undelete16'] = "# Replies";
+$txt['undelete17'] = "# Views";
+$txt['undelete18'] = "Show";
+$txt['undelete19'] = "results, starting at result";
+$txt['undelete20'] = "total";
+$txt['undelete21'] = "UnDelete Selected";
+$txt['undelete22'] = "Clear Selected";
+$txt['undelete23'] = "Messages";
+$txt['undelete24'] = "Undelete Mod - Deleting";
+$txt['undelete25'] = "ERROR! Parent topic";
+$txt['undelete26'] = "not found for message";
+$txt['undelete27'] = "UNDELETE FAILED!";
+$txt['undelete28'] = "Inserting message";
+$txt['undelete29'] = "back into topic";
+$txt['undelete30'] = "Updating board and topic post counts";
+$txt['undelete31'] = "New message is the last post, updating topic";
+$txt['undelete32'] = "New message is older than the newest post, <b>not</b> updating topic";
+$txt['undelete33'] = "Deleting message from undelete table";
+$txt['undelete34'] = "ERROR! Duplicate topic";
+$txt['undelete35'] = "Inserting old topic";
+$txt['undelete36'] = "as a new topic into {$db_prefix}topics";
+$txt['undelete37'] = "Adding this topic to board topic count";
+$txt['undelete38'] = "Inserting old message as new message";
+$txt['undelete39'] = "into {$db_prefix}messages";
+$txt['undelete40'] = "Updating message";
+$txt['undelete41'] = "Updating board post count";
+$txt['undelete42'] = "Deleting old topic and messages from undelete tables";
+$txt['undelete43'] = "UNDELETE DONE!";
+$txt['undelete44'] = "Deleting message";
+$txt['undelete45'] = "Deleting topic";
+$txt['undelete46'] = "Deleting messages in topic";
+$txt['undelete47'] = "Deleting attachment(s)";
+$txt['undelete48'] = "CLEARED!";
+$txt['undelete49'] = "Automatically clear deleted topics/messages after # days (0 for never)";
+
+// Topic Summary Mod
+$txt['tsum1'] = "Summary";
+$txt['tsum2'] = "Close";
+$txt['tsum3'] = "Topic Summary";
+$txt['tsum4'] = "Return to summary";
+$txt['tsum5'] = "Check to return to index and topic summary.";
+$txt['tsum6'] = "does not exist!";
+
+// Enhanced ban mod
+$txt['enhancedban1'] = "Ban Members";
+$txt['enhancedban4'] = "IP";
+$txt['enhancedban5'] = "Ban";
+$txt['enhancedban7'] = "Forever";
+$txt['enhancedban8'] = "Time in days to ban this member for:";
+$txt['enhancedban9'] = "Ban action not known!";
+$txt['enhancedban10'] = "Reason for ban must be given!";
+$txt['enhancedban11'] = "Reason for ban (required):";
+$txt['enhancedban12'] = 'Member ID $memid not found! Unable to ban!'; // FIXME
+$txt['enhancedban13'] = "Reason";
+$txt['enhancedban14'] = "Banned Until";
+$txt['enhancedban15'] = "Remove selected items from the ban list";
+$txt['enhancedban16'] = "This member is";
+$txt['enhancedban17'] = "not";
+$txt['enhancedban18'] = "banned";
+$txt['enhancedban19'] = "Unban";
+$txt['enhancedban20'] = "until";
+$txt['enhancedban21'] = "There are no banned members!";
+$txt['enhancedban22'] = "Ban Member";
+$txt['enhancedban23'] = "or";
+$txt['enhancedban24'] = "Ban this member from the forum?";
+$txt['enhancedban25'] = "by moderator";
+$txt['enhancedban26'] = 'have unbanned user';
+$txt['enhancedban27'] = 'which was banned by you';
+$txt['enhancedban28'] = 'fingerprint';
+$txt['enhancedban_subj'] = 'You have been banned';
+$txt['enhancedunban_subj'] = 'You have been unbanned';
+$txt['enhancedban_deactivated'] = 'Requested user is deactivated.';
+
+$txt['feed'] = 'Feed';
+$txt['feed_all_cats'] = 'All categories';
+$txt['feed_unfiltered'] = 'unfiltered';
+$txt['feed_show_approved'] = 'Show approved';
+$txt['feed_show_non_approved'] = 'Show non approved';
+$txt['feed_read_more'] = 'read more';
+$txt['feed_post_by'] = 'Post by';
+$txt['feed_check_by'] = 'Checked by';
+$txt['feed_discuss'] = 'Discuss on forum';
+$txt['feed_add'] = 'Add';
+$txt['feed_edit'] = 'Edit';
+$txt['feed_pages'] = 'Pages';
+$txt['feed_sticky'] = 'Sticky';
+$txt['feed_sticky_no'] = 'no';
+$txt['feed_sticky_cat'] = 'category';
+$txt['feed_sticky_global'] = 'global';
+$txt['feed_textarea'] = 'Add annotation here';
+$txt['feed_del'] = 'Remove';
+$txt['feed_preview'] = 'Preview';
+$txt['feed_save'] = 'Save';
+$txt['feed_mod_lnk'] = 'Add/edit article to feed';
+
+$txt['moveTopic1'] = 'Post a redirection topic';
+
+$txt['boardmod1'] = '';
+
+$txt['blogmod0'] = 'Make this board a blog board';
+$txt['blogmod1'] = 'Blog Mod';
+$txt['blogmod2'] = 'Min post count needed to a have blog';
+$txt['blogmod3'] = 'Groups allowed to have blog (blank for all)';
+$txt['blogmod4'] = 'Max blog per user';
+$txt['blogmod5'] = 'Give moderator power to blog owners';
+$txt['blogmod6'] = 'Show new blogs on top of the blog page';
+$txt['blogmod7'] = 'Allow guest comments';
+$txt['blogmod8'] = 'Post comment';
+$txt['blogmod9'] = 'comments';
+$txt['blogmod10'] = 'comment';
+$txt['blogmod11'] = 'You\'re not allowed to start a blog.';
+$txt['blogmod12'] = 'Can\'t start new blogs, you\'ve reached your max blogs limit.';
+$txt['blogmod13'] = 'You\'re not allowed to post an blog entry in this blog.';
+$txt['blogmod14'] = 'No message ID specified.';
+$txt['blogmod15'] = 'Blog not found.';
+$txt['blogmod16'] = 'No comments yet';
+$txt['blogmod17'] = 'Guests are not allowed to post comments.';
+$txt['blogmod18'] = 'Comment subject not filled.';
+$txt['blogmod19'] = 'Comment body not filled.';
+$txt['blogmod20'] = 'Operation is not allowed.';
+$txt['blogmod21'] = 'No board ID specified!';
+$txt['blogmod22'] = 'You can not display a board that is in a category with MemberGroups or the board ID does not exist. Please check the board number before trying again.';
+$txt['blogmod23'] = 'Blog error: ';
+$txt['blogmod24'] = 'View Blog Comments';
+$txt['blogmod25'] = 'Comments per page';
+$txt['blogmod26'] = 'Close pop-up window after submitting comment';
+$txt['blogmod27'] = 'Last comment by';
+$txt['blogmod28'] = 'Show last comment poster in blog display';
+
+$txt['blogmod0'] = 'Make this board a blog board';
+$txt['blogmod1'] = 'Blog Mod';
+$txt['blogmod2'] = 'Min post count needed to a have blog';
+$txt['blogmod3'] = 'Groups allowed to have blog (blank for all)';
+$txt['blogmod4'] = 'Max blog per user';
+$txt['blogmod5'] = 'Give moderator power to blog owners';
+$txt['blogmod6'] = 'Show new blogs on top of the blog page';
+$txt['blogmod7'] = 'Allow guest comments';
+$txt['blogmod8'] = 'Post comment';
+$txt['blogmod9'] = 'comments';
+$txt['blogmod10'] = 'comment';
+$txt['blogmod11'] = 'You\'re not allowed to start a blog.';
+$txt['blogmod12'] = 'Can\'t start new blogs, you\'ve reached your max blogs limit.';
+$txt['blogmod13'] = 'You\'re not allowed to post an blog entry in this blog.';
+$txt['blogmod14'] = 'No message ID specified.';
+$txt['blogmod15'] = 'Blog not found.';
+$txt['blogmod16'] = 'No comments yet';
+$txt['blogmod17'] = 'Guests are not allowed to post comments.';
+$txt['blogmod18'] = 'Comment subject not filled.';
+$txt['blogmod19'] = 'Comment body not filled.';
+$txt['blogmod20'] = 'Operation is not allowed.';
+$txt['blogmod21'] = 'No board ID specified!';
+$txt['blogmod22'] = 'You can not display a board that is in a category with MemberGroups or the board ID does not exist. Please check the board number before trying again.';
+$txt['blogmod23'] = 'Blog error: ';
+$txt['blogmod24'] = 'View Blog Comments';
+$txt['blogmod25'] = 'Comments per page';
+$txt['blogmod26'] = 'Close pop-up window after submitting comment';
+$txt['blogmod27'] = 'Last comment by';
+$txt['blogmod28'] = 'Show last comment poster in blog display';
+
+$txt['nowListening1'] = 'Now Listening To Mod';
+$txt['nowListening2'] = 'Enable now listening to mod';
+$txt['nowListening3'] = 'Enable UBBC tags';
+$txt['nowListening4'] = 'Text to display (ubbc code enabled)';
+$txt['nowListening5'] = 'Now listening to';
+
+//Ignore User mod
+$txt['ignore_user1'] = '<< You Have Blocked This Message >>';
+
+$txt['jsvalidate1'] = 'The Subject field or the Message Body was not filled out. It is required.';
+$txt['jsvalidate2'] = 'The Subject field, the Message Body, or Recipient field was not filled out. It is required.';
+
+$txt['rename_theme_to'] = 'Rename theme to:';
+
+$txt['fpsrch'] = 'Find users with same fingerprint';
+
+$txt['rcm'] = 'Recent messages in category';
+$txt['rcc'] = 'Recent comments in category';
+
+$txt['mobile-mode-off'] = 'Switch to desktop view';
+$txt['mobile-mode-off'] = 'Switch to mobile view';
+
+$txt['ssl-link-info'] = 'Secure connection';
+
+$txt['sphinx-title'] = 'Search messages';
+$txt['sphinx-next'] = 'Next page';
+$txt['sphinx-prev'] = 'Previous page';
+$txt['sphinx-beginning'] = 'Go to first page';
+$txt['sphinx-end'] = 'Go to end page';
+$txt['sphinx-old-search'] = 'Old search';
+$txt['sphinx-not-found'] = 'nothing found';
+$txt['sphinx-no-username'] = 'No such username';
+$txt['sphinx-input-text'] = 'Input text to search';
+$txt['sphinx-input-search-in-topic'] = 'Search in this topic';
+$txt['sphinx-search-username'] = 'Username';
+$txt['sphinx-mode-all'] = 'All words';
+$txt['sphinx-mode-any'] = 'Any words';
+$txt['sphinx-mode-phrase'] = 'Phrase';
+$txt['sphinx-sort-rel'] = 'Sort by relevance';
+$txt['sphinx-sort-time'] = 'Sort by date';
+$txt['sphinx-btn-submit'] = 'Search';
+$txt['sphinx-you-searched'] = 'You searched';
+$txt['sphinx-found'] = 'found';
+$txt['sphinx-found-in'] = 'in';
+$txt['sphinx-seconds'] = 's';
+$txt['sphinx-showing'] = 'showing';
+$txt['sphinx-of'] = 'of';
+$txt['sphinx-search-everywhere'] = 'Search everywhere';
+$txt['sphinx-in-thread'] = 'in thread #';
+
+$txt['mvdyr'] = 'moved your';
+$txt['2nwplc'] = 'to a new place';
+$txt['msgmvd'] = 'Your message has been moved';
+
+$txt['mdfrznlbl'] = 'Reason';
+$txt['mdfrznplchldr'] = 'Write modify reason';
+$txt['mdfrznerr'] = '"Reason" field not filled.';
+$txt['mdfsbj'] = 'Your message was modified by moderator';
+$txt['mdfdyr'] = 'modified your';
+$txt['mdfdrgn'] = 'Original message';
+$txt['mdfdlsbj'] = 'Your message was deleted';
+$txt['mdfdlyr'] = 'deleted your';
+$txt['cmntrmvd'] = 'removed your comment for';
+$txt['origcmnt'] = 'Original comment';
+$txt['cmntrmvdsbj'] = 'Your comment was removed';
+$txt['cmntmdfdsbj'] = 'Your comment was modified';
+$txt['mdfdyrcmnt'] = 'modified your comment for';
+
+$txt['mrgdyrtpc'] = 'merged your topic';
+$txt['tpcmvd'] = 'Your topic has been moved';
+
+$txt['dltdyrtpc'] = 'deleted your topic';
+$txt['dltdtpcrzn'] = 'for reason';
+$txt['dltdtpcsbj'] = 'Your topic deleted';
+
+if ($MenuType == 1)
+{
+	$menusep = ' | ';
+	$img['admin'] = $txt[2];
+	$img['delete'] = $txt[31];
+	$img['email'] = $txt[69];
+	$img['email_sm'] = $txt[69];
+	$img['help'] = $txt[119];
+	$img['home'] = $txt[103];
+	$img['im_config'] = $txt[323];
+	$img['im_delete'] = $txt[412];
+	$img['im_inbox'] = $txt[316];
+	$img['im_new'] = $txt[321];
+	$img['im_outbox'] = $txt[320];
+	$img['im_reload'] = $txt[322];
+	$img['im_remove'] = $txt[154];
+	$img['im_reply'] = $txt[146];
+	$img['im_website'] = $txt[515];
+	$img['lock'] = $txt[104];
+	$img['login'] = $txt[34];
+	$img['logout'] = $txt[108];
+	$img['markallread'] = $txt[452];
+	$img['markboardread'] = $txt[300];
+	$img['message'] = $txt[144];
+	$img['message_sm'] = $txt[144];
+	$img['message_sm_on'] = $txt['online4'];
+	$img['message_sm_off'] = $txt['online5'];
+	$img['modify'] = $txt[17];
+	$img['newthread'] = $txt[33];
+	$img['newpoll'] = $txt['yse20'];
+	$img['notification'] = $txt[418];
+	$img['notify'] = $txt[131];
+	$img['notify_sm'] = $txt[131];
+	$img['printt'] = $txt[465];
+	$img['profile'] = $txt[467];
+	$img['register'] = $txt[97];
+	$img['removetopic'] = $txt[63];
+	$img['reply'] = $txt[146];
+	$img['replyquote'] = $txt[145];
+	$img['reply_sm'] = $txt[146];
+	$img['search'] = $txt[182];
+	$img['sendtopic'] = $txt[707];
+	$img['viewprofile'] = $txt[27];
+	$img['viewprofile_sm'] = $txt[27];
+	$img['website'] = $txt[515];
+	$img['website_sm'] = $txt[515];
+	$img['calendar'] = $txt['calendar24'];
+	$img['tbtop'] = $txt['topbottom4'];
+	$img['tbbottom'] = $txt['topbottom5'];
+	$img['split'] = $txt['yse251'];
+	$img['merge'] = $txt['yse252'];
+	$img['movethread'] = $txt[132];
+	$img['removethread'] = $txt[63];
+	$img['lockthread0'] = $txt['yse279'];
+	$img['lockthread1'] = $txt['yse280'];
+	$img['sticky0'] = $txt['yse277'];
+	$img['sticky1'] = $txt['yse278'];
+	$img['linkToCalendar'] = $txt['calendar37'];
+	$img['postEvent'] = $txt['calendar23'];
+}
+else
+{
+	$menusep = ' ';
+
+$img['admin'] = '<img src="' . $imagesdir . $langimages . '/admin.gif" alt="' . $txt[2] . '" title="' . $txt[2] . '" border="0" />';
+	$img['delete'] = '<img src="' . $imagesdir . $langimages . '/delete.gif" alt="' . $txt[121] . '" title="' . $txt[121] . '" border="0" />';
+	$img['email'] = '<img src="' . $imagesdir . $langimages . '/email.gif" alt="' . $txt[69] . '" title="' . $txt[69] . '" border="0" />';
+	$img['email_sm'] = '<img src="' . $imagesdir . '/email_sm.gif" alt="' . $txt[69] . '" title="' . $txt[69] . '"  border="0" />';
+	$img['help'] = '<img src="' . $imagesdir . $langimages . '/help.gif" alt="' . $txt[119] . '" title="' . $txt[119] . '" border="0" />';
+	$img['home'] = '<img src="' . $imagesdir . $langimages . '/home.gif" alt="' . $txt[103] . '" title="' . $txt[103] . '" border="0" />';
+	$img['im_config'] = '<img src="' . $imagesdir . $langimages . '/im_config.gif" alt="' . $txt[323] . '" title="' . $txt[323] . '" border="0" />';
+	$img['im_delete'] = '<img src="' . $imagesdir . $langimages . '/im_delete.gif" alt="' . $txt[412] . '" title="' . $txt[412] . '" border="0" />';
+	$img['im_inbox'] = '<img src="' . $imagesdir . $langimages . '/im_inbox.gif" alt="' . $txt[316] . '" title="' . $txt[316] . '" border="0" />';
+	$img['im_new'] = '<img src="' . $imagesdir . $langimages . '/im_new.gif" alt="' . $txt[321] . '" title="' . $txt[321] . '" border="0" />';
+	$img['im_outbox'] = '<img src="' . $imagesdir . $langimages . '/im_outbox.gif" alt="' . $txt[320] . '" title="' . $txt[320] . '" border="0" />';
+	$img['im_reload'] = '<img src="' . $imagesdir . $langimages . '/im_reload.gif" alt="' . $txt[322] . '" title="' . $txt[322] . '" border="0" />';
+	$img['im_remove'] = '<img src="' . $imagesdir . $langimages . '/delete.gif" alt="' . $txt[154] . '" title="' . $txt[154] . '" border="0" />';
+	$img['im_reply'] = '<img src="' . $imagesdir . $langimages . '/im_reply.gif" alt="' . $txt[146] . '" title="' . $txt[146] . '" border="0" />';
+	$img['im_website'] = '<img src="' . $imagesdir . $langimages . '/im_www.gif" alt="' . $txt[515] . '" title="' . $txt[515] . '" border="0" />';
+	$img['login'] = '<img src="' . $imagesdir . $langimages . '/login.gif" alt="' . $txt[34] . '" title="' . $txt[34] . '" border="0" />';
+	$img['logout'] = '<img src="' . $imagesdir . $langimages . '/logout.gif" alt="' . $txt[108] . '" title="' . $txt[108] . '" border="0" />';
+	$img['markallread'] = '<img src="' . $imagesdir . $langimages . '/markread.gif" alt="' . $txt[452] . '" title="' . $txt[452] . '" border="0" />';
+	$img['markboardread'] = '<img src="' . $imagesdir . $langimages . '/markread.gif" alt="' . $txt[300] . '" title="' . $txt[300] . '" border="0" />';
+	$img['message_sm'] = '<img src="' . $imagesdir . $langimages . '/message_sm.gif" alt="' . $txt[144] . '" title="' . $txt[144] . '" border="0" />';
+	$img['message_sm_on'] = '<img src="' . $imagesdir . '/im_on.gif" alt="' . $txt['online4'] . '" title="' . $txt['online4'] . '" border="0" />';
+	$img['message_sm_off'] = '<img src="' . $imagesdir . '/im_off.gif" alt="' . $txt['online5'] . '" title="' . $txt['online5'] . '" border="0" />';
+	$img['modify'] = '<img src="' . $imagesdir . $langimages . '/modify.gif" alt="' . $txt[66] . '" title="' . $txt[66] . '" border="0" />';
+	$img['newthread'] = '<img src="' . $imagesdir . $langimages . '/new_thread.gif" alt="' . $txt[33] . '" title="' . $txt[33] . '" border="0" />';
+	$img['newpoll'] = '<img src="' . $imagesdir . $langimages . '/new_poll.gif" alt="' . $txt['yse20'] . '" title="' . $txt['yse20'] . '" border="0" />';
+	$img['notification'] = '<img src="' . $imagesdir . $langimages . '/notification.gif" alt="' . $txt[419] . '" title="' . $txt[419] . '" border="0" />';
+	$img['notify'] = '<img src="' . $imagesdir . $langimages . '/notify.gif" alt="' . $txt[131] . '" title="' . $txt[131] . '" border="0" />';
+	$img['notify_sm'] = '<img src="' . $imagesdir . $langimages . '/notify_sm.gif" alt="' . $txt[131] . '" title="' . $txt[131] . '" border="0" />';
+	$img['printt'] = '<img src="' . $imagesdir . $langimages . '/print.gif" alt="' . $txt[465] . '" title="' . $txt[465] . '" border="0" />';
+	$img['profile'] = '<img src="' . $imagesdir . $langimages . '/profile.gif" alt="' . $txt[79] . '" title="' . $txt[79] . '" border="0" />';
+	$img['register'] = '<img src="' . $imagesdir . $langimages . '/register.gif" alt="' . $txt[97] . '" title="' . $txt[97] . '" border="0" />';
+	$img['reply'] = '<img src="' . $imagesdir . $langimages . '/reply.gif" alt="' . $txt[146] . '" title="' . $txt[146] . '" border="0" />';
+	$img['replyquote'] = '<img src="' . $imagesdir . $langimages . '/quote.gif" alt="' . $txt[145] . '" title="' . $txt[145] . '" border="0" />';
+	$img['reply_sm'] = '<img src="' . $imagesdir . $langimages . '/reply_sm.gif" alt="' . $txt[146] . '" title="' . $txt[146] . '" border="0" />';
+	$img['search'] = '<img src="' . $imagesdir . $langimages . '/search.gif" alt="' . $txt[182] . '" title="' . $txt[182] . '" border="0" />';
+	$img['sendtopic'] = '<img src="' . $imagesdir . $langimages . '/sendtopic.gif" alt="' . $txt[707] . '" title="' . $txt[707] . '" border="0" />';
+	$img['viewprofile'] = '<img src="' . $imagesdir . $langimages . '/profile.gif" alt="' . $txt[27] . '" title="' . $txt[27] . '" border="0" />';
+	$img['viewprofile_sm'] = '<img src="' . $imagesdir . '/profile_sm.gif" alt="' . $txt[27] . '" title="' . $txt[27] . '" border="0" />';
+	$img['website'] = '<img src="' . $imagesdir . '/www.gif" alt="' . $txt[515] . '" title="' . $txt[515] . '" border="0" />';
+	$img['website_sm'] = '<img src="' . $imagesdir . '/www_sm.gif" alt="' . $txt[515] . '" title="' . $txt[515] . '" border="0" />';
+	$img['boardmod'] = '<img src="' . $imagesdir . '/boardmodlogo.gif" alt="' . $txt['boardmod1'] . '" title="' . $txt['boardmod1'] . '" border="0" />'; #BoardMod Center Logo
+	$img['calendar'] = '<img src="' . $imagesdir . $langimages . '/calendar.gif" alt="' . $txt['calendar24'] . '" title="' . $txt['calendar24'] . '" border="0" />';
+	$img['tbbottom'] = '<img src="' . $imagesdir . $langimages . '/go_down.gif" alt="' . $txt['topbottom5'] . '" title="' . $txt['topbottom5'] . '" border="0" align="middle" />';
+	$img['tbtop'] = '<img src="' . $imagesdir . $langimages . '/go_up.gif" alt="' . $txt['topbottom4'] . '" title="' . $txt['topbottom4'] . '" border="0" align="middle" />';
+	$img['split'] = '<img src="' . $imagesdir . $langimages . '/split.gif" alt="' . $txt['yse251'] . '" title="' . $txt['yse251'] . '" border="0" />';
+	$img['merge'] = '<img src="' . $imagesdir . $langimages . '/merge.gif" alt="' . $txt['yse252'] . '" title="' . $txt['yse252'] . '" border="0" />';
+	$img['movethread'] = '<img src="' . $imagesdir . $langimages . '/admin_move.gif" alt="' . $txt[132] . '" title="' . $txt[132] . '" border="0" />';
+	$img['removethread'] = '<img src="' . $imagesdir . $langimages . '/admin_rem.gif" alt="' . $txt[63] . '" title="' . $txt[63] . '" border="0" />';
+	$img['lockthread0'] = '<img src="' . $imagesdir . $langimages . '/admin_lock.gif" alt="' . $txt['yse279'] . '" title="' . $txt['yse279'] . '" border="0" />';
+	$img['lockthread1'] = '<img src="' . $imagesdir . $langimages . '/admin_lock.gif" alt="' . $txt['yse280'] . '" title="' . $txt['yse280'] . '" border="0" />';
+	$img['sticky0'] = '<img src="' . $imagesdir . $langimages . '/admin_sticky.gif" border="0" alt="' . $txt['yse277'] . '" title="' . $txt['yse277'] . '"/>';
+	$img['sticky1'] = '<img src="' . $imagesdir . $langimages . '/admin_sticky.gif" border="0" alt="' . $txt['yse278'] . '" title="' . $txt['yse278'] . '"/>';
+	$img['linkToCalendar'] = '<img src="' . $imagesdir . $langimages . '/linktocal.gif" alt="' . $txt['calendar37'] . '" title="' . $txt['calendar37'] . '" border="0" />';
+	$img['postEvent'] = '<img src="' . $imagesdir . $langimages . '/calendarpe.gif" alt="' . $txt['calendar23'] . '" title="' . $txt['calendar23'] . '" border="0" />';
+}
+
+/* Images which are always images */
+$img['new'] = '<img src="' . $imagesdir . $langimages . '/new.gif" alt="' . $txt[302] . '" title="' . $txt[302] . '" border="0" />';
+$img['new_some'] = '<img src="' . $imagesdir . $langimages . '/new_some.gif" border="0" alt="' .$txt[333] . '" title="' .$txt[333] . '"/>';
+$img['new_none'] = '<img src="' . $imagesdir . $langimages . '/new_none.gif" border="0" alt="' . $txt[334] . '" title="' . $txt[334] . '"/>';
+$img['new_off'] = '<img src="' . $imagesdir . '/off.gif" alt="' . $txt[334] . '" title="' . $txt[334] . '" border="0" />';
+$img['new_on'] = '<img src="' . $imagesdir . '/on.gif" alt="' . $txt[333] . '" title="' . $txt[333] . '" border="0" />';
+?>
