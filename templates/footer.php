@@ -1,5 +1,27 @@
 <?= $this->mobileSwitch ?>
 
+<?php if ($this->conf->mediaplayer): ?>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/mediaelementplayer.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/mediaelement-and-player.min.js"></script>
+
+  <script>
+    $(function(){
+        $('div.video-player > video, div.audio-player > audio').mediaelementplayer({
+            // Do not forget to put a final slash (/)
+            pluginPath: 'https://cdn.jsdelivr.net/npm/mediaelement@4.2.9/build/',
+            // this will allow the CDN to use Flash without restrictions
+            // (by default, this is set as `sameDomain`)
+            shimScriptAccess: 'always',
+            // more configuration
+            videoWidth: '100%',
+            videoHeight: '100%',
+            defaultAudioWidth: '100%'
+        });
+    });
+  </script>
+<?php endif; ?>
+
+
 <?php if ($this->conf->timeLoadPageEnable && $this->user->group == 'Administrator'): ?>
   <div align="center"><font size="1"><?= $this->locale->yse301 ?> <?= round(microtime(true)-TIME_START, 3) ?> <?= $this->locale->yse302 ?></font></div>
 <?php endif; ?>

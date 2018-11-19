@@ -606,16 +606,24 @@
                   
                   <?php if($msg['attachment']): ?>
                     <hr color=gray size="1">
-                    <?php if(in_array($msg['attachmentExtension'], $this->imageTypes)): ?>
+                    <?php if($msg['attachmentType'] == 'image'): ?>
                       <?php if($this->conf->maxwidth && $this->conf->maxheight): ?>
                         <a href="<?= $this->conf->attachmentUrl ?>/<?= $msg['attachmentFilename'] ?>" target="_blank" class="msg-attachment"><img src="<?= $this->conf->attachmentUrl ?>/<?= $msg['attachmentFilename'] ?>" title="Увеличить" style="max-width:<?= $this->conf->maxwidth ?>px; max-height:<?= $this->conf->maxheight ?>px;"></a>
                       <?php else: ?>
                         <a href="<?= $this->conf->attachmentUrl ?>/<?= $msg['attachmentFilename'] ?>" target="_blank" class="msg-attachment"><img src="<?= $this->conf->attachmentUrl ?>/<?= $msg['attachmentFilename'] ?>" title="Увеличить"></a>
                       <?php endif; ?>
-                    <?php elseif(in_array($msg['attachmentExtension'], $this->audioTypes)): ?>
-                      <audio src="<?= $this->conf->attachmentUrl ?>/<?= $msg['attachmentFilename'] ?>" controls="controls"></audio>
-                    <?php elseif(in_array($msg['attachmentExtension'], $this->videoTypes)): ?>
-                      <video width="320" height="240" src="<?= $this->conf->attachmentUrl ?>/<?= $msg['attachmentFilename'] ?>" controls="controls"></video>
+                    <?php elseif($msg['attachmentType'] == 'audio'): ?>
+                      <div class="audio-player">
+                        <audio class="mejs" controls preload="none">
+                          <source src="<?= $this->conf->attachmentUrl ?>/<?= $msg['attachmentFilename'] ?>">
+                        </audio>
+                      </div>
+                    <?php elseif($msg['attachmentType'] == 'video'): ?>
+                      <div class="video-player">
+                        <video class="mejs" controls preload="metadata">
+                          <source src="<?= $this->conf->attachmentUrl ?>/<?= $msg['attachmentFilename'] ?>">
+                        </video>
+                      </div>
                     <?php endif; ?>
                   <?php endif; ?>
                   

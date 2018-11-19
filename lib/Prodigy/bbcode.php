@@ -65,9 +65,6 @@ $this->bbcode = array(
             
             '/\[\/(?:hidden|h)\]/is',
             
-            '/\[(?:html5audio|h5a)\](.+?)\[\/(?:html5audio|h5a)\]/is',
-            '/\[(?:html5video|h5v)\](.+?)\[\/(?:html5video|h5v)\]/is',
-            
             '/\[soundcloud url=(?:&quot;|")https?:\/\/api\.soundcloud\.com\/tracks\/(\d+)(?:&quot;|").*?\]/is',
             '/\[soundcloud url=(?:&quot;|")https?:\/\/api\.soundcloud\.com\/playlists\/(\d+)(?:&quot;|").*?\]/is',
             '~\[soundcloud\](https?://soundcloud.com/(.+?)/(?:sets/)?(.+?))\[/soundcloud\]~i',
@@ -160,20 +157,17 @@ $this->bbcode = array(
             
             '</div></div>',
             
-            '<audio src="\\1" controls="controls"><a href="\\1" target="_blank" rel="nofollow">\\1</a></audio>',
-            '<video src="\\1" controls="controls" width="480" height="360"><a href="\\1" target="_blank" rel="nofollow">\\1</a></video>',
-            
             '<iframe width="100%" height="166" scrolling="no" frameborder="no" src="//w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F\\1&show_artwork=true"></iframe>',
             '<iframe width="100%" height="450" scrolling="no" frameborder="no" src="//w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F\\1&show_artwork=true"></iframe>',
             '<div class="soundcloud-embed"><div class="soundcloud-placeholder"><div class="soundcloud-play-btn"></div><div class="soundcloud-waveform"><div class="soundcloud-title">$3 by $2</div></div></div><a href="$1" class="soundcloud-embed-lnk" onclick="Forum.Utils.showImage(event)" onmouseover="Forum.Utils.getSoundcloudMeta(event)"></a></div>',
             
             '<object width="200" height="300" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" align="middle"><param name="allowScriptAccess" value="always" /><param name="wmode" value="transparent" /><param name="movie" value="//widgets.jamendo.com/ru/album/?album_id=\\1&playertype=2008&refuid=524863" /><param name="quality" value="high" /><param name="bgcolor" value="#FFFFFF" /><embed src="//widgets.jamendo.com/ru/album/?album_id=\\1&playertype=2008&refuid=524863" quality="high" wmode="transparent" bgcolor="#FFFFFF" width="200" height="300" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;</embed>&nbsp;</object>', // jamendo
            
-            '<object id="audioplayer455" width="500" height="60"><param name="allowScriptAccess" value="always" /><param name="wmode" value="transparent" /><param name="movie" value="uppod/uppod.swf" /><param name="flashvars" value="comment= &amp;st=uppod/styles/audio24-416-1.txt&amp;file=\\1" /><embed src="uppod/uppod.swf" type="application/x-shockwave-flash" allowscriptaccess="always" wmode="transparent" flashvars="comment= &amp;st=uppod/styles/audio24-416-1.txt&amp;file=\\1" width="500" height="60"></embed></object>',
-            '<object id="audioplayer455" width="500" height="60"><param name="allowScriptAccess" value="always" /><param name="wmode" value="transparent" /><param name="movie" value="uppod/uppod.swf" /><param name="flashvars" value="comment=\\1&amp;st=uppod/styles/audio24-416.txt&amp;file=\\2" /><embed src="uppod/uppod.swf" type="application/x-shockwave-flash" allowscriptaccess="always" wmode="transparent" flashvars="comment=\\1&amp;st=uppod/styles/audio24-416.txt&amp;file=\\2" width="500" height="60"></embed></object>',
+            '<div class="audio-player"><audio class="mejs" controls preload="none"><source src="$1"><a href="$1" rel="nofollow noopener">$1</a></audio></div>', // [audio]
+            '<div class="audio-player"><audio class="mejs" controls preload="none" title="$1"><source src="$2"><a href="$2" rel="nofollow noopener">$2</a></audio></div>', // [audio]
             
-            '<object id="videoplayer" width="512" height="410"><param name="allowFullScreen" value="true"></param><param name="allowScriptAccess" value="always" /><param name="wmode" value="transparent" /><param name="movie" value="uppod/uppod.swf" /><param name="flashvars" value="comment= &amp;st=uppod/styles/video24-881.txt&amp;file=\\1" /><embed src="uppod/uppod.swf" type="application/x-shockwave-flash" allowFullScreen="true" allowscriptaccess="always" wmode="transparent" flashvars="comment= &amp;st=uppod/styles/video24-881.txt&amp;file=\\1" width="512" height="410"></embed></object>',
-            '<object id="videoplayer" width="512" height="410"><param name="allowFullScreen" value="true"></param><param name="allowScriptAccess" value="always" /><param name="wmode" value="transparent" /><param name="movie" value="uppod/uppod.swf" /><param name="flashvars" value="comment=\\1&amp;st=uppod/styles/video24-882.txt&amp;file=\\2" /><embed src="uppod/uppod.swf" type="application/x-shockwave-flash" allowFullScreen="true" allowscriptaccess="always" wmode="transparent" flashvars="comment=\\1&amp;st=uppod/styles/video24-882.txt&amp;file=\\2" width="512" height="410"></embed></object>',
+            '<div class="video-player"><video class="mejs" controls preload="metadata"><source src="$1"><a href="$1" rel="nofollow noopener">$1</a></video></div>', // [video]
+            '<div class="video-player"><video class="mejs" controls preload="metadata" title="$1"><source src="$2"><a href="$2" rel="nofollow noopener">$2</a></video></div>', // [video]
             
             // [media]
             '<div class="media-embed" style="width: $1; height: $2;"><iframe src="//$3" allow="fullscreen"><a href="//$3" target="_blank" rel="nofollow noopener">$3</a></iframe></div>',

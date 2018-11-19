@@ -17,6 +17,10 @@ class Threads extends Respond
         $service->thread = $threadid;
         $service->board = $currentboard;
         
+        $service->videoTypes = array('ogm', 'ogv', 'webm', 'mp4');
+        $service->audioTypes = array('ogg', 'mp3', 'opus', 'm4a', 'aac', 'wav', 'flac');
+        $service->imageTypes = array('jpg', 'jpeg', 'gif', 'png', 'webp');
+        
         if(!empty($page)) {
             $start = $page;
         }
@@ -551,11 +555,32 @@ class Threads extends Respond
             {
                 $message['attachment'] = true;
                 $message['attachmentExtension'] = strtolower(substr(strrchr($message['attachmentFilename'], '.'), 1));
+                if (in_array($message['attachmentExtension'], $service->imageTypes))
+                    $message['attachmentType'] = 'image';
+                elseif (in_array($message['attachmentExtension'], $service->audioTypes))
+                {
+                    $message['attachmentType'] = 'audio';
+                    $app->conf->mediaplayer = true;
+                }
+                elseif (in_array($message['attachmentExtension'], $service->videoTypes))
+                {
+                    $message['attachmentType'] = 'video';
+                    $app->conf->mediaplayer = true;
+                }
+                else
+                    $message['attachmentType'] = null;
             } // attachments
             
+            if (stripos($message['body'], '[/audio]') !== false || stripos($message['body'], '[/video]') !== false || stripos($message['comments'], '[/audio]') !== false)
+            {
+                // message contains audio/video player,
+                // we should include media player js and css code in the footer
+                $app->conf->mediaplayer = true;
+            }
+
             $message['cmnt_display'] = $message['CLOSED_COMMENTS'] == 1 ? 'none' : 'inline';
             $message['comments'] = $app->comments->prepare($message['comments'], $message['posterName'], $message['notify']);
-            
+                        
             $message['agent'] = explode(' #|# ', $message['agent']);
             
             $messages[$message['ID_MSG']] = $message;
@@ -592,10 +617,6 @@ class Threads extends Respond
             $app->locale->applauses = 'поощрений';
             $app->locale->smites = 'покараний';
         }
-        
-        $service->videoTypes = array('ogm', 'ogv', 'webm', 'mp4');
-        $service->audioTypes = array('ogg', 'mp3', 'm4a', 'wav', 'flac');
-        $service->imageTypes = array('jpg', 'jpeg', 'gif', 'png', 'webp');
         
         if($app->conf->QuickReply && $app->user->QuickReply && (!$mstate || $app->user->accessLevel() > 1))
             $service->quickReplyForm = true;
