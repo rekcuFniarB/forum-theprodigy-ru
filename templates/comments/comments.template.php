@@ -25,17 +25,10 @@
 
                   <?php if($this->user->showComments == 1 or $this->user->name == "Guest"): ?>
                     <hr width="100%" size="1" />
-                    <?php if($this->user->name != "Guest"): ?>
-                      <div>
-                        <a href="javascript: Forum.Utils.MessageCommentsForm.showHide(<?= $msgid ?>);" class="msgCommentBtn">комментировать (<?= $msg['comments']['comment_count'] ?>)</a>
-                        <?= $this->menusep ?>
-                        <?php if($msg['comments']['subscribed']): ?>
-                          <a href="<?= SITE_ROOT ?>/comments/unsubscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.unsubscribe(<?= $msgid ?>, this);" class="msgCommentsUnsub" title="отписаться от оповещений о новых комментариях к этому сообщению">отписаться</a>
-                        <?php else: ?>
-                          <a href="<?= SITE_ROOT ?>/comments/subscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.subscribe(<?= $msgid ?>, this);" class="msgCommentsSub" title="подписаться на оповещения о новых комментариях к этому сообщению">подписаться</a>
-                        <?php endif; ?>
-                      </div>
-                    <?php endif; ?>
+                    
+                    <div id="comments<?= $msgid ?>" class="comments">
+                      <?php $this->get_cache('post_comments_format'); ?>
+                    </div>
                     
                     <div style="display: none; margin: 10px 0 0 0" id="commentForm<?= $msgid ?>">
                       <form action="<?= SITE_ROOT ?>/comments/submit/" onsubmit="comment(<?= $msgid ?>, <?= $this->board ?>, <?= $this->thread ?>, <?= $this->start ?>, '<?= $this->app->session->id ?>'); return false;">
@@ -71,13 +64,21 @@
                       </form>
                     </div>
                     
-                    <div id="comments<?= $msgid ?>" class="comments">
-                      <?php $this->get_cache('post_comments_format'); ?>
-                    </div>
+                    <?php if($this->user->name != "Guest"): ?>
+                      <div> <!-- comment|subscribe buttons -->
+                        <a href="javascript: Forum.Utils.MessageCommentsForm.showHide(<?= $msgid ?>);" class="msgCommentBtn">комментировать (<?= $msg['comments']['comment_count'] ?>)</a>
+                        <?= $this->menusep ?>
+                        <?php if($msg['comments']['subscribed']): ?>
+                          <a href="<?= SITE_ROOT ?>/comments/unsubscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.unsubscribe(<?= $msgid ?>, this);" class="msgCommentsUnsub" title="отписаться от оповещений о новых комментариях к этому сообщению">отписаться</a>
+                        <?php else: ?>
+                          <a href="<?= SITE_ROOT ?>/comments/subscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.subscribe(<?= $msgid ?>, this);" class="msgCommentsSub" title="подписаться на оповещения о новых комментариях к этому сообщению">подписаться</a>
+                        <?php endif; ?>
+                      </div> <!-- / comment|subscribe buttons -->
+                    <?php endif; /* non guest */ ?>
                       
                   <?php else: /* hidden comments */ ?>
                     <hr width="100%" size="1" />
-                    <div>
+                    <div> <!-- comments|subscribe buttons -->
                       <a href="javascript: Forum.Utils.MessageCommentsForm.showHide(<?= $msgid ?>);" class="msgCommentBtn">комментариев (<?= $msg['comments']['comment_count'] ?>)</a>
                       <?= $this->menusep ?>
                         <?php if($msg['comments']['subscribed']): ?>
@@ -85,7 +86,12 @@
                         <?php else: ?>
                           <a href="<?= SITE_ROOT ?>/comments/subscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.subscribe(<?= $msgid ?>, this);" class="msgCommentsSub" title="подписаться на оповещения о новых комментариях к этому сообщению">подписаться</a>
                         <?php endif; ?>
+                    </div> <!-- / comments|subscribe buttons -->
+                    
+                    <div id="comments<?= $msgid ?>" class="comments comments-collapsed">
+                      <?php $this->get_cache('post_comments_format'); ?>
                     </div>
+
                     <div style="display: none; margin: 10px 0 0 0" id="commentForm<?= $msgid ?>">
                       <form action="<?= SITE_ROOT ?>/comments/submit/" onsubmit="comment(<?= $msgid ?>, <?= $this->board ?>, <?= $this->thread ?>, <?= $this->start ?>, '<?= $this->app->session->id ?>'); return false;">
                         <div class="commentBox">
@@ -117,7 +123,4 @@
                           <?php endif; ?>
                       </form>
                     </div>
-                    <div id="comments<?= $msgid ?>" class="comments comments-collapsed">
-                      <?php $this->get_cache('post_comments_format'); ?>
-                    </div>
-                  <?php endif; ?>
+                  <?php endif; /* hidden comments */?>
