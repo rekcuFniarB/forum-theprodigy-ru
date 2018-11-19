@@ -436,8 +436,8 @@ class Service extends \Klein\ServiceProvider
             $message = preg_replace($this->bbcode['from']['links'], $this->bbcode['to']['links'], $message);
         }
         $message = str_replace(
-            array('{<{', '}>}', '  ', "\t", "\n\r", "\r\n", "\r", "\n"),
-            array('[', ']', '&nbsp; ', '&nbsp; &nbsp; ', "<br>\n", "<br>\n", "<br>\n", "<br>\n"), $message
+            array('{<{', '}>}', '  ', "\t", "\r", "\n"),
+            array('[', ']', '&nbsp; ', '&nbsp; &nbsp; ', '', "<br>\n"), $message
         );
         
         // html
