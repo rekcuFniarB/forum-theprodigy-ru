@@ -350,11 +350,11 @@ class User {
         $imagesdir = $this->app->conf->imagesdir; //STATIC_ROOT . '/skins/' . $this->skin . '/YaBBImages';
         
         /* Load the website image/link stuff */
-        $this->cache[$user]['websiteUrl_IM'] = (($this->cache[$user]['websiteUrl']  != "") ? "<a href=\"" . $this->cache[$user]['websiteUrl'] . "\" target=\"_blank\" rel=\"nofollow\"><img src=\"{$img['im_website']}\" alt=\"".$this->cache[$user]['websiteTitle']."\" title=\"".$this->cache[$user]['websiteTitle']."\" border=\"0\" /></a>" : "");
+        $this->cache[$user]['websiteUrl_IM'] = (($this->cache[$user]['websiteUrl']  != "") ? "<a href=\"" . $this->cache[$user]['websiteUrl'] . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"{$img['im_website']}\" alt=\"".$this->cache[$user]['websiteTitle']."\" title=\"".$this->cache[$user]['websiteTitle']."\" border=\"0\" /></a>" : "");
         if ($this->app->conf->MenuType == 1)
-            $this->cache[$user]['websiteUrl'] = (($this->cache[$user]['websiteUrl'] != "") ? "<a href=\"" . $this->cache[$user]['websiteUrl'] . "\" target=\"_blank\" rel=\"nofollow\"><img src=\"$imagesdir/www_sm.gif\" alt=\"".$this->cache[$user]['websiteTitle']."\" title=\"" . $this->cache[$user]['websiteTitle'] . "\" border=\"0\" /></a>" : "");
+            $this->cache[$user]['websiteUrl'] = (($this->cache[$user]['websiteUrl'] != "") ? "<a href=\"" . $this->cache[$user]['websiteUrl'] . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"$imagesdir/www_sm.gif\" alt=\"".$this->cache[$user]['websiteTitle']."\" title=\"" . $this->cache[$user]['websiteTitle'] . "\" border=\"0\" /></a>" : "");
         else
-            $this->cache[$user]['websiteUrl'] = (($this->cache[$user]['websiteUrl']  != "") ? "<a href=\"" . $this->cache[$user]['websiteUrl'] . "\" target=\"_blank\" rel=\"nofollow\"><img src=\"{$img[website]}\" alt=\"{$this->cache[$user]['websiteTitle']}\" title=\"{$this->cache[$user]['websiteTitle']}\" border=\"0\" /></a>" : "");
+            $this->cache[$user]['websiteUrl'] = (($this->cache[$user]['websiteUrl']  != "") ? "<a href=\"" . $this->cache[$user]['websiteUrl'] . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"{$img[website]}\" alt=\"{$this->cache[$user]['websiteTitle']}\" title=\"{$this->cache[$user]['websiteTitle']}\" border=\"0\" /></a>" : "");
         
         /* load the signature, replace the breaks in it */
         $breaks = array("\n\r", "\r\n", "\n", "\r");
@@ -367,14 +367,14 @@ class User {
         
         /* ICQ and AIM, and YIM should be initialized in load user */
         if ($this->cache[$user]['ICQ'] != "" && is_numeric($this->cache[$user]['ICQ'])) {
-            $this->cache[$user]['icqad'] = "<a href=\"http://wwp.icq.com/scripts/search.dll?to=" . $this->cache[$user]['ICQ'] . "\" target=\"_blank\"><img src=\"{$this->app->conf->imagesdir}/icqadd.gif\" alt=\"" . $this->cache[$user]['ICQ'] . "\" border=\"0\" /></a>";
+            $this->cache[$user]['icqad'] = "<a href=\"http://wwp.icq.com/scripts/search.dll?to=" . $this->cache[$user]['ICQ'] . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"{$this->app->conf->imagesdir}/icqadd.gif\" alt=\"" . $this->cache[$user]['ICQ'] . "\" border=\"0\" /></a>";
             $this->cache[$user]['ICQ'] = "<a href=\"{$this->app->conf->cgi}&amp;action=icqpager&amp;UIN=" . $this->cache[$user]['ICQ'] . "\" target=\"_blank\"><img src=\"http://status.icq.com/online.gif?icq=" . $this->cache[$user]['ICQ'] . "&amp;img=5\" alt=\"" . $this->cache[$user]['ICQ'] . "\" title=\"" . $this->cache[$user]['ICQ'] . "\" border=\"0\" /></a>";
         }
         $this->cache[$user]['AIM'] = (($this->cache[$user]['AIM'] != "") ? "<a href=\"skype:" . $this->cache[$user]['AIM'] . "?chat&topic=Forum.theProdigy.ru\"><img src=\"".STATIC_ROOT."/img/YaBBImages/Skype-icon-x17.png\" alt=\"Skype: " . $this->cache[$user]['AIM'] . "\" border=\"0\" /></a>" : "");
         if ($this->cache[$user]['YIM'] != "")
-            $this->cache[$user]['yimon'] = "<a href=\"{$this->cache[$user]['YIM']}\" target=\"_blank\" rel=\"nofollow\"><img src=\"".STATIC_ROOT."/img/YaBBImages/livejournal.gif\" border=\"0\" alt=\"" . $this->cache[$user]['YIM'] . "\" title=\"" . $txt['lj'] . "\" /></a>";
+            $this->cache[$user]['yimon'] = "<a href=\"{$this->cache[$user]['YIM']}\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"".STATIC_ROOT."/img/YaBBImages/livejournal.gif\" border=\"0\" alt=\"" . $this->cache[$user]['YIM'] . "\" title=\"" . $txt['lj'] . "\" /></a>";
         
-        $this->cache[$user]['MSN'] = (($this->cache[$user]['MSN'] != '') ? "<a href=\"http://members.msn.com/" . $this->app->subs->htmlescape($this->cache[$user]['MSN']) . "\" target=\"blank\"><img src=\"{$this->app->conf->imagesdir}/msntalk.gif\" border=\"0\" alt=\"\" /></a>" : "");
+        $this->cache[$user]['MSN'] = (($this->cache[$user]['MSN'] != '') ? "<a href=\"http://members.msn.com/" . $this->app->subs->htmlescape($this->cache[$user]['MSN']) . "\" target=\"blank\" rel=\"nofollow noopener\"><img src=\"{$this->app->conf->imagesdir}/msntalk.gif\" border=\"0\" alt=\"\" /></a>" : "");
 
         /* if showing the gender image, and if the gender is specified */
         if ($this->app->conf->showgenderimage && $this->cache[$user]['gender'] != "") {

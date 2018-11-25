@@ -97,13 +97,13 @@ $this->bbcode = array(
         'links' => array(
             '<a href="/$4" class="msgurl localurl">$1$2$3</a>',
             '<a href="/$1" class="msgurl localurl">$2$3</a>',
-            '<a href="$1" target="_blank" class="msgurl" rel="nofollow">$1</a>',
-            '<a href="\\1" target="_blank" class="msgurl" rel="nofollow">\2</a>',
-            '<a href="\\1" class="msgurl" rel="nofollow">\\1</a>',
-            '<a href="\1" class="msgurl" rel="nofollow">\\2</a>',
-            '<a href="$1" target="_blank" class="msgurl comment-image-preview" rel="nofollow">$1</a>',
-            '<a href="\\1" target="_blank" rel="nofollow">\\1</a>',
-            '<a href="\\1" target="_blank" rel="nofollow">\\2</a>',
+            '<a href="$1" target="_blank" class="msgurl" rel="nofollow noopener">$1</a>',
+            '<a href="\\1" target="_blank" class="msgurl" rel="nofollow noopener">\2</a>',
+            '<a href="\\1" class="msgurl" rel="nofollow noopener">\\1</a>',
+            '<a href="\1" class="msgurl" rel="nofollow noopener">\\2</a>',
+            '<a href="$1" target="_blank" class="msgurl comment-image-preview" rel="nofollow noopener">$1</a>',
+            '<a href="\\1" target="_blank" rel="nofollow noopener">\\1</a>',
+            '<a href="\\1" target="_blank" rel="nofollow noopener">\\2</a>',
             '<a href="mailto:\\1">\\1</a>',
             '<a href="mailto:\\1">\\2</a>'
         ),
@@ -143,9 +143,9 @@ $this->bbcode = array(
             '<tr>\\1</tr>',
             '<td>\\1</td>',
             '<hr>',
-            '<div class="youtube-embed youtube-playlist"><a href="https://www.youtube.com/playlist?list=$2" yt-params="$1" target="_blank"></a></div>',
-            '<div class="youtube-embed"><a href="https://youtu.be/$2" yt-params="$1" target="_blank"><img src="//img.youtube.com/vi/$2/mqdefault.jpg"></a></div>',
-            '<div class="youtube-embed"><a href="https://youtu.be/$1" yt-params="$2" target="_blank"><img src="//img.youtube.com/vi/$1/mqdefault.jpg"></a></div>',
+            '<div class="youtube-embed youtube-playlist"><a href="https://www.youtube.com/playlist?list=$2" yt-params="$1" target="_blank" rel="nofollow noopener"></a></div>',
+            '<div class="youtube-embed"><a href="https://youtu.be/$2" yt-params="$1" target="_blank" rel="nofollow noopener"><img src="//img.youtube.com/vi/$2/mqdefault.jpg"></a></div>',
+            '<div class="youtube-embed"><a href="https://youtu.be/$1" yt-params="$2" target="_blank" rel="nofollow noopener"><img src="//img.youtube.com/vi/$1/mqdefault.jpg"></a></div>',
             '<OBJECT width="470" height="353"><PARAM name="movie" value="//video.rutube.ru/\\1"></PARAM><PARAM name="wmode" value="window"></PARAM><PARAM name="allowFullScreen" value="true"></PARAM><EMBED src="//video.rutube.ru/\\1" type="application/x-shockwave-flash" wmode="window" width="470" height="353" allowFullScreen="true" ></EMBED></OBJECT>',
             '<ul>',
             '</ul>',
@@ -159,7 +159,7 @@ $this->bbcode = array(
             
             '<iframe width="100%" height="166" scrolling="no" frameborder="no" src="//w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F\\1&show_artwork=true"></iframe>',
             '<iframe width="100%" height="450" scrolling="no" frameborder="no" src="//w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F\\1&show_artwork=true"></iframe>',
-            '<div class="soundcloud-embed"><div class="soundcloud-placeholder"><div class="soundcloud-play-btn"></div><div class="soundcloud-waveform"><div class="soundcloud-title">$3 by $2</div></div></div><a href="$1" class="soundcloud-embed-lnk" onclick="Forum.Utils.showImage(event)" onmouseover="Forum.Utils.getSoundcloudMeta(event)"></a></div>',
+            '<div class="soundcloud-embed"><div class="soundcloud-placeholder"><div class="soundcloud-play-btn"></div><div class="soundcloud-waveform"><div class="soundcloud-title">$3 by $2</div></div></div><a href="$1" class="soundcloud-embed-lnk" onclick="Forum.Utils.showImage(event)" onmouseover="Forum.Utils.getSoundcloudMeta(event)" rel="nofollow noopener"></a></div>',
             
             '<object width="200" height="300" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" align="middle"><param name="allowScriptAccess" value="always" /><param name="wmode" value="transparent" /><param name="movie" value="//widgets.jamendo.com/ru/album/?album_id=\\1&playertype=2008&refuid=524863" /><param name="quality" value="high" /><param name="bgcolor" value="#FFFFFF" /><embed src="//widgets.jamendo.com/ru/album/?album_id=\\1&playertype=2008&refuid=524863" quality="high" wmode="transparent" bgcolor="#FFFFFF" width="200" height="300" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;</embed>&nbsp;</object>', // jamendo
            
@@ -184,7 +184,7 @@ $this->bbcode = array(
             '<table style="border: 5px double grey;" cellpadding="0" cellspacing="0" align="center">
                <tr align="center" valign="middle">
                  <td style="height:30" align="center" valign="middle">
-                   <div style="color:red;font-size: 24px;font-variant:small-caps;">&nbsp;&nbsp;\\2&nbsp;&nbsp;<a href="\\1" target="_blank" rel="nofollow">(источник)&nbsp;&nbsp;</a></div>
+                   <div style="color:red;font-size: 24px;font-variant:small-caps;">&nbsp;&nbsp;\\2&nbsp;&nbsp;<a href="\\1" target="_blank" rel="nofollow noopener">(источник)&nbsp;&nbsp;</a></div>
                   </td>
                  </tr>
                  <tr>
