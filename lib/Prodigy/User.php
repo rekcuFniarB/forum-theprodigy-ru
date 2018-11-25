@@ -240,13 +240,15 @@ class User {
 
         // xmas switch, also disable xmas for "no_xmas" skin
         if (strpos(strtolower($this->skin), 'no_xmas') === FALSE) {
-            if ($this->app->conf->xmas == 'auto') {
+            if ($this->app->conf->xmas === 'auto') {
                 $date_xmas = getdate();
                 if (($date_xmas['mon'] == 12 && $date_xmas['mday'] > 14) || ($date_xmas['mon'] == 1 && $date_xmas['mday'] < 16)) {
                     $imagesdir .= '_xmas';
+                    $this->app->conf->is_xmas = true;
                 }
-            } elseif ($this->app->conf->xmas == 'enable') {
+            } elseif ($this->app->conf->xmas === 'enable') {
                 $imagesdir .= '_xmas';
+                $this->app->conf->is_xmas = true;
             }
         } // if not "no_xmas" skin
         

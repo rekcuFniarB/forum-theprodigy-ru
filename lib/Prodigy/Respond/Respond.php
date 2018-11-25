@@ -284,7 +284,7 @@ abstract class Respond {
         $cookies = $this->request->cookies();
         
         // SNOWFLAKES MOD
-        if ((date('md') >= 1220 or date('md') <= 114) && !$MobileMode && $config['snowing_enabled']) {
+        if ($this->app->conf->is_xmas && !$service->mobileMode && $this->app->conf->snowing_enabled) {
             if (!$cookies->get('disableSnowflakes2011', null) && !$cookies->get('flakemode', null)) {
                 if (!headers_sent()) {
                     $flakeCookieExpireDate = time() + 3*31*24*60*60;
