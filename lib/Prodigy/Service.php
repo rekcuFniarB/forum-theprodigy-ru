@@ -242,9 +242,9 @@ class Service extends \Klein\ServiceProvider
         for ($i = 0; $i < count($emoji['from']); $i++)
           {
             $_emoji['from'][] = 
-                '~(?<=^|\s)' // look behind, allows beginning or space
+                '~(?<=^|\s|\])' // look behind, allows beginning of string or ] or space
                 . quotemeta(str_replace(array('~', '|'), array('\~', '\|'), $emoji['from'][$i]))
-                . '(?=\s|$)~'; // look ahead, allows space or EOL
+                . '(?=\s|$|\[)~'; // look ahead, allows space, [ or EOL
             $_emoji['to'][] = "\\1<img src=\"{$this->app->conf->imagesdir}/{$emoji['to'][$i]}\" alt=\"".$this->esc($emoji['from'][$i])."\" border=\"0\">";
           }
         $this->emoji = $_emoji;
