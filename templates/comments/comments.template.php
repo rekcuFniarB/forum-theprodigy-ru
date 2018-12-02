@@ -69,9 +69,9 @@
                         <a href="javascript: Forum.Utils.MessageCommentsForm.showHide(<?= $msgid ?>);" class="msgCommentBtn">комментировать (<?= $msg['comments']['comment_count'] ?>)</a>
                         <?= $this->menusep ?>
                         <?php if($msg['comments']['subscribed']): ?>
-                          <a href="<?= SITE_ROOT ?>/comments/unsubscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.unsubscribe(<?= $msgid ?>, this);" class="msgCommentsUnsub" title="отписаться от оповещений о новых комментариях к этому сообщению">отписаться</a>
+                          <a href="<?= SITE_ROOT ?>/comments/unsubscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.unsubscribe(<?= $msgid ?>, this);" class="cmnts-subscr-lnk msgCommentsUnsub" title="отписаться от оповещений о новых комментариях к этому сообщению">отписаться</a>
                         <?php else: ?>
-                          <a href="<?= SITE_ROOT ?>/comments/subscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.subscribe(<?= $msgid ?>, this);" class="msgCommentsSub" title="подписаться на оповещения о новых комментариях к этому сообщению">подписаться</a>
+                          <a href="<?= SITE_ROOT ?>/comments/subscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.subscribe(<?= $msgid ?>, this);" class="cmnts-subscr-lnk msgCommentsSub" title="подписаться на оповещения о новых комментариях к этому сообщению">подписаться</a>
                         <?php endif; ?>
                       </div> <!-- / comment|subscribe buttons -->
                     <?php endif; /* non guest */ ?>
@@ -82,9 +82,9 @@
                       <a href="javascript: Forum.Utils.MessageCommentsForm.showHide(<?= $msgid ?>);" class="msgCommentBtn">комментариев (<?= $msg['comments']['comment_count'] ?>)</a>
                       <?= $this->menusep ?>
                         <?php if($msg['comments']['subscribed']): ?>
-                          <a href="<?= SITE_ROOT ?>/comments/unsubscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.unsubscribe(<?= $msgid ?>, this);" class="msgCommentsUnsub" title="отписаться от оповещений о новых комментариях к этому сообщению">отписаться</a>
+                          <a href="<?= SITE_ROOT ?>/comments/unsubscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.unsubscribe(<?= $msgid ?>, this);" class="cmnts-subscr-lnk msgCommentsUnsub" title="отписаться от оповещений о новых комментариях к этому сообщению">отписаться</a>
                         <?php else: ?>
-                          <a href="<?= SITE_ROOT ?>/comments/subscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.subscribe(<?= $msgid ?>, this);" class="msgCommentsSub" title="подписаться на оповещения о новых комментариях к этому сообщению">подписаться</a>
+                          <a href="<?= SITE_ROOT ?>/comments/subscribe/<?= $msgid ?>/" onclick="return Forum.Utils.MessageCommentsForm.subscribe(<?= $msgid ?>, this);" class="cmnts-subscr-lnk msgCommentsSub" title="подписаться на оповещения о новых комментариях к этому сообщению">подписаться</a>
                         <?php endif; ?>
                     </div> <!-- / comments|subscribe buttons -->
                     

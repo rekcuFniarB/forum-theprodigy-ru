@@ -17,10 +17,9 @@
       </script>
     <?php endif; ?>
     
-    <table width="100%" cellpadding="0" cellspacing="0">
+    <table id="top" width="100%" cellpadding="0" cellspacing="0">
       <tr>
         <td class="board_tree" valign="bottom">
-          <a name="top"></a>
           
           <?php $this->start_cache('curthreadurl') ?>
             <?php if($this->conf->curposlinks): ?>
@@ -260,9 +259,8 @@
     <table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="<?= $this->conf->color['bordercolor'] ?>" class="bordercolor" align="center">
     
     <?php foreach($this->messages as $msgid => $msg): ?>
-      <tr class="message-table-tr" data-msgid="<?= $msgid ?>" data-userid="<?= $msg['ID_MEMBER'] ?>">
+      <tr id="msg<?= $msgid ?>" class="message-table-tr" data-msgid="<?= $msgid ?>" data-userid="<?= $msg['ID_MEMBER'] ?>">
         <td>
-          <a name="msg<?= $msgid ?>"></a>
           <table class="message-table" cellpadding="3" cellspacing="1" border="0" width="100%">
             <tr>
               <td bgcolor="<?= $msg['windowbg'] ?>" class="<?= $msg['css'] ?>">
@@ -640,8 +638,7 @@
     <?php endforeach; /* display messages */ ?>
     </table>
     
-    <a name="lastPost"></a>
-    <table border="0" width="100%" cellspacing="0" cellpadding="0" bgcolor="<?= $this->conf->color['bordercolor'] ?>" class="bordercolor">
+    <table id="lastPost" border="0" width="100%" cellspacing="0" cellpadding="0" bgcolor="<?= $this->conf->color['bordercolor'] ?>" class="bordercolor">
       <tr>
         <td>
           <table width="100%" border="0" cellpadding="3" cellspacing="1" bgcolor="' . $color['bordercolor'] . '" class="bordercolor">
@@ -649,8 +646,8 @@
               <td align="left" class="catbg" bgcolor="<?= $this->conf->color['catbg'] ?>" width="100%" height="30">
                 <table cellpadding="3" cellspacing="0" width="100%">
                   <tr>
-                    <td class="board_pageindex">
-                      <a name="bot"></a><font size="1"><b><?= $this->locale->txt[139] ?>:</b> <?= $this->pageindex ?></font>
+                    <td id="bot" class="board_pageindex">
+                      <font size="1"><b><?= $this->locale->txt[139] ?>:</b> <?= $this->pageindex ?></font>
                       <?php if($this->conf->topbottomEnable): ?>
                         <?= $this->menusep ?><a href="#top"><?= $this->locale->tbtop ?></a>
                       <?php endif; ?>
