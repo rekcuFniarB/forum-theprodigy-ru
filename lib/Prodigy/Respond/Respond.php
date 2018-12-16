@@ -288,7 +288,7 @@ abstract class Respond {
             if (!$cookies->get('disableSnowflakes2011', null) && !$cookies->get('flakemode', null)) {
                 if (!headers_sent()) {
                     $flakeCookieExpireDate = time() + 3*31*24*60*60;
-                    $response->cookie("flakemode", 1, $flakeCookieExpireDate);
+                    $this->response->cookie("flakemode", 1, $flakeCookieExpireDate);
                 }
                 //$_COOKIE['flakemode'] = 1;
             }
