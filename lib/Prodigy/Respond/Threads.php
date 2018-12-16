@@ -777,7 +777,7 @@ class Threads extends Respond
         
         if ($service->thread != '' && $service->quotemsg != '')
         {
-            $app->session->check('get');
+            // $app->session->check('get'); // FIXME why do we check session here?
             
             $dbrq = $app->db->query("
                 SELECT m.subject, m.posterName, m.posterEmail, m.posterTime, m.icon, m.posterIP, m.body, m.smiliesEnabled, m.ID_MEMBER, m.comments

@@ -375,7 +375,7 @@
                               <?php if (!$this->mstate || $this->user->accessLevel() > 1): ?>
                                 <?php if (!$this->isBlog || ($this->isBlog && $this->topicinfo['ID_MEMBER'] == $this->user->id)): ?>
                                   <?= $this->menusep() ?>
-                                  <a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/<?= $this->start ?>/?quote=<?= $msgid ?>&amp;title=<?= urlencode($this->locale->txt[116]) ?>&amp;sesc=<?= $this->app->session->id ?>" onclick="return quickReplyQuote(event, '<?= SITE_ROOT ?>', <?= $this->thread ?>, <?= $msgid ?>, '<?= urlencode($this->locale->txt[116]) ?>', '<?= $this->start ?>', '<?= $this->app->session->id ?>');"><font size="1" class="imgwindowbg"><?= $this->locale->replyquote ?></font></a>
+                                  <a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/reply/<?= $msgid ?>/" onclick="return quickReplyQuote(event, '<?= SITE_ROOT ?>', <?= $this->thread ?>, <?= $msgid ?>, '<?= urlencode($this->locale->txt[116]) ?>', '<?= $this->start ?>', '<?= $this->app->session->id ?>');"><font size="1" class="imgwindowbg"><?= $this->locale->replyquote ?></font></a>
                                 <?php endif; ?>
                                 
                                 <?php if($this->user->accessLevel() > 1 || ($this->user->id == $msg['ID_MEMBER'] && $this->user->id != -1)): ?>

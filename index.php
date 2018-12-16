@@ -190,7 +190,7 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/msg[i:startmsg]/
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/[new|all|next|prev:start]/', 'thread->display');
 $router->respond('POST', '/preview/', 'thread->preview');
 
-$router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/reply/[i:quotemsg]?/', 'thread->reply');
+$router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/reply/[i:quote]?/', 'thread->reply');
 //$router->respond('GET', '/b[i:board]/t[i:thread]/quote/[i:quotemsg]/', 'thread->reply');
 
 $router->respond(array('GET', 'POST'), '/b[i:board]/[i:start]?/', 'board->index');

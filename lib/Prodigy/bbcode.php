@@ -40,7 +40,7 @@ $this->bbcode = array(
         'blocks' => array(
             '/\[move\](.+?)\[\/move\]/is',
             '/\[move=(.+?)\](.+?)\[\/move\]/is',
-            //'/\n?\[(?:quote|q) author=(.+?) link=(.+?) date=(.+?)\](?:\n|\<br \/\>)*/ei',
+            //'/\n?\[(?:quote|q) author=(.+?) msg=(\d+?) date=(\d+?)\](?:\n|\<br \/\>)*/i',
             '/\[\/(?:quote|q)\]/i',
             '/\n?\[(?:quote|q)\](?:\n|\<br \/\>)*/i',
             '/\[me=([^\]]+)\](.+?)\[\/me\]/is',
@@ -132,7 +132,7 @@ $this->bbcode = array(
         'blocks' => array(
             '<marquee>\\1</marquee>',
             '<marquee direction="\\1">\\2</marquee>',
-            //"'<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td><font size=\"1\"><b><a href=\"$scripturl?action=display;\\2\">$txt[yse239]: \\1 $txt[176] '.timeformat('\\3').'</a></b></font></td></tr></table><table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" bgcolor=\"#000000\"><tr><td><table border=\"0\" cellspacing=\"1\" cellpadding=\"2\" width=\"100%\"><tr><td class=\"quote\">'",
+            //"<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td><font size=\"1\"><b><a href=\"".SITE_ROOT."/$2\">{$this->app->locale->txt['yse239']}: \\1 {$this->app->locale->txt[176]} '.timeformat('\\3').'</a></b></font></td></tr></table><table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" bgcolor=\"#000000\"><tr><td><table border=\"0\" cellspacing=\"1\" cellpadding=\"2\" width=\"100%\"><tr><td class=\"quote\">",
             "</td></tr></table></td></tr></table>",
             "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" class=\"quote-msg-meta\"><tr><td><font size=\"1\"><b>{$this->app->locale->yse240}:</b></font></td></tr></table><table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" bgcolor=\"#000000\" role=\"presentation\" class=\"quote-msg\"><tr><td><table border=\"0\" cellspacing=\"1\" cellpadding=\"2\" width=\"100%\" role=\"presentation\"><tr><td class=\"quote\">",
             "<font class=\"meaction\">* \\1 \\2</font>",
