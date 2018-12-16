@@ -203,6 +203,8 @@ $router->respond('GET', '/example/', 'main->example');
 $router->respond('GET', '/example/', 'main->example2');
 $router->respond('GET', '/test/', 'main->testResponse');
 
+$router->with('/feed', 'lib/Prodigy/Feed/index.php');
+
 $router->dispatch();
 
 //var_dump($router->app()->conf);
