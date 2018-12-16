@@ -538,7 +538,7 @@ class Main extends Respond {
                             [<a href="' . $siteroot . '/b' . $row['ID_BOARD'] . '/">' . $this->service->esc($row['bName']) . '</a>]
                         </td>
                         <td valign="top" class="info_post">
-                            <a href="' . $siteroot . '/b' . $row['ID_BOARD'] . '/t' . $row['ID_TOPIC'] . '/' . $row['ID_MSG'] . '/#msg' . $row['ID_MSG'] . '">' . $this->service->esc($row['subject']) . '</a> ' . $this->app->locale->txt[525] . ' ' . $dummy . '
+                            <a href="' . $siteroot . '/b' . $row['ID_BOARD'] . '/t' . $row['ID_TOPIC'] . '/msg' . $row['ID_MSG'] . '/#msg' . $row['ID_MSG'] . '">' . $this->service->esc($row['subject']) . '</a> ' . $this->app->locale->txt[525] . ' ' . $dummy . '
                         </td>
                         <td align="right" nowrap="nowrap" class="info_date">
                             ' . $this->app->subs->timeformat($row['posterTime']) . '
@@ -606,7 +606,7 @@ class Main extends Respond {
                             [<a href="' . $siteroot . '/b' . $row['ID_BOARD'] . '/">' . $this->service->esc($row['bName']) . '</a>]
                         </td>
                         <td valign="top" class="info_post">
-                            <a href="' . $siteroot . '/b' . $row['ID_BOARD'] . '/t' . $row['ID_TOPIC'] . '/' . $row['ID_MSG'] . '/#msg' . $row['ID_MSG'] . '">' . $this->service->esc($row['subject']) . '</a> ' . $this->app->locale->txt[525] . ' ' . $dummy . '
+                            <a href="' . $siteroot . '/b' . $row['ID_BOARD'] . '/t' . $row['ID_TOPIC'] . '/msg' . $row['ID_MSG'] . '/#msg' . $row['ID_MSG'] . '">' . $this->service->esc($row['subject']) . '</a> ' . $this->app->locale->txt[525] . ' ' . $dummy . '
                         </td>
                         <td align="right" nowrap="nowrap" class="info_date">
                             ' . $this->app->subs->timeformat($lastcsvline[2]) . '

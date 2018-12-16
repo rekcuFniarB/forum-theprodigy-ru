@@ -661,7 +661,7 @@ class Threads extends Respond
         $namedParams = $request->paramsNamed();
         $service->board = $namedParams->get('board');
         $service->thread = $namedParams->get('thread');
-        $service->quotemsg = $namedParams->get('quotemsg');
+        $service->quotemsg = $namedParams->get('quote');
         
         if(!isset($service->action))
             $service->action = 'reply';
