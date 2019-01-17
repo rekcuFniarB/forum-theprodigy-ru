@@ -1,7 +1,7 @@
 <?php
 define('PROJECT_ROOT', __DIR__);
 
-require_once __DIR__ . '/lib/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 define('SITE_ROOT', dirname($_SERVER['PHP_SELF']));
 
@@ -122,7 +122,8 @@ $router->respond(function($request, $response, $service, $app, $router) {
     $service->ajax = $request->param('requesttype') || $request->headers()->get('X_REQUESTED_WITH', false);
     
     // Our custom PHP error page
-    set_error_handler(array($app->errors, 'handler'), E_ALL);
+    // set_error_handler(array($app->errors, 'handler'), E_ALL)
+    set_error_handler(array($app->errors, 'handler'), E_STRICT);
 });
 
 //// Defaults for POST requests
@@ -204,6 +205,7 @@ $router->respond('GET', '/example/', 'main->example2');
 $router->respond('GET', '/test/', 'main->testResponse');
 
 $router->with('/feed', 'lib/Prodigy/Feed/index.php');
+$router->with('/files', 'lib/Prodigy/Cloud/index.php');
 
 $router->dispatch();
 

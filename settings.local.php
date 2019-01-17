@@ -109,4 +109,29 @@ $config['sphinx'] = array(
     'max_matches' => 250,
 );
 
+// Cloud settings
+$config['cloud'] = array(
+    "scopes" => array(
+        'https://www.googleapis.com/auth/photoslibrary.readonly',
+        //'https://www.googleapis.com/auth/photoslibrary',
+        'https://www.googleapis.com/auth/photoslibrary.sharing',
+        'https://www.googleapis.com/auth/photoslibrary.appendonly',
+        'https://www.googleapis.com/auth/photoslibrary.readonly.appcreateddata'
+    ),
+    "albumID" => 'qwerty',
+    "credentials" => array(
+        "client_id" => "qwerty.apps.googleusercontent.com",
+        "project_id" => "qwerty",
+        "auth_uri" => "https://accounts.google.com/o/oauth2/auth",
+        "token_uri" => "https://www.googleapis.com/oauth2/v3/token",
+        "auth_provider_x509_cert_url" => "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret" => "qwerty",
+        "redirect_uris" => array(
+            "urn:ietf:wg:oauth:2.0:oob",
+            "http://localhost"
+        ),
+        "refresh_token" => 'qwerty'
+    )
+);
+
 ?>
