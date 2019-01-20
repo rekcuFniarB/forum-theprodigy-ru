@@ -1,0 +1,30 @@
+.cloud form {
+    text-align: center;
+}
+.status {
+    text-align: center;
+}
+.cloud form > input[type="text"] {
+    width: 50em;
+}
+.cloud form > textarea {
+    width: 50em;
+}
+.status > div {
+    display: none;
+}
+
+.cloud > .show-embed {
+    text-align: center;
+}
+.cloud > .show-embed > div {
+    display: inline-block;
+    text-align: left;
+}
+.cloud > .show-embed input {
+    width: 100%;
+}
+
+.cloud div.uploaded-by {
+    text-align: right;
+}
