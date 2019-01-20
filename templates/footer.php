@@ -36,6 +36,10 @@
     <script type="text/javascript" src="<?= STATIC_ROOT ?>/js/snow.js"></script>
 <?php endif; ?>
 
+<?php foreach($this->_include_js as $_js): ?>
+  <script src="<?= $_js ?>"></script>
+<?php endforeach; ?>
+
 <?php if($this->conf->debug || $this->user->accessLevel() > 2): ?>
     <?php $stats = $this->app->subs->runtime_stats(); ?>
     <div align="center">

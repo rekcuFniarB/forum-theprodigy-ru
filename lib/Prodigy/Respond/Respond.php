@@ -11,6 +11,8 @@ abstract class Respond {
     private static $layout_ready;
     private static $count = 0;
     public $instance_id;
+    protected $css;
+    protected $js;
 
     public function __construct($router) {
         $this->app = $router->app();
@@ -28,6 +30,9 @@ abstract class Respond {
         
         if(!isset($this->app->respond))
             $this->app->respond = $this;
+        
+        $this->css = array();
+        $this->js = array();
     }
     
 //     public function __invoke($name) {
@@ -158,7 +163,10 @@ abstract class Respond {
             $templateFile = PROJECT_ROOT . '/templates/skins/' . $skinname . '/template.html';
         
         $service->layout($templateFile);
-
+        
+        $service->_include_js = $this->js;
+        $service->_include_css = $this->css;
+        
         $service->yyboardname = $this->app->conf->mbname;
         
         $time = $this->app->user->timeOffset;
@@ -310,6 +318,24 @@ abstract class Respond {
         self::$layout_ready = true;
 
     } // prepare_layout()
+    
+    /**
+     * Add css to main template
+     * @param string $path css path
+     */
+    protected function addCSS($path)
+    {
+        $this->css[] = STATIC_ROOT . '/css/' . $path;
+    }
+    
+    /**
+     * Add js to main template
+     * @param string $path css path
+     */
+    protected function addJS($path)
+    {
+        $this->css[] = STATIC_ROOT . '/js/' . $path;
+    }
     
     public function prepareJumpToForm($currentboard) {
         $db_prefix = $this->app->db->prefix;

@@ -3,6 +3,11 @@
     <script defer type="text/javascript" src="<?= STATIC_ROOT ?>/js/pngfix.js"></script>
 <![endif]-->
 <link rel="stylesheet" type="text/css" href="<?= STATIC_ROOT ?>/css/theprodigy.ru.css?v=1519417894" />
+
+<?php foreach($this->_include_css as $_css): ?>
+  <link rel="stylesheet" type="text/css" href="<?= $_css ?>">
+<?php endforeach; ?>
+
 <script type="text/javascript" src="<?= STATIC_ROOT ?>/js/jquery-latest.js"></script>
 <?php if (!$this->mobileMode): ?>
     <script type="text/javascript" src="<?= STATIC_ROOT ?>/js/jquery-ui.min.js"></script>
