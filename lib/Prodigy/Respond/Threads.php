@@ -327,7 +327,7 @@ class Threads extends Respond
         } // building pageindex
         error_log("__DEBUG__: STARTNUM: $start, $maxmessagedisplay");
         // view all mod
-        if ($maxmessagedisplay < $mreplies)
+        if ($maxmessagedisplay < $mreplies + 1)
             $pageindex .= '<a class="navPages" href="' . SITE_ROOT . "/b$currentboard/t$threadid/all/\">{$app->locale->txt[190]}</a> ";
         
         $service->pageindex = $pageindex;
