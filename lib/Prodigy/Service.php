@@ -335,25 +335,25 @@ class Service extends \Klein\ServiceProvider
                     
                     $parts[$i] = $this->prepare_urls($parts[$i]);
                                         
-                    // Hide all embedded objects under the spoiler for mobile devices
-                    if ($this->app->user->mobileMode){
-                        $parts[$i] = preg_replace(array(
-                            //'~(\[youtube=(?:.+?)\](?:.+?)\[/youtube\])~i',
-                            //'~(\[y\](?:.+?)\[/y\])~i',
-                            //'~(\[(?:media|m)=(?:.+?)\[/(?:media|m)\])~i',
-                            //'~(\[(?:audio|html5audio|h5a)(?:.+?)\[/(?:audio|html5audio|h5a)\])~i',
-                            //'~(\[(?:video|html5video|h5v|rutube)(?:.+?)\[/(?:video|html5video|h5v|rutube)\])~i',
-                            '~(\[soundcloud (?:.+?)/\])~i',
-                        ),
-                        array(
-                            //'[h=Youtube]$1[/h]',
-                            //'[h=Youtube]$1[/h]',
-                            //'[h=Media]$1[/h]',
-                            //'[h=Audio]$1[/h]',
-                            //'[h=Video]$1[/h]',
-                            '[h=SoundCloud]$1[/h]',
-                        ), $parts[$i]);
-                    }
+                    //// Put all embedded objects into the spoiler for mobile devices
+                    //if ($this->app->user->mobileMode){
+                    //    $parts[$i] = preg_replace(array(
+                    //        //'~(\[youtube=(?:.+?)\](?:.+?)\[/youtube\])~i',
+                    //        //'~(\[y\](?:.+?)\[/y\])~i',
+                    //        //'~(\[(?:media|m)=(?:.+?)\[/(?:media|m)\])~i',
+                    //        //'~(\[(?:audio|html5audio|h5a)(?:.+?)\[/(?:audio|html5audio|h5a)\])~i',
+                    //        //'~(\[(?:video|html5video|h5v|rutube)(?:.+?)\[/(?:video|html5video|h5v|rutube)\])~i',
+                    //        '~(\[soundcloud (?:.+?)/\])~i',
+                    //    ),
+                    //    array(
+                    //        //'[h=Youtube]$1[/h]',
+                    //       //'[h=Youtube]$1[/h]',
+                    //        //'[h=Media]$1[/h]',
+                    //        //'[h=Audio]$1[/h]',
+                    //        //'[h=Video]$1[/h]',
+                    //        '[h=SoundCloud]$1[/h]',
+                    //    ), $parts[$i]);
+                    //}
                     
                     // prepare [media] tag, make size values of type "px" if type not specivied
                     $parts[$i] = preg_replace(

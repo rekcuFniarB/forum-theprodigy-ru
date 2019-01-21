@@ -65,8 +65,7 @@ $this->bbcode = array(
             
             '/\[\/(?:hidden|h)\]/is',
             
-            '/\[soundcloud url=(?:&quot;|")https?:\/\/api\.soundcloud\.com\/tracks\/(\d+)(?:&quot;|").*?\]/is',
-            '/\[soundcloud url=(?:&quot;|")https?:\/\/api\.soundcloud\.com\/playlists\/(\d+)(?:&quot;|").*?\]/is',
+            '#\[soundcloud url=(?:&quot;|")https?://(api\.soundcloud\.com/(?:tracks|playlists)/\d+)(?:&quot;|").*?\]#is',
             '~\[soundcloud\](https?://soundcloud.com/(.+?)/(?:sets/)?(.+?))\[/soundcloud\]~i',
             
             '/\[(?:jamendo|jm)]http:\/\/www.jamendo\.com\/[a-zA-Z]{2}\/album\/(\d+)\[\/(?:jamendo|jm)\]/is',
@@ -157,8 +156,7 @@ $this->bbcode = array(
             
             '</div></div>',
             
-            '<iframe width="100%" height="166" scrolling="no" frameborder="no" src="//w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F\\1&show_artwork=true"></iframe>',
-            '<iframe width="100%" height="450" scrolling="no" frameborder="no" src="//w.soundcloud.com/player/?url=http%3A%2F%2Fapi.soundcloud.com%2Fplaylists%2F\\1&show_artwork=true"></iframe>',
+            '<div class="soundcloud-embed"><div class="soundcloud-placeholder"><div class="soundcloud-play-btn"></div><div class="soundcloud-waveform"><div class="soundcloud-title"></div></div></div><a href="https://$1" class="soundcloud-embed-lnk" onclick="Forum.Utils.showImage(event)" onmouseover="Forum.Utils.getSoundcloudMeta(event)" rel="nofollow noopener"></a></div>',
             '<div class="soundcloud-embed"><div class="soundcloud-placeholder"><div class="soundcloud-play-btn"></div><div class="soundcloud-waveform"><div class="soundcloud-title">$3 by $2</div></div></div><a href="$1" class="soundcloud-embed-lnk" onclick="Forum.Utils.showImage(event)" onmouseover="Forum.Utils.getSoundcloudMeta(event)" rel="nofollow noopener"></a></div>',
             
             '<object width="200" height="300" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0" align="middle"><param name="allowScriptAccess" value="always" /><param name="wmode" value="transparent" /><param name="movie" value="//widgets.jamendo.com/ru/album/?album_id=\\1&playertype=2008&refuid=524863" /><param name="quality" value="high" /><param name="bgcolor" value="#FFFFFF" /><embed src="//widgets.jamendo.com/ru/album/?album_id=\\1&playertype=2008&refuid=524863" quality="high" wmode="transparent" bgcolor="#FFFFFF" width="200" height="300" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer">&nbsp;</embed>&nbsp;</object>', // jamendo
