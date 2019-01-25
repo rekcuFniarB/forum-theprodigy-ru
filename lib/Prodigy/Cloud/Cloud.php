@@ -5,18 +5,16 @@ use \Prodigy\Respond\Respond;
 
 class Cloud extends Respond
 {
-    protected $scopes;
     protected $OAuth;
     protected $authCredentials;
-    protected $credentials;
-    protected $albumID;
-    protected $imgTupes;
+    protected $imgTypes;
+    protected $conf;
     
     public function __construct($router)
     {
         parent::__construct($router);
         
-        $this->albumID = $this->app->conf->cloud['albumID'];
+        $this->conf = new \Klein\DataCollection\DataCollection($this->app->conf->cloud);
         
         // Registering lazy services
         $router->registerServices(
@@ -30,14 +28,14 @@ class Cloud extends Respond
 
         $_this = $this;
         $this->app->register('authCredentials', function() use ($router, $_this) {
-            $conf = $router->app()->conf;
-            $authCredentials = new \Google\Auth\Credentials\UserRefreshCredentials($conf->cloud['scopes'], $conf->cloud['credentials']);
+            //$conf = $router->app()->conf;
+            $authCredentials = new \Google\Auth\Credentials\UserRefreshCredentials($this->conf->scopes, $this->conf->credentials);
             
             $_this->OAuth = $authCredentials->oauth();
             if($_this->OAuth->getAuthorizationUri() === null)
-                $_this->OAuth->setAuthorizationUri($this->credentials['auth_uri']);
+                $_this->OAuth->setAuthorizationUri($this->conf->credentials['auth_uri']);
             if($_this->OAuth->getRedirectUri() === null)
-                $_this->OAuth->setRedirectUri($this->credentials['redirect_uris'][0]);
+                $_this->OAuth->setRedirectUri($this->conf->credentials['redirect_uris'][0]);
             
             $_this->authCredentials = $authCredentials;
             return $authCredentials;
@@ -47,22 +45,30 @@ class Cloud extends Respond
             return new \Google\Photos\Library\V1\PhotosLibraryClient(['credentials' => $this->app->authCredentials]);
         });
         
-        $this->credentials = $this->app->conf->cloud['credentials'];
-        $this->scopes = $this->app->conf->cloud['scopes'];
-        
+        // extensions and mimes of images
         $this->imgTypes = array(
             'png',
+            'image/png',
             'jpg',
+            'image/jpeg',
             'jpeg',
             'gif',
-            'webp'
+            'image/gif',
+            'webp',
+            'image/webp'
         );
     } // __construct()
     
-    protected function is_image($imgname)
+    /**
+     * is uploaded file an image?
+     * @param array $file uploaded file info ($_FILES)
+     * @return bool
+     */
+    protected function is_image($file)
     {
-        $ext = $this->get_file_ext($imgname);
-        if (in_array($ext, $this->imgTypes))
+        if (empty($file['type']))
+            return false;
+        if (in_array($file['type'], $this->imgTypes))
             return true;
         else
             return false;
@@ -103,7 +109,7 @@ class Cloud extends Respond
             $uploadToken = $this->app->GooglePhotosClient->upload(file_get_contents($image['path']), $image['title']);
             $newMediaItems[] = $this->app->PhotosLibraryResourceFactory::newMediaItemWithDescription($uploadToken, $image['description']);
         }
-        $response = $this->app->GooglePhotosClient->batchCreateMediaItems($newMediaItems, ['albumId' => $this->albumID]);
+        $response = $this->app->GooglePhotosClient->batchCreateMediaItems($newMediaItems, ['albumId' => $this->conf->albumID]);
         
         $items = array();
         
@@ -126,8 +132,12 @@ class Cloud extends Respond
         {
             $app->session->check('post');
             $uplfile = $request->files()->get('uplfile');
-            if ($this->is_image($uplfile['name']))
+            if ($this->is_image($uplfile))
             {
+                $filesize = filesize($uplfile['tmp_name']);
+                if ($filesize > $this->conf->piece_size)
+                    return $app->errors->abort('', 'Uploaded file size exceeded.', 500);
+                
                 $uplfile['IS_IMAGE'] = true;
                 // $this->upload_image();
                 //$imgpath = $uplfile['tmp_name'] . '-' . $uplfile['name'];
@@ -165,6 +175,7 @@ class Cloud extends Respond
         } // if method POST
         else
         {
+            // Show upload form if it's GET request
             $service->title = "Upload files";
             $service->sessid = $app->session->id;
             $this->addCSS('cloud.css');
@@ -216,6 +227,17 @@ class Cloud extends Respond
         $service->ProdUrl = $item->getProductUrl();
         $service->Filename = $item->getFilename();
         
+        error_log('__RENDER__: iteminfo');
+        
         $this->render('templates/cloud/main.template.php');
     } // example()
+    
+    public function example($request, $response, $service, $app)
+    {
+        error_log('__RENDER__: example');
+        $service->title = 'Cloud examples';
+        $img = imagecreatefromstring('qwerty');
+        var_dump($img);
+        $this->render('templates/cloud/example.template.php');
+    }
 }

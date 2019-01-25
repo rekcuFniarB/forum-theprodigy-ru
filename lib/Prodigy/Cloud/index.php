@@ -20,3 +20,4 @@ error_log("__DEBUG__: WITH CLOUD");
 $this->respond(array('GET', 'POST'), '/', 'files->main');
 $this->respond('GET', '/show/[:id]/', 'files->show');
 $this->respond('GET', '/example/iteminfo/', 'files->iteminfo');
+$this->respond('GET', '/example/', 'files->example');
