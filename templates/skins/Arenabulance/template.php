@@ -195,7 +195,7 @@ body,td,th {
 <body>
 <?php $this->partial('templates/body.inc.php'); // <yabb body> ?>
 
-<table class=bordercolor cellSpacing=0 cellPadding=0 width="<?= ($this->mobileMode?'100%':'92%') ?>" align=center bgColor=#333333 border=0>
+<table class=bordercolor cellSpacing=0 cellPadding=0 width="<?= ($this->mobileMode?'100%':'90%') ?>" align=center bgColor=#333333 border=0>
   <tbody>
   <tr>
     <td>
