@@ -38,7 +38,10 @@
                       $('.status > .error').show();
                   },
                   success: function(response){
-                      document.location.pathname += 'show/' + response[0] + '/';
+                      if (response[0] == '__ERROR__')
+                          $('.status > .error').text('Upload failed.').show();
+                      else
+                          document.location.pathname += 'show/' + response[0] + '/';
                   }
               }); // ajax
           });
