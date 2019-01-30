@@ -94,7 +94,7 @@ class Session {
         else
         {
             if (!$request->method('GET') || $request->paramsGet()->get('sesc') != $this->id)
-                return $this->app->erros->abort('', $this->app->loale->yse305);
+                return $this->app->errors->abort('', $this->app->locale->yse305);
         }
         
         $server = $request->server();
