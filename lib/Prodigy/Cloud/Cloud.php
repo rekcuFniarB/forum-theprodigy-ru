@@ -159,10 +159,10 @@ class Cloud extends Respond
         
         if ($size < $real_length)
         {
-            $zeroes = str_repeat("\0", $real_length - $size);
+            $fill = random_bytes($real_length - $size);
             error_log("__DEBUG__: Appending zeroes $real_length - $size");
-            // add zeroes to the end
-            file_put_contents($patched_file, $zeroes, FILE_APPEND);
+            // fill empty space
+            file_put_contents($patched_file, $fill, FILE_APPEND);
         }
         
         rename($patched_file, $path);
@@ -200,13 +200,13 @@ class Cloud extends Respond
         error_log("__DEBUG__: Resolution from $size");
         
      
-        // Google workaround. Don't know why it damages small files FIXME it doesn't work though
-        //if ($size < 900)
-        //    $size = 900;
+        // Small images damaging workaround for Google cloud.
+        if ($size < 900)
+           $size = 900;
         
         $pixels = intval($size/3 + 1);
         $y = intval(sqrt($pixels));
-        $x = $pixels/$y +1;
+        $x = intval($pixels/$y) + 1;
         error_log("__DEBUG__: RESOLUTION: $x, $y");
         return array($x, $y);
     }
