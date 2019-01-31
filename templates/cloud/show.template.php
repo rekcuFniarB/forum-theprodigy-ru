@@ -21,7 +21,7 @@
             </div>
           <?php else: ?>
             Not an image <?= $this->info['mime'] ?><br>
-            <a href="<?= $this->esc($this->uri) ?>?>sesc=<?= $this->sesc ?>&amp;dl=<?= urlencode($this->info['name']) ?>">Download</a>
+            <a href="<?= $this->esc($this->uri) ?>?sesc=<?= $this->sesc ?>">Download</a>
             <!-- this is only for testing, should be removed later -->
             <div><img src="<?= $this->esc($this->BaseUrl) ?>"></div>
           <?php endif; ?>

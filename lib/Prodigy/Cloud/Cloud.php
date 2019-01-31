@@ -90,7 +90,10 @@ class Cloud extends Respond
     {
         $_filename = explode('.', $filename);
         $cnt = sizeof($_filename);
-        return strtolower($_filename[$cnt - 1]);
+        if ($cnt == 1)
+            return '';
+        else
+            return strtolower($_filename[$cnt - 1]);
     }
     
     /**
@@ -369,9 +372,11 @@ class Cloud extends Respond
         $service->uri = $service->siteurl . $request->uri();
         
         if(empty($service->info['ext']))
-            $ext = $this->get_file_ext($service->info['name']);
+            $ext = '.'.$this->get_file_ext($service->info['name']);
         else
-            $ext = $service->info['ext'];
+            $ext = ".{$service->info['ext']}";
+        if ($ext == '.')
+            $ext = '';
         
         // if request came from embedded link and referer is our site
         if (strpos($accept, 'text/html') === false && $referer['host'] == $service->host)
@@ -385,25 +390,27 @@ class Cloud extends Respond
             {
                 // Not an image
                 
-                $rslt = $this->get_remote_file($service->BaseUrl . '=d', "$itemID.$ext");
+                $rslt = $this->get_remote_file($service->BaseUrl . '=d', "$itemID$ext");
                 if ($rslt)
-                    return $response->redirect("{$this->conf->cache_url}/$itemID.$ext");
+                    return $response->redirect("{$this->conf->cache_url}/$itemID$ext");
                 else
-                    return $app->errors->abort('', "Failed to get file $itemID.$ext", 400);
+                    return $app->errors->abort('', "Failed to get file $itemID$ext", 400);
             }
         }
-        elseif ($referer['path'] == SITE_ROOT . $request->pathname() && $dl !== null)
+        elseif ($referer['path'] == SITE_ROOT . $request->pathname())
         {
-            // came from same page
+            // came from same page from download link
             
             // validate session
             $app->session->check('get');
             
-            $rslt = $this->get_remote_file($service->BaseUrl . '=d', "$itemID.$ext");
+            $e_name = urlencode($info['name']);
+            
+            $rslt = $this->get_remote_file($service->BaseUrl . '=d', "$itemID$ext");
             if ($rslt)
-                return $response->redirect("{$this->conf->cache_url}/$itemID.$ext");
+                return $response->redirect("{$this->conf->cache_url}/$itemID$ext?dl=$e_name");
             else
-                return $app->errors->abort('', "Failed to get file $itemID.$ext", 400);
+                return $app->errors->abort('', "Failed to get file $itemID$ext", 400);
         }
         else
         {
