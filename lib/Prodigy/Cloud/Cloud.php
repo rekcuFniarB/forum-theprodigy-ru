@@ -375,7 +375,17 @@ class Cloud extends Respond
     public function show($request, $response, $service, $app) {
         $itemID = $request->paramsNamed()->get('id');
         $dl = $request->paramsGet()->get('dl');
-        $item = $app->GooglePhotosClient->getMediaItem($itemID);
+        try {
+            $item = $app->GooglePhotosClient->getMediaItem($itemID);
+        }
+        catch (\Google\ApiCore\ApiException $e)
+        {
+            if ($e->getStatus() == 'INVALID_ARGUMENT')
+                return $app->errors->abort('', 'Item not found', 404);
+            else
+                return $app->errors->abort('', $e, 404);
+        }
+        
         $service->BaseUrl = $item->getBaseUrl();
         $HEADERS = $request->headers();
         $accept = $HEADERS->get('accept');
