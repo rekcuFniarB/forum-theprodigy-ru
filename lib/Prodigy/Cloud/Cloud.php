@@ -29,16 +29,15 @@ class Cloud extends Respond
             )
         );
 
-        $_this = $this;
-        $this->app->register('authCredentials', function() use ($router, $_this) {
-            //$conf = $router->app()->conf;
+        $this->app->register('authCredentials', function() use ($router) {
+            $conf = $router->app()->conf;
             $authCredentials = new \Google\Auth\Credentials\UserRefreshCredentials($this->conf->scopes, $this->conf->credentials);
             
-            $_this->OAuth = $authCredentials->oauth();
-            if($_this->OAuth->getAuthorizationUri() === null)
-                $_this->OAuth->setAuthorizationUri($this->conf->credentials['auth_uri']);
-            if($_this->OAuth->getRedirectUri() === null)
-                $_this->OAuth->setRedirectUri($this->conf->credentials['redirect_uris'][0]);
+            $this->OAuth = $authCredentials->oauth();
+            if($this->OAuth->getAuthorizationUri() === null)
+                $this->OAuth->setAuthorizationUri($this->conf->credentials['auth_uri']);
+            if($this->OAuth->getRedirectUri() === null)
+                $this->OAuth->setRedirectUri($this->conf->credentials['redirect_uris'][0]);
             
             $_this->authCredentials = $authCredentials;
             return $authCredentials;
