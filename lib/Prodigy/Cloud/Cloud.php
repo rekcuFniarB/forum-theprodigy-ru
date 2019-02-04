@@ -377,6 +377,7 @@ class Cloud extends Respond
         $dl = $request->paramsGet()->get('dl');
         try {
             $item = $app->GooglePhotosClient->getMediaItem($itemID);
+            $this->saveAccessToken();
         }
         catch (\Google\ApiCore\ApiException $e)
         {
@@ -467,8 +468,6 @@ class Cloud extends Respond
                 $service->type = null;
                 $service->embed_code = false;
             }
-            
-            $this->saveAccessToken();
             
             $this->addCss('cloud.css');
             return $this->render('templates/cloud/show.template.php');
