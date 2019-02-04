@@ -11,7 +11,8 @@
     </form>
     
     <div class="status">
-      <div class="uploading">Uploading...</div>
+      <div class="uploading"><img src="<?= STATIC_ROOT ?>/img/YaBBImages/loading2.gif"><br>
+      Uploading...</div>
       <div class="preparing">Preparing...</div>
       <div class="error">Error occurred.</div>
     </div>
@@ -35,11 +36,14 @@
                   processData: false,
                   contentType: false,
                   error: function() {
+                      $('.status > .uploading').hide();
                       $('.status > .error').show();
                   },
                   success: function(response){
-                      if (response[0] == '__ERROR__')
+                      if (response[0] == '__ERROR__') {
+                          $('.status > .uploading').hide();
                           $('.status > .error').text('Upload failed.').show();
+                      }
                       else
                           document.location.pathname += 'show/' + response[0] + '/';
                   }
