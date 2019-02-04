@@ -39,7 +39,16 @@ class Cloud extends Respond
             if($this->OAuth->getRedirectUri() === null)
                 $this->OAuth->setRedirectUri($this->conf->credentials['redirect_uris'][0]);
             
-            $_this->authCredentials = $authCredentials;
+            // reuse last access token
+            if ($conf->cloudAccessToken !== null)
+            {
+                $this->OAuth->updateToken(json_decode($conf->cloudAccessToken, true));
+                error_log("__DEBUG__: Reusing last Access Token: {$conf->cloudAccessToken}");
+            }
+            else
+                error_log("__DEBUG__: Not Reusing last Access Token: {$conf->cloudAccessToken}");
+            
+            $this->authCredentials = $authCredentials;
             return $authCredentials;
         });
         
@@ -96,11 +105,23 @@ class Cloud extends Respond
     }
     
     /**
-     * Store access token for reusing later
+     * Save access token for reusing later with OAuth->updateToken()
+     * Call it everytime after doing requests to Google API
+     * @return boolean true on success or false
      */
-    protected function storeAccessToken()
+    protected function saveAccessToken()
     {
-        // 
+        $token = array(
+            'extensionParams' => $this->OAuth->getExtensionParams(),
+            'access_token' => $this->OAuth->getAccessToken(),
+            'id_token' => $this->OAuth->getIdToken(),
+            'expires_in' => $this->OAuth->getExpiresIn(),
+            'expires_at' => $this->OAuth->getExpiresAt(),
+            'issued_at' => $this->OAuth->getIssuedAt()
+        );
+        $token = json_encode($token);
+        $rslt = $this->app->conf->modSet('cloudAccessToken', $token);
+        error_log("__DEBUG__: Storing Access Token: $rslt");
     }
     
     /**
@@ -126,6 +147,9 @@ class Cloud extends Respond
         {
             $items[] = $itemResult->getMediaItem()->getId();
         }
+        
+        $this->saveAccessToken();
+        
         return $items;
     }
     
@@ -433,6 +457,8 @@ class Cloud extends Respond
                 $service->type = null;
                 $service->embed_code = false;
             }
+            
+            $this->saveAccessToken();
             
             $this->addCss('cloud.css');
             return $this->render('templates/cloud/show.template.php');
