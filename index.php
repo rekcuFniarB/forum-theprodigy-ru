@@ -66,6 +66,7 @@ $router->respond(function($request, $response, $service, $app, $router) {
     $service->host = $host;
     $service->siteurl = $protocol . $host . SITE_ROOT;
     //$service->baseHref = "$protocol$host{$service->appDir}";
+    define('SITE_URL', $service->siteurl);
     
     $request_path = $request->pathname();
     $request_uri = $request->uri();

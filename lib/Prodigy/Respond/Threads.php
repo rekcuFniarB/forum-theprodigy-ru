@@ -1598,14 +1598,13 @@ class Threads extends Respond
         $thread = $service->thread;
         
         # Notify any members who have notification turned on for this thread.
-        $app->im->NotifyUsers();
+        $app->im->NotifyUsers($service->thread, $input_subject);
         
         $notify = $POST->get('notify');
         // turn notification on
         if (!empty($notify))
         {
-            //include_once("$sourcedir/Notify.php");
-            //Notify2(); FIXME
+            $app->im->Notify2($service->thread);
         }
         
         # Let's figure out what page number to show

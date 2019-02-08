@@ -6,7 +6,7 @@ class Localization {
 
     private $app;
     private $router;
-    private $lngfile;
+    public $lngfile;
     
     public $txt;
     public $img;
