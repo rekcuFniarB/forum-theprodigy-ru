@@ -789,6 +789,9 @@ class Threads extends Respond
                     AND (FIND_IN_SET('{$app->user->group}', c.memberGroups) != 0 || c.memberGroups = '' || '{$app->user->group}' LIKE 'Administrator' || '{$app->user->group}' LIKE 'Global Moderator')
                 )", false);
 
+            if ($dbrq->num_rows == 0)
+                $app->errors->abort('', 'No such post.');
+            
             list($service->msubject, $service->mname, $service->memail, $service->mdate, $service->micon, $service->mip, $service->mmessage, $service->mns, $service->mi, $service->mcomments) = $dbrq->fetch_row();
             
             if ($service->mi != '-1')
