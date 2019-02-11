@@ -13,8 +13,7 @@ class Board extends Respond
         parent::__construct($router);
         $this->moderators = array();
         $this->announcement = false;
-        $this->board = null;
-        $this->service->board = null;
+        $this->board = $this->service->board;
     }
     
     /**
@@ -30,8 +29,11 @@ class Board extends Respond
         
         $board = (int) $board;
         if ($board < 1)
+        {
             //return $this->error('Bad board specified.');
+            error_log("__WARNING__: bad board specified: $board");
             return;
+        }
         
         if ($this->board == $board)
             return;

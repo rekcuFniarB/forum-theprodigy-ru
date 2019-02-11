@@ -557,7 +557,7 @@ class User {
      * Get user access level
      * @return int
      */
-    public function accessLevel() { // FIXME
+    public function accessLevel($board = null) { // FIXME
         if($this->name == 'Guest')
             return 0;
         elseif($this->group == 'Global Moderator')
@@ -566,7 +566,7 @@ class User {
             return 4;
         else
         {
-            $board_moderators = $this->app->board->moderators();
+            $board_moderators = $this->app->board->moderators($board);
             if(isset($board_moderators[$this->name]))
                 return 2;
             else
