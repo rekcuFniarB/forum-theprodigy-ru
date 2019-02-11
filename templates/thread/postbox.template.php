@@ -18,18 +18,18 @@
 
                     <select name="txtcolor" onchange="surroundText('[color='+this.options[this.selectedIndex].value+']','[/color]')">
                       <option value="Black" selected="selected"><?= $this->locale->txt[262] ?></option>
-                      <option value="Red"><?= $this->locale->txt[263] ?></option>
-                      <option value="Yellow"><?= $this->locale->txt[264] ?></option>
-                      <option value="Pink"><?= $this->locale->txt[265] ?></option>
-                      <option value="Green">'. $txt[266] ?></option>
-                      <option value="Orange"><?= $this->locale->txt[267] ?></option>
-                      <option value="Purple"><?= $this->locale->txt[268] ?></option>
-                      <option value="Blue"><?= $this->locale->txt[269] ?></option>
-                      <option value="Beige"><?= $this->locale->txt[270] ?></option>
-                      <option value="Brown"><?= $this->locale->txt[271] ?></option>
-                      <option value="Teal"><?= $this->locale->txt[272] ?></option>
-                      <option value="Navy"><?= $this->locale->txt[273] ?></option>
-                      <option value="Maroon"><?= $this->locale->txt[274] ?></option>
+                      <option value="Red"><?=       $this->locale->txt[263] ?></option>
+                      <option value="Yellow"><?=    $this->locale->txt[264] ?></option>
+                      <option value="Pink"><?=      $this->locale->txt[265] ?></option>
+                      <option value="Green"><?=     $this->locale->txt[266] ?></option>
+                      <option value="Orange"><?=    $this->locale->txt[267] ?></option>
+                      <option value="Purple"><?=    $this->locale->txt[268] ?></option>
+                      <option value="Blue"><?=      $this->locale->txt[269] ?></option>
+                      <option value="Beige"><?=     $this->locale->txt[270] ?></option>
+                      <option value="Brown"><?=     $this->locale->txt[271] ?></option>
+                      <option value="Teal"><?=      $this->locale->txt[272] ?></option>
+                      <option value="Navy"><?=      $this->locale->txt[273] ?></option>
+                      <option value="Maroon"><?=    $this->locale->txt[274] ?></option>
                       <option value="LimeGreen"><?= $this->locale->txt[275] ?></option>
                     </select>
                     <br>
