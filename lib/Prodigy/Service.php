@@ -19,6 +19,12 @@ class Service extends \Klein\ServiceProvider
         $this->bbcode = null;
         $this->emoji = null;
         $this->menusep = ' | ';
+        
+        $this->addValidator('empty', function ($str) {
+            $str = trim($str);
+            return empty($str);
+        });
+        
         error_log("__CONSTRUCT__: SERVICE ". __NAMESPACE__);
     }
     
