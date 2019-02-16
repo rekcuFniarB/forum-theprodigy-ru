@@ -52,17 +52,21 @@ class Service extends \Klein\ServiceProvider
     /**
      * Parent class already has such method but doesn't allow to set charset
      * HtmlSpecialChars wrapper
-     * @param string $str       input string
+     * @param string $str       input string or key
      * @param string $charset   input encoding
      * @return string
      */
     public function esc($string, $charset = null) {
-        if (is_null($charset)) {
+        if ($charset === null) {
             if(defined('SITE_CHARSET'))
                 $charset = SITE_CHARSET;
             else
                 $charset = 'UTF-8';
         }
+        
+        if ($this->shared_data->exists($string))
+            $string = $this->shared_data->get($string);
+        
         $string = str_replace(array('<br />', '<br>'), "\n", $string);
         return htmlspecialchars($string, ENT_COMPAT, $charset, false);
     } // escape
