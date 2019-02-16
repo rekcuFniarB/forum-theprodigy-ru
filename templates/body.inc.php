@@ -27,12 +27,14 @@
 
 
 
-<?php if (!$this->app->conf->debug){
-      if (!defined('_SAPE_USER')){
-         define('_SAPE_USER', '35cffc2e45e75319980061a17e79df73');
-      }
-      require_once(PROJECT_ROOT.'/'._SAPE_USER.'/sape.php');
-        $o['force_show_code'] = true;
-        $sape = new SAPE_client($o);
-   }
+<?php 
+//// Why is it instantiated twice? We have it already in counters template.
+//   if ($this->app->conf->sape){
+//       if (!defined('_SAPE_USER')){
+//          define('_SAPE_USER', '35cffc2e45e75319980061a17e79df73');
+//       }
+//       require_once(PROJECT_ROOT.'/'._SAPE_USER.'/sape.php');
+//         $o['force_show_code'] = true;
+//         $sape = new SAPE_client($o);
+//    }
 ?>

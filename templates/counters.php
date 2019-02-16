@@ -88,16 +88,12 @@
   <br>
   Реклама:
 <?php
-if (!$this->app->conf->debug){
+if ($this->app->conf->sape){
     if (!defined('_SAPE_USER')){
        define('_SAPE_USER', '35cffc2e45e75319980061a17e79df73');
     }
     require_once(realpath(PROJECT_ROOT.'/'._SAPE_USER.'/sape.php'));
     $sape = new SAPE_client();
-}
-?>
-<?php
-if (!$this->app->conf->debug){
     echo $sape->return_links(5);
 }
 ?>
