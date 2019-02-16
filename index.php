@@ -123,8 +123,8 @@ $router->respond(function($request, $response, $service, $app, $router) {
     $service->ajax = $request->param('requesttype') || $request->headers()->get('X_REQUESTED_WITH', false);
     
     // Our custom PHP error page
-    // set_error_handler(array($app->errors, 'handler'), E_ALL)
-    set_error_handler(array($app->errors, 'handler'), E_STRICT);
+    set_error_handler(array($app->errors, 'handler'), E_ALL);
+    //set_error_handler(array($app->errors, 'handler'), E_STRICT);
 });
 
 //// Defaults for POST requests
@@ -197,6 +197,8 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/reply/[i:quote]?
 
 $router->respond(array('GET', 'POST'), '/b[i:board]/[i:start]?/', 'board->index');
 $router->respond(array('GET', 'POST'), '/b[i:board]/[all:start]/', 'board->index');
+
+$router->respond(array('GET', 'POST'), '/modify/[i:msg]/', 'thread->modify');
 
 //$router->respond('GET', '/main-static-call/', '\Prodigy\Router::Main');
 
