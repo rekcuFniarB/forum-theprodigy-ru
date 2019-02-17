@@ -7,11 +7,13 @@
                       <?php if (count($this->boardviewers[0]) > 0 and $this->boardviewers[1] > 0): ?>
                         и 
                       <?php endif; ?>
-                      <?php if ($this->boardviewers[1] % 10  == 1 and $this->boardviewers[1] != 11): ?>
-                        <?= $this->boardviewers[1] ?> гость
-                      <?php elseif ($this->boardviewers[1] % 10  > 1 and $this->boardviewers[1] % 10  < 5 and !($this->boardviewers[1] > 11 and $this->boardviewers[1] < 15)): ?>
-                        <?= $this->boardviewers[1] ?> гостя
-                      <?php else: ?>
-                        <?= $this->boardviewers[1] ?> гостей
-                      <?php endif; ?>
+                      <?php if ($this->boardviewers[1] > 0): /* guests */?>
+                        <?php if ($this->boardviewers[1] % 10  == 1 and $this->boardviewers[1] != 11): ?>
+                          <?= $this->boardviewers[1] ?> гость
+                        <?php elseif ($this->boardviewers[1] % 10  > 1 and $this->boardviewers[1] % 10  < 5 and !($this->boardviewers[1] > 11 and $this->boardviewers[1] < 15)): ?>
+                          <?= $this->boardviewers[1] ?> гостя
+                        <?php else: ?>
+                          <?= $this->boardviewers[1] ?> гостей
+                        <?php endif; ?>
+                      <?php endif; /* guests */?>
                     </font>
