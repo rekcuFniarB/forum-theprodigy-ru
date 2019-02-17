@@ -380,7 +380,7 @@
                                 
                                 <?php if($this->user->accessLevel() > 1 || ($this->user->id == $msg['ID_MEMBER'] && $this->user->id != -1)): ?>
                                   <?= $this->menusep() ?>
-                                  <a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/<?= $this->start ?>/modify/<?= $msgid ?>/?sesc=<?= $this->app->session->id ?>"><font size="1" class="imgwindowbg"><?= $this->locale->modify ?></font></a>
+                                  <a href="<?= SITE_ROOT ?>/modify/<?= $msgid ?>/"><font size="1" class="imgwindowbg"><?= $this->locale->modify ?></font></a>
                                   <?= $this->menusep() ?>
                                   <a href="javascript:DoConfirm('<?= $this->locale->txt[154] ?>?','<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/delete/<?= $msgid ?>/?reason=none&amp;sesc=<?= $this->app->session->id ?>');" onclick="Forum.Utils.deleteMessage(event)"><font size="1" class="imgwindowbg"><?= $this->locale->delete ?></font></a>
                                 

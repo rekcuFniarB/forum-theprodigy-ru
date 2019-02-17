@@ -5,18 +5,18 @@
                 <!-- LinkTree -->
                 <?php if($this->conf->enableInlineLinks): ?>
                   <font size="1">
-                    <b><a href="<?= SITE_ROOT ?>/" class="nav"><?= $this->conf->mbname ?></a></b>&nbsp;|&nbsp;<!--
-                    --><b><a href="<?= SITE_ROOT ?>/#<?= $this->cat ?>" class="nav"><?= $this->catname ?></a></b>&nbsp;|&nbsp;<!--
-                    --><b><a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->boardname ?></a></b>&nbsp;|&nbsp;<!--
-                    --><b><?= $this->title ?> ( <?= $this->sub ?> )</b>
+                    <b><a href="<?= SITE_ROOT ?>/" class="nav"><?= $this->esc($this->conf->mbname) ?></a></b>&nbsp;|&nbsp;<!--
+                    --><b><a href="<?= SITE_ROOT ?>/#<?= $this->cat ?>" class="nav"><?= $this->esc('catname') ?></a></b>&nbsp;|&nbsp;<!--
+                    --><b><a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->esc('boardname') ?></a></b>&nbsp;|&nbsp;<!--
+                    --><b><?= $this->esc('title') ?> ( <?= $this->esc('sub') ?> )</b>
                   </font>
                 <?php else: ?>
                   <font size="2">
                     <b>
-                      <img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="" />&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/" class="nav"><?= $this->conf->mbname ?></a><br />
-                      <img src="<?= $this->conf->imagesdir ?>/tline.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/#<?= $this->cat ?>" class="nav"><?= $this->catname ?></a><br />
-                      <img src="<?= $this->conf->imagesdir ?>/tline2.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->boardname ?></a><br />
-                      <img src="<?= $this->conf->imagesdir ?>/tline3.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<?= $this->title ?> ( <?=$this->sub ?> )
+                      <img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="" />&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/" class="nav"><?= $this->esc($this->conf->mbname) ?></a><br />
+                      <img src="<?= $this->conf->imagesdir ?>/tline.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/#<?= $this->cat ?>" class="nav"><?= $this->esc('catname') ?></a><br />
+                      <img src="<?= $this->conf->imagesdir ?>/tline2.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->esc('boardname') ?></a><br />
+                      <img src="<?= $this->conf->imagesdir ?>/tline3.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<?= $this->esc('title') ?> ( <?=$this->esc('sub') ?> )
                     </b>
                   </font>
                 <?php endif; ?>
@@ -36,7 +36,7 @@
               <td class="windowbg" bgcolor="<?= $this->conf->color['windowbg'] ?>">
                 <input type="hidden" name="threadid" value="<?= $this->thread ?>">
                 <table border="0" cellpadding="3" width="100%">
-                  <?php if($this->threadinfo['locked']): ?>
+                  <?php if($this->locked): ?>
                     <tr>
                       <td>&nbsp;</td>
                       <td align="left">
@@ -93,6 +93,10 @@
                       </td>
                       <td>
                         <select name="icon" onchange="showimage()">
+                          <?php if(!empty($this->icon)): ?>
+                              <option value="<?= $this->esc('icon') ?>"><?= $this->locale->txt[112] ?></option>
+                              <option value="<?= $this->esc('icon') ?>">------------</option>
+                          <?php endif; ?>
                           <option value="xx"><?= $this->locale->txt[281] ?></option>
                           <option value="thumbup"><?= $this->locale->txt[282] ?></option>
                           <option value="thumbdown"><?= $this->locale->txt[283] ?></option>
@@ -106,7 +110,11 @@
                           <option value="sad"><?= $this->locale->txt[291] ?></option>
                           <option value="wink"><?= $this->locale->txt[292] ?></option>
                         </select>
-                        <img src="<?= $this->conf->imagesdir ?>/xx.gif" name="icons" border="0" hspace="15" alt="">
+                        <?php if(!empty($this->icon)): ?>
+                          <img src="<?= $this->conf->imagesdir ?>/<?= $this->esc('icon') ?>.gif" name="icons" border="0" hspace="15" alt="">
+                        <?php else: ?>
+                          <img src="<?= $this->conf->imagesdir ?>/xx.gif" name="icons" border="0" hspace="15" alt="">
+                        <?php endif; ?>
                       </td>
                     </tr>
                     
@@ -120,7 +128,7 @@
                         </font>
                       </td>
                       <td>
-                        <input type="text" name="nowListening" size="50" maxlength="250" value="">
+                        <input type="text" name="nowListening" size="50" maxlength="250" value="<?= $this->esc($this->nowListening) ?>">
                       </td>
                     </tr>
                   <?php endif; ?>
@@ -128,14 +136,25 @@
                   <?php /* quick poll title by dig7er, 14.04.2010 */ ?>
                     <tr>
                       <td valign="top" align="right">
-                        <font size="2"><b>??стр?й ?прос:</b></font>
+                        <font size="2"><b>Быстрый опрос:</b></font>
                       </td>
                       <td>
-                        <input type="text" name="quickPoll" size="50" maxlength="250" value="">
+                        <input type="text" name="quickPoll" size="50" maxlength="250" value="<?= $this->esc($this->quickPollTitle) ?>">
                       </td>
                     </tr>
-                      
-                    <?php if( $this->user->accessLevel() > 2 && !$this->threadinfo['locked'] ): ?>
+                    
+                    <?php if(!empty($this->lastmodification)): ?>
+                      <tr>
+                        <td valign="top" align="right">
+                          <font size="2"><b><?= $this->locale->txt[211] ?>:</b></font>
+                        </td>
+                        <td>
+                          <font size="2"><?= $this->lastmodification ?></font>
+                        </td>
+                      </tr>
+                    <?php endif; ?>
+                    
+                    <?php if($this->lock): ?>
                       <tr>
                         <td align="right">
                           <font size="2"><b><?= $this->locale->yse13 ?>:</b></font>
@@ -149,7 +168,7 @@
                       </tr>
                     <?php endif; ?>
                     
-                    <?php if($this->conf->enable_notification && $this->user->name != 'Guest'): ?>
+                    <?php if($this->notify): ?>
                       <tr>
                         <td align="right">
                           <font size="2"><b><?= $this->locale->txt[131] ?>:</b></font>
@@ -172,34 +191,75 @@
                         <br>
                       </td>
                       <td>
-                        <input type="checkbox" name="ns" value="NS">
+                        <input type="checkbox" name="ns" value="NS" <?= $this->nosmiley ?>>
                         <font size="1"><?= $this->locale->txt[277] ?></font>
                         <br>
                         <br>
                       </td>
                     </tr>
                     
-                    <?php if($this->attachment_fields): ?>
+                    <?php if($this->mn): ?>
                     <tr>
-                      <td align="right" valign="top">
-                        <font size="2">
-                          <b><?= $this->locale->yse119 ?>:</b>
-                        </font>
-                        <br>
-                        <br>
+                      <td align="right">
+                        <font size="2"><b><?= $this->locale->Hierarchical18 ?>:</b></font>
+                        <br><br>
                       </td>
                       <td>
-                        <input type="file" size="48" name="attachment" onchange="updateFields();">
-                        <br>
-                        <font size="1">
-                          <?= $this->locale->yse120 ?>: <?= $this->conf->attachmentExtensions ?>
-                          <br>
-                          <?= $this->locale->yse121 ?>: <?= $this->locale->attachmentSizeLimit ?> KB
-                        </font>
-                        <input type="hidden" name="attachmentp" value="">
+                        <font size="2"><input type="checkbox" name="mn" value="MN"/></font>
+                        <font size="1"><?= $this->locale->txt['Hierarchical19'] ?></font>
                         <br><br>
                       </td>
                     </tr>
+                    <?php endif; ?>
+                    
+                    <?php if($this->attachment_fields): ?>
+                      <?php if($this->attachmentFilename): /* show delete checkbox */ ?>
+                        <tr>
+                          <td align="right">
+                            <font size="2"><b><?= $this->locale->yse119 ?>:</b></font>
+                            <br><br>
+                          </td>
+                          <td>
+                            <input type="hidden" name="attachOld" value="<?= $this->esc('attachmentFilename') ?>">
+                            <input type="checkbox" name="delAttach" value="on">
+                            <font size="1"><?= $this->locale->yse130 ?></font>
+                            <br><br>
+                          </td>
+                        </tr>
+                      <?php else: ?>
+                        <tr>
+                          <td align="right" valign="top">
+                            <font size="2">
+                              <b><?= $this->locale->yse119 ?>:</b>
+                            </font>
+                            <br><br>
+                          </td>
+                          <td>
+                            <input type="file" size="48" name="attachment" onchange="updateFields();">
+                            <br>
+                            <font size="1">
+                              <?= $this->locale->yse120 ?>: <?= $this->conf->attachmentExtensions ?>
+                              <br>
+                              <?= $this->locale->yse121 ?>: <?= $this->locale->attachmentSizeLimit ?> KB
+                            </font>
+                            <input type="hidden" name="attachmentp" value="">
+                            <br><br>
+                          </td>
+                        </tr>
+                      <?php endif; ?>
+                    <?php endif; /* attachment field */ ?>
+                    
+                    <?php if($this->modify): ?>
+                      <tr>
+                        <td valign="top" align="right">
+                          <font size="2"><b><?= $this->locale->mdfrznlbl ?>:</b></font>
+                        </td>
+                        <td>
+                          <font size="2">
+                            <input type="text" name="mdfrzn" required maxlength="256" placeholder="<?= $this->locale->mdfrznplchldr ?>" size="50">
+                          </font>
+                        </td>
+                      </tr>
                     <?php endif; ?>
                     
                     <tr>
@@ -219,6 +279,11 @@
                       <td colspan="2"></td>
                     </tr>
                   </table>
+                  <?php if($this->editfeed): ?>
+                    <div class="feed-mod-link">
+                      <a href="<?= SITE_ROOT ?>/feed/0/0/<?= $this->msg ?>/edit/"><?= $this->locale->feed_mod_lnk ?></a>
+                    </div>
+                  <?php endif; ?>
                 </td>
               </tr>
             </table>

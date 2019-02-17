@@ -634,22 +634,27 @@ class Threads extends Respond
         
     } // Display()
     
-    public function findBoard($prevboard, $threadid) {
+    private function getBoard($threadid)
+    {
+        $threadid = intval($threadid);
         $dbrq = $this->app->db->query(
-            "SELECT ID_BOARD FROM {$this->app->db->prefix}topics AS board WHERE ID_TOPIC = $threadid", false
+            "SELECT ID_BOARD FROM {$this->app->db->prefix}topics WHERE ID_TOPIC = $threadid", false
         );
         if ($dbrq->num_rows == 0)
             $this->app->errors->abort($this->app->locale->txt[106], $this->app->locale->txt[472]);
-        else {
+        else
             list($board) = $dbrq->fetch_row();
+        return intval($board);
+    }
+    
+    public function findBoard($prevboard, $threadid) {
+        $board = $this->getBoard($threadid);
             
-            $request_uri = $this->request->uri();
-            $new_uri = str_replace("/b$prevboard/", "/b$board/", $request_uri);
-            
-            
-            $this->app->errors->log("__DEBUG__: redirecting to $new_uri.");
-            return $this->service->redirect($new_uri);
-        }
+        $request_uri = $this->request->uri();
+        $new_uri = str_replace("/b$prevboard/", "/b$board/", $request_uri);
+        
+        $this->app->errors->log("__DEBUG__: redirecting to $new_uri.");
+        return $this->service->redirect($new_uri);
     } // findBoard()
     
     public function reply($request, $response, $service, $app)
@@ -901,6 +906,12 @@ class Threads extends Respond
         
         if ($service->thread > 0)
             $service->thread_summary = $this->thread_summary($service->thread);
+        
+        $service->threadinfo = $threadinfo;
+        
+        $service->notify = $app->conf->enable_notification && !$app->user->guest;
+        $service->lock = $app->user->accessLevel() > 2 && !$threadinfo['locked'];
+        $service->locked = $threadinfo['locked'];
         
         $this->render('templates/thread/reply.template.php');
     } // reply()
@@ -1194,7 +1205,7 @@ class Threads extends Respond
             }
         }
         
-        if (isset($app->session->userInfo) and ($app->session->userInfo['name'] != $rname or $app->session->userInfo['username'] != $app->user->name))
+        if (isset($app->session->userInfo) and isset($app->session->userInfo['name']) and ($app->session->userInfo['name'] != $rname or $app->session->userInfo['username'] != $app->user->name))
         {
             if ($app->user->guest and !in_array(crc32($rname), array_keys($app->session->userInfo['nicks'])) and sizeof($app->session->userInfo['nicks']) >= 2)
             {
@@ -1637,6 +1648,280 @@ class Threads extends Respond
         $message = $service->doubbc($message);
         return $this->ajax_response($message, 'html');
     }
+    
+    public function modify($request, $response, $service, $app)
+    {
+        if ($request->method() == 'GET')
+        {
+            //$app->session->check('get');
+            
+            // Show post modify form
+            
+            $PARAMS = $request->paramsNamed();
+            $GET = $request->paramsGet();
+            //$threadid = intval($PARAMS->thread);
+            $msg = intval($PARAMS->msg);
+            //$board = $this->getBoard($threadid);
+            
+            $db_prefix = $app->db->prefix;
+            
+            $dbrq = $app->db->query("SELECT m.*, t.locked, qpolls.POLL_TITLE FROM {$db_prefix}messages AS m LEFT JOIN {$db_prefix}quickpolls AS qpolls ON (m.ID_MSG = qpolls.ID_MSG), {$db_prefix}topics AS t WHERE (m.ID_MSG=$msg AND m.ID_TOPIC=t.ID_TOPIC) LIMIT 1;");
+            $row = $dbrq->fetch_assoc();
+            
+            $service->quickPollTitle = $row['POLL_TITLE'];
+            $threadid = $row['ID_TOPIC'];
+            
+            if ($row['locked'] == 1 && $app->user->accessLevel < 2)
+                return $app->errors->abort('', $app->locale->txt[90], 403);
+            
+            $service->title = $app->locale->txt[66];
+            
+            if ($row['ID_MEMBER'] != $app->user->id && $app->user->accessLevel() < 2)
+                return $app->errors-abort('', $app->locale->txt[67], 403);
+            
+            $service->lastmodification = (isset($row['modifiedTime']) ? $app->subs->timeformat($row['modifiedTime']) : '-');
+            $service->nosmiley = ($row['smiliesEnabled'] ? '' : ' checked="checked"');
+            
+            $row['body'] = preg_replace("|<br( /)?[>]|", "\n", $row['body']);
+            
+            if ($app->conf->notify_users && $app->user->id != $row['ID_MEMBER'])
+                $service->modify = true;
+            
+            if ($app->conf->attachmentEnable == 0)
+            {
+                // if attachments are disabled, don't show anything
+                $service->attachment_fields = 0;
+            }
+            elseif ($app->conf->attachmentEnable == 1)
+            {
+                if ($row['attachmentSize'] > 0)
+                {
+                    // if there is an attachment show only delete
+                    $service->attachment_fields = 2;
+                }
+                else
+                    $service->attachment_fields = 1;
+            }
+            elseif ($app->conf->attachmentEnable == 2)
+            {
+                if ($row['attachmentSize'] > 0)
+                {
+                    // if there is an attachment show only delete
+                    $service->attachment_fields = 2;
+                }
+            }
+            
+            if ($app->conf->attachmentMemberGroups != "")
+                if (!(in_array($app->user->group, explode(',', trim($app->conf->attachmentMemberGroups))) || $app->user->accessLevel > 2))
+                    $service->attachment_fields = 0;
+            
+            $dbrq = $app->db->query("SELECT b.ID_BOARD AS bid, b.name AS bname, c.ID_CAT AS cid, c.name AS cname, t.ID_MEMBER_STARTED FROM {$db_prefix}boards AS b, {$db_prefix}categories AS c, {$db_prefix}topics AS t WHERE (b.ID_BOARD=t.ID_BOARD AND b.ID_CAT=c.ID_CAT AND t.ID_TOPIC = $threadid)", false);
+            
+            $bcinfo = $dbrq->fetch_array();
+            
+            $board = intval($bcinfo['bid']);
+            $service->boardname = $bcinfo['bname'];
+            $curcat = $bcinfo['cid'];
+            $service->catname = $bcinfo['cname'];
+            
+            // preparing data for template {
+            $service->sub = $row['subject'];
+            $service->form_subject = $row['subject'];
+            $service->form_message = $row['body'];
+            $service->nowListening = $row['nowListening'];
+            $service->attachmentFilename = $row['attachmentFilename'];
+            $service->icon = $row['icon'];
+            $service->threadinfo = array('locked' => $row['locked'], 'ID_MEMBER_STARTED' => $bcinfo['ID_MEMBER_STARTED']);
+            $service->mn = true;
+            $service->msg = $msg;
+            $service->ses_id = $app->session->id;
+            $service->locked = $row['locked'];
+            
+            if ($app->user->accessLevel($board) > 1 )
+                $service->editfeed = true;
+            
+            return $this->render('templates/thread/reply.template.php');
+        }
+        elseif ($request->method() == 'POST')
+        {
+            if ($app->user->guest) return $app->errors->abort('', $app->locale->txt[223], 403);
+            
+            $app->session->check('post');
+            
+            $POST = $request->paramsPost();
+            $PARAMS = $request->paramsNamed();
+            $input = array();
+            
+            $input['mdfrzn'] = $POST->get('mdfrzn', '');
+            if ($service->ajax) $input['mdfrzn'] = mb_convert_encoding($input['mdfrzn'], $app->conf->charset, 'utf-8');
+            
+            $input['msg'] = intval($PARAMS->msg);
+            if ($input['msg'] < 1) return $app->errors->abort('', 'Wrong message ID');
+            
+            $ns = $POST->get('ns', '');
+            $input['smilies'] = ($ns != '') ? 0 : 1;
+            $input['mn'] = $POST->mn;
+            $input['subject'] = trim($POST->naztem);
+            $input['icon'] = $POST->get('icon', 'xx');
+            $service->validate($input['subject'], $app->locale->txt[77])->notEmpty();
+            $input['message'] = trim($POST->message);
+            $service->validate($input['message'], $app->locale->txt[499])->isLen(1, $app->conf->MaxMessLen);
+            $input['message'] = $app->subs->preparsecode($input['message']);
+            $input['nowListening'] = $POST->nowListening;
+            $input['quickPoll'] = trim($POST->quickPoll);
+            //$input['lock'] = $POST->get('lock', 'off');
+            $input['notify'] = $POST->get('notify', 'off');
+            $input['delAttach'] = $POST->get('delAttach', 'off');
+            $input['attachOld'] = $POST->attachOld;
+            $attachment = $request->files()->get('attachment');
+            error_log("__DEBUG__: INPUT: " . print_r($input, true));
+            
+            $db_prefix = $app->db->prefix;
+            
+            $dbst = $app->db->prepare("
+                SELECT m.ID_MSG, m.ID_MEMBER, m.attachmentSize, m.attachmentFilename, m.subject, m.body, t.locked, t.ID_FIRST_MSG, t.ID_LAST_MSG, t.ID_TOPIC, t.ID_POLL, t.numReplies, b.ID_BOARD, b.count, p.POLL_TITLE as quickPollOld
+                FROM {$db_prefix}messages AS m, {$db_prefix}topics AS t, {$db_prefix}boards AS b, {$db_prefix}quickpolls as p
+                WHERE m.ID_MSG = ? 
+                AND t.ID_TOPIC=m.ID_TOPIC
+                AND b.ID_BOARD=t.ID_BOARD
+                LIMIT 1");
+            $dbst->bind_param('i', $input['msg']);
+            $dbst->execute();
+            $dbrs = $dbst->get_result();
+            $dbst->close();
+            $row = $dbrs->fetch_assoc();
+            $dbrs->free();
+            
+            // whether user edits self message
+            if ($row['ID_MEMBER'] == $app->user->id) $self_edit = true;
+            else $self_edit = false;
+            
+            // Make sure the user is allowed to edit this post.
+            // Removed by Hierarchical Categories MOD - Begin
+            if (!$self_edit && $app->user->accessLevel() < 2)
+                return $app->errors->abort('', $app->locale->txt[67], 403);
+            
+            if ($row['locked'] == 1 && $app->user->accessLevel() < 2)
+                return $app->errors->abort('', $app->locale->txt[90], 403);
+            
+            if (!$self_edit && empty($input['mdfrzn']))
+                // Only author allowed to remove or modify without a reason
+                return $app->errors->abort('', $app->locale->mdfrznerr, 403);
+            
+            $input['threadid'] = $row['ID_TOPIC'];
+            
+            if ($input['delAttach'] == 'on')
+            {
+                $service->validate($input['delAttach'], 'Empty filename to remove.')->notEmpty();
+                unlink($app->conf->attachmentUploadDir . "/" . $input['attachOld']);
+                
+                $dbst = $app->db->prepare("UPDATE {$db_prefix}messages SET attachmentSize='0', attachmentFilename=NULL WHERE ID_MSG=?");
+                $dbst->bind_param('i', $input['msg']);
+                $dbst->execute();
+                $dbst->close();
+            }
+            elseif ($attachment !== null && $attachment['name'] != '' && $app->conf->attachmentEnable > 0 && ($app->conf->attachmentMemberGroups == "" || in_array($app->user->group, explode(',', trim($app->conf->attachmentMemberGroups))) || $app->user->accessLevel() > 2))
+            {
+                $attachment['name'] = preg_replace(
+                    array("/\s/", "/[äåãâáà]/", "/[ÄÅÁÂÀÃ]/", "/[öòóôõøð]/", "/[ÖØÔÒÔÕ]/", "/[éèêë]/", "/[ÉÊËÈ]/", "/[ûüùú]/", "/[ÜÛÚÙ]/", "/[ïîìí]/", "/[ÍÎÏ]/", "/[ç]/", "/[ñ]/",	"/[Ñ]/", "/[^\w_.-]/"),
+                    array('_', 'a', 'A', 'o', 'O', 'e', 'E', 'u', 'U', 'i', 'I', 'c', 'n', 'N', ''), 
+                    $attachment['name']
+                );
+                
+                if ($attachment['size'] > $app->conf->attachmentSizeLimit * 1024)
+                    return $app->errors->abort('', "{$app->locale->yse122} {$app->conf->attachmentSizeLimit}.");
+                if ($app->conf->attachmentCheckExtensions == "1")
+                    if (!in_array(strtolower(substr(strrchr($attachment['name'], '.'), 1)), explode(',', strtolower($app->conf->attachmentExtensions))))
+                        return $app->errors->abort('', "{$attachment['name']}.<br />{$app->locale->yse123} {$app->conf->attachmentExtensions}.");
+                
+                // make sure they aren't trying to upload a nasty file
+                $disabledFiles = array('CON','COM1','COM2','COM3','COM4','PRN','AUX','LPT1');
+                if (in_array(strtoupper(substr(strrchr($attachment['name'], '.'), 1)), $disabledFiles))
+                    return $app->errors->abort('', "{$attachment['name']}.<br />{$app->locale->yse130b}.");
+                
+                if (!file_exists($app->conf->attachmentUploadDir . "/" . $attachment['name']))
+                {
+                    $dirSize = "0";
+                    $dir = opendir($app->conf->attachmentUploadDir);
+                    while ($file = readdir($dir))
+                        $dirSize = $dirSize + filesize($app->conf->attachmentUploadDir . "/" . $file);
+                        if ($attachment['size'] + $dirSize > $app->conf->attachmentDirSizeLimit * 1024)
+                            return $app->errors->abort('', $app->locale->yse126);
+                    
+                    $parts = (!empty($attachment) ? preg_split("~(\\|/)~", $attachment['name']) : array());
+                    $destName = array_pop($parts);
+                    
+                    if (!move_uploaded_file($attachment['tmp_name'], $app->conf->attachmentUploadDir . "/" . $destName))
+                        return $app->errors->abort('', $app->locale->yse124);
+                    chmod("{$app->conf->attachmentUploadDir}/$destName", 0644) || $chmod_failed = 1;
+                    
+                    $dbst = $app->db->prepare("UPDATE {$db_prefix}messages SET attachmentSize=?, attachmentFilename=? WHERE ID_MSG=?");
+                    $dbst->bind_param('isi', $attachment['size'], $attachment['name'], $input['msg']);
+                    $dbst->execute();
+                    $dbst->close();
+                }
+            }
+            
+            $modTime = time();
+            
+            $dbst = $app->db->prepare("UPDATE {$db_prefix}messages SET subject = ?, icon = ?, body = ?, modifiedTime = ?, modifiedName = ?, smiliesEnabled = ?, nowListening = ? WHERE ID_MSG = ?;");
+            $dbst->bind_param('sssisisi', $input['subject'], $input['icon'], $input['message'], $modTime, $app->user->realname, $input['smilies'], $input['nowListening'], $input['msg']);
+            if(!$dbst->execute()) return $app->errors->abort('', $dbst->error, 500);
+            $dbst->close();
+            
+            // quick poll mod by dig7er, 14.04.2010
+            if ($input['quickPoll'] != $row['quickPollOld'])
+            {
+                if (empty($input['quickPoll']))
+                {
+                    $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG = ?");
+                    $dbst->bind_param('i', $input['msg']);
+                    $dbst->execute();
+                    $dbst->close();
+                    $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG = ?");
+                    $dbst->bind_param('i', $input['msg']);
+                    $dbst->execute();
+                    $dbst->close();
+                }
+                else
+                {
+                      $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG = ?");
+                      $dbst->bind_param('i', $input['msg']);
+                      $dbst->execute();
+                      $dbst->close();
+                      $dbst = $app->db->prepare("REPLACE INTO {$db_prefix}quickpolls
+                          (ID_MSG, POLL_TITLE)
+                          VALUES (?, ?)");
+                      $dbst->bind_param('is', $input['msg'], $input['quickPoll']);
+                      $dbst->execute();
+                      $dbst->close();
+                }
+            }
+            
+            if (!empty($input['mn']))
+                $app->im->NotifyUsers($input['threadid'], $row['subject']);
+            
+            if (!$self_edit && $app->conf->notify_users)
+            {
+                // Notify users to IM
+                $notice_from_user = urlencode($app->user->name);
+                $notice_sbj = $app->locale->mdfsbj;
+                $notice_msg = "[url=" . SITE_ROOT . "/people/$notice_from_user/]{$app->user->realname}[/url] {$app->locale->mdfdyr} [url=" . SITE_ROOT . "/{$input['msg']}/]{$app->locale->txt[471]}[/url].\n";
+                
+                $notice_msg .= "[b]{$app->locale->mdfrznlbl}[/b]: {$input['mdfrzn']}\n\n";
+                $notice_msg .= "[h={$app->locale->mdfdrgn}][b][u]{$row['subject']}[/u][/b]\n\n{$row['body']}[/h]";
+                $app->im->send_notice($row['ID_MEMBER'], $notice_sbj, $notice_msg);
+            } // if not self modify
+            
+            return $this->redirect("/b{$row['ID_BOARD']}/t{$row['ID_TOPIC']}/msg{$input['msg']}/#msg{$input['msg']}");
+            
+        } // POST
+        else
+        {
+            // normally we shouldn't get here
+            $app->errors->abort('', 'Bad request.', 400);
+        }
+    } // modify
 }
 
 ?>

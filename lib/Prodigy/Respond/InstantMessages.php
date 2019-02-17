@@ -183,7 +183,12 @@ class InstantMessages extends Respond
     
     public function sendmail()
     {
+        // TODO
+    }
     
+    public function send_notice()
+    {
+        // TODO
     }
 
 }
