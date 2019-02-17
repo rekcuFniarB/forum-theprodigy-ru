@@ -114,6 +114,20 @@ class MySQLDatabase extends \Mysqli {
         return $request;
     }
     
+    /**
+     * mysqli->prepare() wrapper
+     * @param string $query SQL query string
+     * @return object statement
+     */
+    public function prepare($query)
+    {
+        $stmt = parent::prepare($query);
+        if ($stmt === false)
+            throw new Errors\MySQLException($this->error, $this->errno);
+        else
+            return $stmt;
+    }
+    
     public function show_error($file='none', $line='none') {
         error_log("__SQL_ERROR__: [{$this->errno}] {$this->error} File: $file at line $line");
         return; // FIXME
