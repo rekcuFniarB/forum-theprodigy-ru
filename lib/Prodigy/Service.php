@@ -447,7 +447,7 @@ class Service extends \Klein\ServiceProvider
         }
         $message = str_replace(
             array('{<{', '}>}', '  ', "\t", "\r", "\n"),
-            array('[', ']', '&nbsp; ', '&nbsp; &nbsp; ', '', "<br>\n"), $message
+            array('[', ']', '&nbsp; ', '&nbsp;&nbsp;&nbsp;&nbsp;', '', "<br>\n"), $message
         );
         
         // html

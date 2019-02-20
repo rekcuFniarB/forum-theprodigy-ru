@@ -203,9 +203,150 @@ class Subs {
      */
     public function preparsecode($message)
     {
-        // FIXME 
+        if (strstr($this->app->user->realname, '[') || strstr($this->app->user->realname, ']') || strstr($this->app->user->realname, '\'') || strstr($this->app->user->realname, '"'))
+            $realname = $this->app->user->name;
+        else
+            $realname = $this->app->user->realname;
+        
+        $codes = array('/(\/me) (.*)([\r\n]?)/i');
+        $codesto = array("[me=$realname]\\2[/me]\\3");
+        
+        $message = preg_replace($codes, $codesto, $message);
+        
+        $message = str_replace(array("\r\n", "\n\r", "\v"), array("\n", "\n", "\n"), $message);
+        
+        // Check if all quotes are closed
+        $parts = preg_split ("/(\[\/quote\])/is", $message, -1, PREG_SPLIT_DELIM_CAPTURE);
+        
+        $level = 0;
+        for ($i = 0; $i < count($parts); $i++)
+        {
+            if (preg_match('/\[\/quote\]/i',$parts[$i]) !=0 )
+                $level--;
+            preg_match_all("~(\[quote author=(.+?) msg=(\d+?) date=(\d+?)\])|(\[quote\])~is", $parts[$i], $regs);
+            $level += count ($regs[0]);
+            while ($level < 0)
+            {
+                $parts[$i] = '[quote]'.$parts[$i];
+                $level++;
+            }
+        }
+        $message = implode ('', $parts);
+        while ($level > 0)
+        {
+            $message .= '[/quote]';
+            $level--;
+        }
+        
+        // Check if all code tags are closed
+        preg_match_all("/(\[code\])/", $message, $regs);
+        $codeopen = count($regs[0]);
+        preg_match_all("/(\[\/code\])/", $message, $regs);
+        $codeclose = count($regs[0]);
+        
+        if ($codeopen > $codeclose)
+        {
+            $toclose = $codeopen - $codeclose;
+            for ($i = 0 ; $i < $toclose ; $i++)
+                $message .= "[/code]";
+        }
+        elseif ($codeclose > $codeopen)
+        {
+            $toopen = $codeclose - $codeopen;
+            for ($i = 0 ; $i < $toopen ; $i++)
+                $message = "[code]$message";
+        }
+        
+        // now that we've fixed all the code tags, let's fix the IMG and URL tags
+        $parts = preg_split('/\[\/?code\]/', " $message");
+        
+        for ($i = 0 ;$i < count($parts) ;$i++)
+        {
+            if ($i % 2 == 0)
+            {
+                $parts[$i] = $this->fixTags($parts[$i]);
+                if ($i > 0)
+                    $parts[$i] = '[/code]' . $parts[$i];
+            }
+            else
+                $parts[$i] = '[code]' . $parts[$i];
+        }
+        $message = substr(implode('', $parts), 1);
+        
         return $message;
-    }
+    } // preparsecode()
+
+    private function fixTags($message)
+    {
+        $fixArray = array
+            (
+                array('tag' => 'img', 'protocol' => 'http', 'embeddedUrl' => false, 'hasEqualSign' => false),
+                array('tag' => 'url', 'protocol' => 'http', 'embeddedUrl' => true, 'hasEqualSign' => false),
+                array('tag' => 'url', 'protocol' => 'http', 'embeddedUrl' => true, 'hasEqualSign' => true),
+                array('tag' => 'iurl', 'protocol' => 'http', 'embeddedUrl' => true, 'hasEqualSign' => false),
+                array('tag' => 'iurl', 'protocol' => 'http', 'embeddedUrl' => true, 'hasEqualSign' => true),
+                array('tag' => 'ftp', 'protocol' => 'ftp', 'embeddedUrl' => true, 'hasEqualSign' => false),
+                array('tag' => 'ftp', 'protocol' => 'ftp', 'embeddedUrl' => true, 'hasEqualSign' => true),
+                array('tag' => 'flash', 'protocol' => 'http', 'embeddedUrl' => false, 'hasEqualSign' => true)
+            );
+        
+        foreach ($fixArray as $param)
+            $message = $this->fixTag($message, $param['tag'], $param['protocol'], $param['embeddedUrl'], $param['hasEqualSign']);
+        
+        return $message;
+    } // fixTags()
+    
+    private function fixTag($message, $myTag, $protocol, $embeddedUrl = false, $hasEqualSign = false)
+    {
+        $isEqual = ($hasEqualSign ? '(=(.+?))' : '(())');
+        while (preg_match("/\[($myTag)$isEqual\](.+?)\[\/($myTag)\]/si", $message, $matches))
+        {
+            $leftTag = $matches[1];
+            $equalTo = $matches[3];
+            $searchfor = $matches[4];
+            $rightTag = $matches[5];
+            $replace = ($hasEqualSign && $embeddedUrl ? $equalTo : $searchfor);
+            $replace = trim($replace);	// remove all leading and trailing whitespaces
+            
+            if (!stristr($replace, "$protocol://"))
+            {
+                if ($protocol != 'http' || !stristr($replace,'https://'))
+                    $replace = "$protocol://$replace";
+                else
+                    $replace = stristr($replace, 'https://');
+            }
+            else
+                $replace = stristr($replace, "$protocol://");
+            
+            if ($hasEqualSign && $embeddedUrl)
+                $message = str_replace(
+                    "[$leftTag=$equalTo]{$searchfor}[/$rightTag]",
+                    "\{$myTag=$replace]$searchfor\{/$myTag\}", $message);
+            elseif ($hasEqualSign && !$embeddedUrl)
+                $message = str_replace(
+                    "[$leftTag=$equalTo]{$searchfor}[/$rightTag]",
+                    "\{$myTag=$equalTo]$replace\{/$myTag\}", $message);
+            elseif ($embeddedUrl)
+                $message = str_replace(
+                    "[$leftTag]{$searchfor}[/$rightTag]",
+                    "\{$myTag=$replace]$searchfor\{/$myTag\}", $message);
+            else
+                $message = str_replace(
+                    "[$leftTag]{$searchfor}[/$rightTag]",
+                    "\{$myTag\}$replace\{/$myTag\}", $message);
+        }
+        
+        if ($embeddedUrl || $hasEqualSign)
+            $message = str_replace(
+                array("\{$myTag=", "\{/$myTag\}"),
+                array("[$myTag=", "[/$myTag]"), $message);
+        else
+            $message = str_replace(
+                array("\{$myTag\}", "\{/$myTag\}"),
+                array("[$myTag]", "[/$myTag]"), $message);
+        
+        return $message;
+    } // fixTag()
     
     public function updateStats($type)
     {
