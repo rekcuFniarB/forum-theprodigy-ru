@@ -272,6 +272,7 @@ class User {
             $this->cache[$user] = $request->fetch_array();
             $this->cache[$user]['found'] = true;
             $this->cache[$user]['name'] = $user;
+            $this->cache[$user]['guest'] = false;
             if (!isset($this->cache[$user]['realName']))
                 $this->cache[$user]['realName'] = $user;
             if (!isset($this->cache[$user]['signature']))
@@ -339,6 +340,7 @@ class User {
             $this->cache[$user]['memberinfo'] = '';
             $this->cache[$user]['memberstar'] = '';
             $this->cache[$user]['groupinfo'] = '';
+            $this->cache[$user]['guest'] = true;
             //$yyUDLoaded[$user]=0;
             
             return $this->cache[$user];
