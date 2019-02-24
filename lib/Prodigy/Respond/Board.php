@@ -35,9 +35,18 @@ class Board extends Respond
             return;
         }
         
-        if ($this->moderators !== null && $board == $this->board)
-            // we already got it
+        if (is_array($this->moderators))
+        {
+            // we already got here earlier
+            
             return;
+        }
+        
+        // Initial data
+        $this->board = $board;
+        $this->service->board = $board;
+        $this->service->board_moderators = $this->moderators = array();
+        $this->announcement = false;
         
         $db = $this->app->db;
         $dbrq = $db->query("SELECT b.moderators, b.isAnnouncement FROM {$db->prefix}boards AS b WHERE (b.ID_BOARD='$board')", false);
@@ -57,14 +66,6 @@ class Board extends Respond
             }
             $this->moderators = $this->service->board_moderators = $_moderators;
         }
-        else
-        {
-            $this->service->board_moderators = $this->moderators = array();
-            $this->announcement = false;
-        }
-        
-        $this->board = $board;
-        $this->service->board = $board;
     } // load()
     
     public function isAnnouncement($board = null)
@@ -84,15 +85,9 @@ class Board extends Respond
      */
     public function index($request, $response, $service, $app)
     {
-        error_log('__RESPONSE__: BOARD');
-        //$this->board = intval($request->param('board'));
         $this->load($request->param('board'));
-        //$service->board = $this->board;
-        
         $user = $app->user;
         $site_root = SITE_ROOT;
-        
-        error_log("__DEBUG__: USER: {$app->user->id}");
         
         $db_prefix = $app->db->prefix;
         
