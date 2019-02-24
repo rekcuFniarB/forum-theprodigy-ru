@@ -11,7 +11,7 @@ class Board extends Respond
     public function __construct($router)
     {
         parent::__construct($router);
-        $this->moderators = array();
+        $this->moderators = null;
         $this->announcement = false;
         $this->board = $this->service->board;
     }
@@ -21,26 +21,19 @@ class Board extends Respond
      */
     public function load($board = null)
     {
-        //if($board === null && $this->board === null)
-            //return $this->error('Error, board should not be null.');
-        
-        // FIXME need to do something with it
-        
         if ($board === null)
             $board = $this->board;
         
         $board = (int) $board;
         if ($board < 1)
         {
-            //return $this->error('Bad board specified.');
-            error_log("__WARNING__: bad board specified: $board");
-            return;
+            return $this->error("Invalid board $board.");
         }
         
-        if ($this->board == $board)
+        if ($this->moderators !== null && $board == $this->board)
+            // we already got it
             return;
         
-        //$app = $this->app;
         $db = $this->app->db;
         $dbrq = $db->query("SELECT b.moderators, b.isAnnouncement FROM {$db->prefix}boards AS b WHERE (b.ID_BOARD='$board')", false);
         
@@ -67,7 +60,7 @@ class Board extends Respond
         
         $this->board = $board;
         $this->service->board = $board;
-    }
+    } // load()
     
     public function isAnnouncement($board = null)
     {
@@ -107,8 +100,6 @@ class Board extends Respond
         if ($result->num_rows == 0)
             return $app->errors->abort('Error', $app->locale->txt('yse232', 'No such board'));
         list ($boardname,$bdescrip,$bdmods,$cat,$currcat,$temp2,$isAnnouncement,$topiccount) = $result->fetch_row();
-        
-        //$service->board_moderators = $app->user->LoadBoardModerators($bdmods);
         
         $memgroups = explode(',',$temp2);
         if (!(in_array($user->group, $memgroups) || $memgroups[0] == null || $user->accessLevel() > 2))

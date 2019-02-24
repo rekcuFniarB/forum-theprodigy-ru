@@ -506,9 +506,11 @@ class User {
      * @return bool
      */
     public function isBoardModerator($user = null) {
-        if (!isset($this->service->board_moderators) && !is_array($this->service->board_moderators)) {
-            //$this->app->errors->abort('Error', 'Could not check board moderators, list is empty');
-            return false;
+        $board_moderators = $this->app->board->moderators();
+        if (empty($board_moderators) || !is_array($board_moderators))
+        {
+            return $this->app->errors->abort('Error', "Could not check if $user is board moderators, list is null. Probably calling isBoardModerator() too early.");
+            //return false;
         }
         if (null === $user) $user = $this->name;
         

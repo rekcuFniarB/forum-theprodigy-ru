@@ -33,7 +33,7 @@ class Threads extends Respond
         if ($currentboard == 0 || empty($currentboard))
             return $this->findBoard($currentboard, $threadid);
         
-        $service->board_moderators = $app->user->LoadBoardModerators($currentboard);
+        $board_moderators = $app->board->moderators($currentboard);
         
         $db_prefix = $app->db->prefix;
         $db = $app->db;
@@ -52,12 +52,17 @@ class Threads extends Respond
                 WHERE (mes.ID_MSG=t.ID_LAST_MSG && t.ID_BOARD=$currentboard && t.ID_TOPIC=$threadid && ((mes2.posterTime $gt_lt mes.posterTime && t2.isSticky $gt_lt= t.isSticky) || t2.isSticky $gt_lt t.isSticky) && t2.ID_LAST_MSG=mes2.ID_MSG && t2.ID_BOARD=t.ID_BOARD)
                 ORDER BY t2.isSticky $order, mes2.posterTime $order LIMIT 1";
 
-            $dbrq = $db->query($query, false);
-            if ($dbrq->num_rows > 0){
-                list ($threadid) = $dbrq->fetch_row();
+            $dbst = $db->prepare($query);
+            $dbst->bind_param('ii', $currentboard, $threadid);
+            $dbst->execute();
+            $dbrs = $dbst->get_result();
+            $dbst->close();
+            if ($dbrs->num_rows > 0){
+                list ($threadid) = $dbrs->fetch_row();
+                $dbrs->free();
                 return $service->redirect("/b$currentboard/t$threadid/");
             }
-            elseif($dbrq->num_rows == 0)
+            elseif($dbrs->num_rows == 0)
                 return $app->errors->abort('', 'You have reached the end of the topic list');
         }
         
@@ -232,14 +237,14 @@ class Threads extends Respond
         $showmods = '';		// create an empty string
         $tmp = array();		// used to temporarily store the list
         
-        if (sizeof($service->board_moderators) > 0)
+        if (sizeof($board_moderators) > 0)
         {
-            if (sizeof($service->board_moderators) == 1)    // if only one mod - use a different string
+            if (sizeof($board_moderators) == 1)    // if only one mod - use a different string
                 $showmods = "({$app->locale->txt[298]}: ";
             else
                 $showmods = "({$app->locale->txt[299]}: ";
             
-            foreach ($service->board_moderators as $modername => $moderinfo)
+            foreach ($board_moderators as $modername => $moderinfo)
             {
                 $euser = urlencode($modername);
                 $tmp[] = '<a href="' . SITE_ROOT . '/people/' . $euser . '/"><acronym title="' . $app->locale->txt[62] . '">' . $service->esc($moderinfo['realName']) . '</acronym></a>';
