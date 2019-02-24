@@ -864,7 +864,7 @@ class Threads extends Respond
                 $service->form_subject = '' . $service->form_subject;
             
             if (!empty($service->quickreplyquote))
-                return $this->ajax(str_replace(array('&quot;', '&lt;', '&gt;'), array('"', '<', '>'), $service->form_message), 'txt');
+                return $this->ajax_response(str_replace(array('&quot;', '&lt;', '&gt;'), array('"', '<', '>'), $service->form_message), 'txt');
         }
         else if ($service->thread != '' && $service->quotemsg == '')
         {
