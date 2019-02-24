@@ -111,7 +111,7 @@ class Main extends Respond {
      */
     public function index($request, $response, $service, $app) {
         $db_prefix = $app->db->prefix;
-        
+        $service->board = -1;
         if ($request->param('markallasread') == 1) {
             // Mark all boards as read and exit
             $result = $app->db->query("
@@ -241,8 +241,7 @@ class Main extends Respond {
             }
         }
         
-        
-        $condition = ($app->user->accessLevel() > 2 ? '1' : "(FIND_IN_SET('{$app->user->group}', c.memberGroups) != 0 || c.memberGroups='')");
+        $condition = ($app->user->isStaff() ? '1' : "(FIND_IN_SET('{$app->user->group}', c.memberGroups) != 0 || c.memberGroups='')");
         $result_boards = $app->db->query ("
             SELECT DISTINCT c.name AS catName, c.ID_CAT, b.ID_BOARD, b.name AS boardName, b.description, b.moderators, b.numPosts, b.numTopics, c.memberGroups, m.posterName, m.posterTime, m.subject, t.ID_TOPIC, t.numReplies, IFNULL(mem.realName, m.posterName) AS realName, IFNULL(lb.logTime, 0) AS boardTime, IFNULL(lmr.logTime, 0) AS markReadTime, IFNULL(mem.ID_MEMBER, -1) AS ID_MEMBER, IFNULL(lon.viewers, 0) AS numBoardViewers
             FROM {$db_prefix}categories AS c
@@ -292,7 +291,7 @@ class Main extends Respond {
                 // $subject = CensorTxt($subject);
                 $topicID = $row_board['ID_TOPIC'];
                 $subject = str_replace (array('&quot;', '&#039;', '&amp;', '&lt;', '&gt;'),  array('"', "'", '&', '<', '>'),  $subject);
-                $subject = (strlen($subject) > 80)? $app->subs->htmlescape(substr($subject, 0, 80) . '...') : $app->subs->htmlescape($subject);
+                $subject = (strlen($subject) > 80)? $service->esc(substr($subject, 0, 80) . '...') : $service->esc($subject);
                 $numReplies = $row_board['numReplies'];
                 $startPage = (floor(($numReplies)/$app->conf->maxmessagedisplay)*$app->conf->maxmessagedisplay);
                 $latestPostSubject = ($subject ? ' <a href="' . SITE_ROOT . "/b{$row_board['ID_BOARD']}/t$topicID/new/\"><b class=\"latestPostSubject\">$subject</b></a>" : $app->locale->txt[470]);
@@ -328,7 +327,7 @@ class Main extends Respond {
                 }
                 
                 // alt text for button
-                if ($app->user->name != 'Guest') {
+                if ($app->user->guest) {
                     if($new == 'on') {
                         $new_txt = $app->locale->txt[333];
                     } else {
@@ -342,17 +341,16 @@ class Main extends Respond {
                     // Hide last post name of ignored user
                     $latestPostName = '';
                 }
-                elseif ($latestPostName != $this->app->locale->txt[470] && $latestPostID != '-1') {
+                elseif ($latestPostName != $app->locale->txt[470] && $latestPostID != '-1') {
                     $euser=urlencode($latestPostName);
                     $latestPostName = '<a href="' . SITE_ROOT . "/people/$euser/\"><b class=\"latestPostRealName\">".$service->esc($latestPostRealName)."</b></a>";
                 }
-                if ($latestPostTime != $this->app->locale->txt[470])
-                    $latestPostTime = $this->app->subs->timeformat($latestPostTime);
+                
+                if ($latestPostTime != $app->locale->txt[470])
+                    $latestPostTime = $app->subs->timeformat($latestPostTime);
                 
                 $cats[$curcat]['boards'][$curboard] = $row_board;
-                
                 $cats[$curcat]['boards'][$curboard]['n'] = (($c++)%2)+1;
-                
                 $cats[$curcat]['boards'][$curboard]['boardViewers'] = $row_board['numBoardViewers'];
                 $cats[$curcat]['boards'][$curboard]['latestPostSubject'] = $latestPostSubject;
                 $cats[$curcat]['boards'][$curboard]['latestPostTime'] = $latestPostTime;

@@ -507,14 +507,14 @@ class User {
      */
     public function isBoardModerator($user = null) {
         $board_moderators = $this->app->board->moderators();
-        if (empty($board_moderators) || !is_array($board_moderators))
+        if (!is_array($board_moderators))
         {
             return $this->app->errors->abort('Error', "Could not check if $user is board moderators, list is null. Probably calling isBoardModerator() too early.");
             //return false;
         }
         if (null === $user) $user = $this->name;
         
-        return in_array($user, $this->service->board_moderators) || isset($this->service->board_moderators[$user]);
+        return in_array($user, $board_moderators) || isset($board_moderators[$user]);
     } // isBoardModerator()
 
     /**
@@ -577,7 +577,14 @@ class User {
                 return 1;
         }
     } // getAccessLevel()
-
+    
+    public function isStaff()
+    {
+        if($this->group == 'Global Moderator' || $this->group == 'Administrator')
+            return true;
+        else
+            return false;
+    }
     
     public function allowedToReply($ID_MEMBER = null, $board = null)
     {

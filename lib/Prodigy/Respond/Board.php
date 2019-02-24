@@ -25,9 +25,14 @@ class Board extends Respond
             $board = $this->board;
         
         $board = (int) $board;
-        if ($board < 1)
+        if ($board == 0)
+            return $this->error("Board info requested but no board ID specified.");
+        elseif ($board == -1)
         {
-            return $this->error("Invalid board $board.");
+            $this->service->board_moderators = $this->moderators = array();
+            $this->announcement = false;
+            $this->board = $this->service->board = -1;
+            return;
         }
         
         if ($this->moderators !== null && $board == $this->board)
