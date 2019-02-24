@@ -199,6 +199,7 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/[i:start]?/', 'board->index'
 $router->respond(array('GET', 'POST'), '/b[i:board]/[all:start]/', 'board->index');
 
 $router->respond(array('GET', 'POST'), '/modify/[i:msg]/', 'thread->modify');
+$router->respond(array('GET', 'POST'), '/delete/[i:msg]/', 'thread->deleteMsg');
 
 //$router->respond('GET', '/main-static-call/', '\Prodigy\Router::Main');
 

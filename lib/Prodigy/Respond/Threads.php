@@ -1921,7 +1921,215 @@ class Threads extends Respond
             // normally we shouldn't get here
             $app->errors->abort('', 'Bad request.', 400);
         }
-    } // modify
+    } // modify()
+    
+    public function deleteMsg($request, $response, $service, $app)
+    {
+        
+        if ($app->user->guest) return $this->error(147, 403);
+        
+        $msg = $request->paramsNamed()->get('msg');
+        
+        $db_prefix = $app->db->prefix;
+        
+        $dbst = $app->db->prepare("
+                SELECT m.ID_MSG, m.ID_MEMBER, m.attachmentSize, m.attachmentFilename, m.subject, m.body, m.posterName, m.posterTime, t.locked, t.ID_FIRST_MSG, t.ID_LAST_MSG, t.ID_TOPIC, t.ID_POLL, t.numReplies, b.ID_BOARD, b.count, p.POLL_TITLE as quickPollOld
+                FROM {$db_prefix}messages AS m, {$db_prefix}topics AS t, {$db_prefix}boards AS b, {$db_prefix}quickpolls as p
+                WHERE m.ID_MSG = ? 
+                AND t.ID_TOPIC=m.ID_TOPIC
+                AND b.ID_BOARD=t.ID_BOARD
+                LIMIT 1");
+        $dbst->bind_param('i', $msg);
+        $dbst->execute();
+        $dbrs = $dbst->get_result();
+        $dbst->close();
+        
+        if ($dbrs->num_rows == 0) return $this->error("Message $msg not found.");
+        
+        $row = $dbrs->fetch_assoc();
+        $dbrs->free();
+        
+        $threadid = $row['ID_TOPIC'];
+        
+        // whether user deletes self message
+        if ($row['ID_MEMBER'] == $app->user->id) $selfdel = true;
+        else $selfdel = false;
+        
+        // get board id of this thread
+        $boardid = $row['ID_BOARD'];
+        // load board info
+        $app->board->load($boardid);
+        
+        // Make sure the user is allowed to delete this post.
+        if ($app->user->accessLevel() < 2)
+        {
+            // Non privileged users allowed delete only self post
+            if (!$selfdel)
+                return $this->error(67, 403);
+            
+            // Non privileged users not allowed to delete post in locked thread
+            if ($row['locked'] == 1)
+                return $this->error(90, 403);
+        }
+        
+        $redirect = "/b$boardid/t$threadid/new/";
+        $ajaxresponse = '["OK"]';
+        
+        $firstOrOnly = false;
+        if ($row['ID_FIRST_MSG'] == $row['ID_MSG'] || $row['ID_FIRST_MSG'] == $row['ID_LAST_MSG'])
+        {
+            $firstOrOnly = true;
+            // this is the first message or this is the only message in a topic
+            if ($row['numReplies'] != 0)
+                // don't allow deleting first message with replies, should delete thread instead
+                return $this->error($app->locale->delFirstPost, 403);
+        }
+        
+        if ($request->method('GET'))
+        {
+            // preview deleting message
+            $service->subject = $row['subject'];
+            $service->body = $row['body'];
+            $service->date = $app->subs->timeformat($row['posterTime']);
+            $service->poster = $app->user->loadDisplay($row['posterName']);
+            $service->sessid = $app->session->id;
+            $service->msgid = $msg;
+            $service->title = $app->locale->txt(154);
+            return $this->render('templates/thread/deletemsg.template.php');
+        }
+        elseif ($request->method('POST'))
+        {
+            $topicundeleted = false;
+            
+            if ($firstOrOnly)
+            {
+                // undelete mod - save entire topic
+                if ($app->conf->enableUnDelete)
+                {
+                    $topicundeleted = true;
+                    //$app->undelete->saveTopic($row['ID_TOPIC']); // TODO implement undelete
+                }
+                
+                // quick poll mod by dig7er, 14.04.2010
+                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = ?)");
+                $dbst->bind_param('i', $threadid);
+                $dbst->execute();
+                $dbst->close();
+                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = ?) LIMIT 1");
+                $dbst->bind_param('i', $threadid);
+                $dbst->execute();
+                $dbst->close();
+                
+                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}topics WHERE ID_TOPIC=? LIMIT 1");
+                $dbst->bind_param('i', $threadid);
+                $dbst->execute();
+                $dbst->close();
+                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}polls WHERE ID_POLL=? LIMIT 1");
+                $dbst->bind_param('i', $row['ID_POLL']);
+                $dbst->execute();
+                $dbst->close();
+                $dbst = $app->db->prepare("UPDATE {$db_prefix}boards SET numPosts=numPosts-1, numTopics=numTopics-1 WHERE ID_BOARD=?");
+                $dbst->bind_param('i', $boardid);
+                $dbst->execute();
+                $dbst->close();
+                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}calendar WHERE id_topic = ?");
+                $dbst->bind_param('i', $threadid);
+                $dbst->execute();
+                $dbst->close();
+                
+                $redirect = "/b$boardid/";
+                $ajaxresponse = '["REDIRECT", "' . SITE_ROOT . '/b' . $boardid . '/"]';            
+            }
+            elseif ($row['ID_LAST_MSG'] == $row['ID_MSG'])
+            {
+                // this is the last message
+                $dbst = $app->db->prepare("SELECT ID_MSG FROM {$db_prefix}messages WHERE (ID_TOPIC=? AND ID_MSG != ?) ORDER BY ID_MSG DESC LIMIT 1");
+                $dbst->bind_param('ii', $threadid, $msg);
+                $dbst->execute();
+                $dbrs = $dbst->get_result();
+                $dbst->close();
+                $row2 = $dbrs->fetch_assoc();
+                $dbrs->free();
+                $dbst = $app->db->prepare("UPDATE {$db_prefix}topics SET ID_LAST_MSG=?, numReplies=numReplies-1 WHERE ID_TOPIC=?");
+                $dbst->bind_param('ii', $row2['ID_MSG'], $threadid);
+                $dbst->execute();
+                $dbst->close();
+                $dbst = $app->db->prepare("UPDATE {$db_prefix}boards SET numPosts=numPosts-1 WHERE ID_BOARD=?");
+                $dbst->bind_param('i', $boardid);
+                $dbst->execute();
+                $dbst->close();
+                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}calendar WHERE id_topic = ?");
+                $dbst->bind_param('i', $threadid);
+                $dbst->execute();
+                $dbst->close();
+            }
+            else
+            {
+                // this is just "some" message
+                $dbst = $app->db->prepare("UPDATE {$db_prefix}topics SET numReplies=numReplies-1 WHERE ID_TOPIC=?");
+                $dbst->bind_param('i', $threadid);
+                $dbst->execute();
+                $dbst->close();
+                $dbst = $app->db->prepare("UPDATE {$db_prefix}boards SET numPosts=numPosts-1 WHERE ID_BOARD=?");
+                $dbst->bind_param('i', $boardid);
+                $dbst->execute();
+                $dbst->close();
+            }
+            
+            if ($row['ID_MEMBER'] != '-1' && $row['count'] != 1)
+            {
+                $dbst = $app->db->prepare("UPDATE {$db_prefix}members SET posts=posts-1 WHERE (ID_MEMBER=? && posts > 0)");
+                $dbst->bind_param('i', $row['ID_MEMBER']);
+                $dbst->execute();
+                $dbst->close();
+            }
+            
+            // undelete mod - save message only (if haven't previously saved topic
+            if ( !$topicundeleted && $app->conf->enableUnDelete)
+                // $app->undelete->saveMessage($row['ID_MSG']); // TODO implement undelete
+            
+            $dbst = $app->db->prepare("DELETE FROM {$db_prefix}messages WHERE ID_MSG=? LIMIT 1");
+            $dbst->bind_param('i', $msg);
+            $dbst->execute();
+            $dbst->close();
+            
+            $nowtime = time();
+            $app->db->query("DELETE FROM {$db_prefix}log_last_comments WHERE LAST_COMMENT_TIME < FROM_UNIXTIME($nowtime - 7*24*60*60) OR LAST_COMMENT_TIME IS NULL");
+            
+            // quick poll mod by dig7er, 14.04.2010
+            $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG=?");
+            $dbst->bind_param('i', $msg);
+            $dbst->execute();
+            $dbst->close();
+            $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG=?");
+            $dbst->bind_param('i', $msg);
+            $dbst->execute();
+            $dbst->close();
+            
+            $app->subs->updateStats('message');
+            $app->subs->updateStats('topic');
+            $app->subs->updateLastMessage($boardid);
+            
+            // undelete mod
+            if (!$app->conf->unDeleteAttachments)
+            {
+                // delete attachment, by Meriadoc
+                if ($row['attachmentSize'] > 0)
+                    unlink($app->conf->attachmentUploadDir . "/" . $row['attachmentFilename']);
+            }
+            
+            if ($service->ajax)
+                return $this->ajax_response($ajaxresponse, 'json');
+            else
+                return $this->redirect($redirect);
+            
+        }
+        else
+        {
+            // normally we shouldn't get here
+            $app->errors->abort('', 'Bad request.', 400);
+        }
+    } // deleteMsg()
 }
 
 ?>

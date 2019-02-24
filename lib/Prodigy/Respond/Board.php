@@ -24,6 +24,8 @@ class Board extends Respond
         //if($board === null && $this->board === null)
             //return $this->error('Error, board should not be null.');
         
+        // FIXME need to do something with it
+        
         if ($board === null)
             $board = $this->board;
         

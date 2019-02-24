@@ -382,12 +382,12 @@
                                   <?= $this->menusep() ?>
                                   <a href="<?= SITE_ROOT ?>/modify/<?= $msgid ?>/"><font size="1" class="imgwindowbg"><?= $this->locale->modify ?></font></a>
                                   <?= $this->menusep() ?>
-                                  <a href="javascript:DoConfirm('<?= $this->locale->txt[154] ?>?','<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/delete/<?= $msgid ?>/?reason=none&amp;sesc=<?= $this->app->session->id ?>');" onclick="Forum.Utils.deleteMessage(event)"><font size="1" class="imgwindowbg"><?= $this->locale->delete ?></font></a>
+                                  <a href="<?= SITE_ROOT ?>/delete/<?= $msgid ?>/" onclick="Forum.Utils.deleteMessage(event)"><font size="1" class="imgwindowbg"><?= $this->locale->delete ?></font></a>
                                 
                                 <?php elseif($msg['ID_MEMBER'] == -1 and $this->user->id != -1 and $this->user->posts >= 600): ?>
                                   <?php /* Add possibility for registered users with more than 600 msgs to delete guest messages. Added by dig7er, 18.09.2010 */ ?>
                                   <?= $this->menusep() ?>
-                                  <a href="javascript:DoConfirm('<?= $this->locale->txt[154] ?>?','<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/delete/<?= $msgid ?>/?reason=none&amp;sesc=<?= $this->app->session->id ?>');" onclick="Forum.Utils.deleteMessage(event)"><font size="1" class="imgwindowbg"><?= $this->locale->delete ?></font></a>
+                                  <a href="<?= SITE_ROOT ?>/delete/<?= $msgid ?>/" onclick="Forum.Utils.deleteMessage(event)"><font size="1" class="imgwindowbg"><?= $this->locale->delete ?></font></a>
                                 <?php endif; ?>
                                 
                                 <?php if($this->user->accessLevel() > 1): ?>
