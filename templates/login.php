@@ -12,7 +12,7 @@
                     </td>
                     <td align="right" class="titlebg">
                       <?php if(!$this->request->isSecure()): ?>
-                        <a href="https://<?= $this->host ?><?= SITE_ROOT ?>/login/" title="<?= $this->locale->txt['ssl-link-info'] ?>" class="ssl-login"><img src="<?= STATIC_ROOT ?>/img/YaBBImages/lock_closed.png">SSL</a>
+                        <a href="https://<?= $this->host ?><?= SITE_ROOT ?>/login/" title="<?= $this->locale->ssl-link-info ?>" class="ssl-login"><img src="<?= STATIC_ROOT ?>/img/YaBBImages/lock_closed.png">SSL</a>
                       <?php endif; ?>
                     </td>
                   </tr>

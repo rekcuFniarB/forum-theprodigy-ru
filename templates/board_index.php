@@ -338,16 +338,16 @@
                   <img src="<?= $this->conf->imagesdir ?>/login_bindex.gif" border="0" alt="">
                 </td>
                 <td class="windowbg" valign="middle">
-                  <form action="<?= $this->conf->cgi ?>;action=login2" method="post">
+                  <form action="<?= SITE_ROOT ?>/login/" method="post">
                     <table border="0" cellpadding="2" cellspacing="0" align="center" width="100%">
                       <tr>
                         <td valign="middle" align="left">
                           <b><?= $this->locale->txt(35) ?>:</b><br>
-                          <input type="text" name="user" size="15" />
+                          <input type="text" name="user" size="20" />
                         </td>
                         <td valign="middle" align="left">
                           <b><?= $this->locale->txt(36) ?>:</b><br>
-                          <input type="password" name="passwrd" size="15" />
+                          <input type="password" name="password" size="20" />
                         </td>
                         <td valign="middle" align="left">
                           <b><?= $this->locale->txt(497) ?>:</b><br>
@@ -355,7 +355,7 @@
                         </td>
                         <td valign="middle" align="left">
                           <b><?= $this->locale->txt(508) ?>:</b><br>
-                          <input type="checkbox" name="cookieneverexp" checked="checked" />
+                          <input type="checkbox" name="cookieneverexp" checked>
                         </td>
                         <td valign="middle" align="left">
                           <input type="submit" value="<?= $this->locale->txt(34) ?>">
@@ -363,7 +363,7 @@
                         
                         <?php if (!$this->request->isSecure()): ?>
                           <td valign="middle" align="left">
-                            <a href="https:/s<?= $this->host ?><?= SITE_ROOT ?>/#login-form" title="<?= $this->locale->txt('ssl-link-info') ?>" class="ssl-login"><img src="<?= STATIC_ROOT?>/img/YaBBImages/lock_closed.png">SSL</a>
+                            <a href="https://<?= $this->host ?><?= SITE_ROOT ?>/#login-form" title="<?= $this->locale->ssl-link-info ?>" class="ssl-login"><img src="<?= STATIC_ROOT?>/img/YaBBImages/lock_closed.png">SSL</a>
                           </td>
                         <?php endif; ?>
                       </tr>
