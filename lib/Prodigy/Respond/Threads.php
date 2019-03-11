@@ -2004,8 +2004,9 @@ class Threads extends Respond
         }
         elseif ($request->method('POST'))
         {
+            $app->session->check('post');
             $topicundeleted = false;
-            
+            // TODO implement notify author
             if ($firstOrOnly)
             {
                 // undelete mod - save entire topic
@@ -2135,6 +2136,151 @@ class Threads extends Respond
             $app->errors->abort('', 'Bad request.', 400);
         }
     } // deleteMsg()
+    
+    public function deleteThread($request, $response, $service, $app)
+    {
+        if ($app->user->guest) return $this->error(147, 403);
+        
+        $threadid = $request->paramsNamed()->get('thread');
+        
+        $threadid = intval($threadid);
+        if ($threadid == 0) return $this->error('Invalid thread ID specified.');
+        
+        $db_prefix = $app->db->prefix;
+        $dbst = $app->db->prepare("SELECT
+            t.ID_TOPIC, t.ID_BOARD, t.ID_FIRST_MSG, t.locked, t.numReplies, t.ID_POLL,
+            msg.subject, msg.body, msg.posterName, msg.posterTime
+            FROM {$db_prefix}topics AS t LEFT JOIN messages AS msg
+            ON t.ID_FIRST_MSG = msg.ID_MSG
+            WHERE t.ID_TOPIC = ?
+        ");
+        $dbst->bind_param('i', $threadid);
+        $dbst->execute();
+        $dbrs = $dbst->get_result();
+        $dbst->close();
+        if($dbrs->num_rows < 1) return $this->error("No thread with ID $threadid.");
+        $row = $dbrs->fetch_array();
+        $dbrs->free();
+        
+        $boardid = $row['ID_BOARD'];
+        $app->board->load($boardid);
+        
+        if ($app->user->accessLevel() < 2) return $this->errors($app->locale->txt[73], 403);
+        
+        if ($request->method('GET'))
+        {
+            // preview deleting message
+            $service->subject = $row['subject'];
+            $service->body = $row['body'];
+            $service->date = $app->subs->timeformat($row['posterTime']);
+            $service->poster = $app->user->loadDisplay($row['posterName']);
+            $service->sessid = $app->session->id;
+            $service->msgid = $row['ID_FIRST_MSG'];
+            $service->title = 'Delete thread';
+            return $this->render('templates/thread/deletemsg.template.php');
+        }
+        elseif ($request->method('POST'))
+        {
+            $app->session->check('post');
+            $POST = $request->paramsPost();
+            $reason = $POST->get('mdfrzn', 'none');
+            if($service->ajax)
+                $reason = mb_convert_encoding($reason, $app->conf->charset, 'utf-8');
+            
+            //// undelete mod
+            //if ($app->conf->enableUnDelete)
+                // $app->undelete->saveTopic($threadid); // TODO implement undelete topic
+            
+            // undelete mod
+            if (!$app->conf->unDeleteAttachments)
+            {
+                //Lines 38-43 all there to delete attachments on thread deletion - Jeff
+                $dbst = $app->db->prepare("SELECT attachmentFilename FROM {$db_prefix}messages WHERE (ID_TOPIC=? AND (attachmentFilename IS NOT NULL))");
+                $dbst->bind_param('i', $threadid);
+                $dbst->execute();
+                $dbrs = $dbst->get_result();
+                $dbst->close();
+                if ($dbrs->num_rows > 0)
+                    while ($row = $request->fetch_array())
+                    {
+                        $attachmentFilename = $app->conf->attachmentUploadDir . "/" . $row['attachmentFilename'];
+                        if (file_exists($attachmentFilename))
+                            unlink($attachmentFilename);
+                    }
+                $dbrs->free();
+            }
+            
+            // quick poll mod by dig7er, 14.04.2010
+            $app->db->query("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = $threadid)");
+            $app->db->query("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = $threadid)");
+            
+            $dbst = $app->db->prepare("DELETE FROM {$db_prefix}polls WHERE ID_POLL=? LIMIT 1");
+            $dbst->bind_param('i', $row['ID_POLL']);
+            $dbst->execute();
+            $dbst->close();
+            $row['numReplies']++;
+            $dbst = $app->db->prepare("UPDATE {$db_prefix}boards SET numTopics=numTopics-1, numPosts=numPosts-? WHERE ID_BOARD=?");
+            $dbst->bind_param('ii', $row['numReplies'], $row['ID_BOARD']);
+            $dbst->execute();
+            $dbst->close();
+            $app->db->query("DELETE FROM {$db_prefix}topics WHERE ID_TOPIC=$threadid");
+            $app->db->query("DELETE FROM {$db_prefix}messages WHERE ID_TOPIC=$threadid");
+            $app->db->query("DELETE FROM {$db_prefix}calendar WHERE id_topic=$threadid");
+            $app->db->query("DELETE FROM {$db_prefix}log_topics WHERE ID_TOPIC=$threadid");
+            
+            $app->subs->updateStats('message');
+            $app->subs->updateStats('topic');
+            $app->subs->updateLastMessage($row['ID_BOARD']);
+            
+            // Check on whether posts count in this board.
+            $dbrq = $app->db->query("
+                SELECT count
+                FROM {$db_prefix}boards
+                WHERE ID_BOARD = $row[ID_BOARD]");
+            list ($pcounter) = $dbrq->fetch_row();
+            $dbrq->free_result();
+            
+            $subject = null;
+            $thread_author = null;
+            
+            $dbrq = $app->db->query("SELECT ID_MEMBER, subject FROM {$db_prefix}messages WHERE ID_TOPIC=$threadid ORDER BY ID_MSG ASC");
+            
+            // Posts *do* count here, do decrease the poster's post counts.
+            if (empty($pcounter))
+                while ($temp = $dbrq->fetch_row())
+                {
+                    if ($thread_author == null){
+                        $thread_author = $temp[0];
+                        $subject = $temp[1];
+                    }
+                    if ($temp[0] != '-1')
+                        $app->db->query("UPDATE {$db_prefix}members SET posts=posts-1 WHERE ID_MEMBER=$temp[0]");
+                }
+            else
+            {
+                if($app->conf->notify_users)
+                {
+                    $temp = $dbrq->fetch_row();
+                    $thread_author = $temp[0];
+                    $subject = $temp[1];
+                }
+            }
+
+            if ($app->conf->notify_users && $thread_author > 0 && $app->user->id != $thread_author)
+            {
+                // Notify thread author
+                $euser = urlencode($username);
+                $notice_msg = "[url=" . SITE_ROOT . "/people/$euser]{$app->user->realname}[/url] {$app->locale->dltdyrtpc} [url=" . SITE_ROOT . "/b$boardid/t$threadid/]{$subject}[/url] {$app->locale->dltdtpcrzn} \"$reason\".";
+                $app->im->send_notice($thread_author, $app->locale->dltdtpcsbj, $notice_msg);
+            }
+            
+            if ($service->ajax)
+                return $this->ajax_response("[\"REDIRECT\", \"" . SITE_ROOT . "/b$boardid/\"]");
+            else
+                return $this->redirect("/b$boardid/");
+        } // method POST
+        
+    } // deleteThread()
 }
 
 ?>

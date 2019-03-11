@@ -719,7 +719,7 @@
               <?= $this->menusep() ?>
               <a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/move/"><font size="1" class="imgwindowbg"><?= $this->locale->movethread ?></font></a>
               <?= $this->menusep() ?>
-              <a href="javascript:DoConfirm('<?= $this->locale->txt[162] ?>', '<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/remove/?sesc=<?= $this->app->session->id ?>');" onclick="Forum.Utils.deleteThread(event, <?= $this->thread ?>);"><font size="1" class="imgwindowbg"><?= $this->locale->removethread ?></font></a>
+              <a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/delete/"><font size="1" class="imgwindowbg"><?= $this->locale->removethread ?></font></a>
             <?php endif; ?>
             
             <?php if($this->allow_locking): ?>

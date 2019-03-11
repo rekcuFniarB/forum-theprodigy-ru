@@ -315,6 +315,7 @@ class User {
             // No such user, fill initial data
             $this->cache[$user] = array();
             $this->cache[$user]['found'] = false;
+            $this->cache[$user]['name'] = $user;
             $this->cache[$user]['realName'] = $user;
             $this->cache[$user]['signature'] = '';
             $this->cache[$user]['websiteUrl'] = '';
