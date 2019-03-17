@@ -363,7 +363,7 @@
                         
                         <?php if (!$this->request->isSecure()): ?>
                           <td valign="middle" align="left">
-                            <a href="https://<?= $this->host ?><?= SITE_ROOT ?>/#login-form" title="<?= $this->locale->ssl-link-info ?>" class="ssl-login"><img src="<?= STATIC_ROOT?>/img/YaBBImages/lock_closed.png">SSL</a>
+                            <a href="https://<?= $this->host ?><?= SITE_ROOT ?>/#login-form" title="<?= $this->locale->txt('ssl-link-info') ?>" class="ssl-login"><img src="<?= STATIC_ROOT?>/img/YaBBImages/lock_closed.png">SSL</a>
                           </td>
                         <?php endif; ?>
                       </tr>
