@@ -98,7 +98,7 @@ img.msg-embed-img {
  * Quotes
  */
 table.quote-msg-meta { margin-top: 1em; }
-
+table.quote-msg + br { display: none; }
 
 /* MESSAGE COMMENTS FORM */
 div[id^="commentForm"] {display: table; width: 100%;}
@@ -128,6 +128,13 @@ a.msgCommentsSub {
 a.msgCommentsUnsub {
 	background: transparent url('../YaBBImages/minus_round.png') no-repeat left center;
 	padding: 5px 0px 5px 20px;
+}
+
+div.multinick-info {
+    display: none;
+    width: 400px;
+    border: 1px solid black;
+    padding: 20px;
 }
 
 /*
@@ -199,7 +206,16 @@ div.comment:hover {background-color: rgba(0,0,0,0.2);}
 .session-config-page > h1 {text-align: center;}
 .session-config-page .response_block {display: none; margin: 0; width: auto;}
 .session-config-page .submit_button {float: left; margin: -0.5em 1em 0 0; width: auto;}
-.session-settings-btn {float: right; margin-right: 1em;}
+a.session-settings-btn {
+    display: inline-block;
+    float: right;
+    margin-right: 1em;
+    width: 20px;
+    height: 20px;
+    background-image: url('../img/YaBBImages/settings.png');
+}
+
+a.orange-arrow-right {float: right;}
 
 /* Karma Page */
 .karma-page-summary {
