@@ -503,11 +503,11 @@ class User {
     
     public function OnlineStatus($user = null)
     {
-        if ($user === null) $user = $this->name;
-        if ($this->guest) return 0;
+        if ($user === null) $user = $this->id;
         
         $dbst = $this->app->db->prepare("SELECT identity FROM {$this->app->db->prefix}log_online WHERE identity = ? LIMIT 1");
-        $dbst->bind_param('s', $user);
+        $dbst->bind_param('i', $user);
+        $dbst->execute();
         $dbst->store_result();
         $result = $dbst->num_rows > 0 ? 1 : 0;
         $dbst->close();

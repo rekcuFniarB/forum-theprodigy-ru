@@ -481,15 +481,16 @@
           </form>
         </td>
       </tr>
-    </table> <!-- tmp -->
+    </table>
     
     <?php if($this->staff && $this->meminf['passwd'] == 'INACTIVE'): ?>
         <script type="text/javascript">
           $("#activate_button").on("click", function(){
               var uid = $(this).val();
-              var cgi = "$cgi";
-              $.ajax(cgi,{
-                  data: {action: "profileactivate", uid: uid, requesttype: "ajax"},
+              var url = "<?= SITE_ROOT ?>/people/<?= $this->meminf['memberName'] ?>/activate/";
+              $.ajax(url,{
+                  type: 'POST',
+                  data: {requesttype: "ajax", sc: "<?= $this->session_id ?>"},
                   timeout: 10000,
                   error: function(){alert("Произошла ошибка, повторите позже.");},
                   success: function(result){
