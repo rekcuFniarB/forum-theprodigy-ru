@@ -47,7 +47,12 @@ class Security
         {
             return $this->app->errors->abort('', "$txt[409] $timeout $txt[410]");
         }
-    }
+    } // spam_protection()
+    
+    public function enhanced_banning($user, $only_check=false)
+    {
+        return 0; // TODO
+    } // enhanced_banning()
 }
 
 ?>

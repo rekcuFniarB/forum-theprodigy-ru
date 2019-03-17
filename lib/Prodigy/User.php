@@ -501,6 +501,19 @@ class User {
         }
     } // memberGroups()
     
+    public function OnlineStatus($user = null)
+    {
+        if ($user === null) $user = $this->name;
+        if ($this->guest) return 0;
+        
+        $dbst = $this->app->db->prepare("SELECT identity FROM {$this->app->db->prefix}log_online WHERE identity = ? LIMIT 1");
+        $dbst->bind_param('s', $user);
+        $dbst->store_result();
+        $result = $dbst->num_rows > 0 ? 1 : 0;
+        $dbst->close();
+        return $result;
+    }
+    
     /**
      * Check if user is a board moderator
      * @param string $user  user name (current user when ommited)
@@ -582,6 +595,14 @@ class User {
     public function isStaff()
     {
         if($this->group == 'Global Moderator' || $this->group == 'Administrator')
+            return true;
+        else
+            return false;
+    }
+    
+    public function isAdmin()
+    {
+        if($this->group == 'Administrator')
             return true;
         else
             return false;

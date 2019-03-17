@@ -105,7 +105,8 @@ $router->respond(function($request, $response, $service, $app, $router) {
             array('security', '\Prodigy\Security'),
             array('locale',   '\Prodigy\Localization'),
             array('im',       '\Prodigy\Respond\InstantMessages'),
-            array('calendar', '\Prodigy\Respond\Calendar')
+            array('calendar', '\Prodigy\Respond\Calendar'),
+            array('profile',  '\Prodigy\Respond\Profile')
         )
     );
     
@@ -203,6 +204,8 @@ $router->respond(array('GET', 'POST'), '/delete/[i:msg]/', 'thread->deleteMsg');
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/delete/', 'thread->deleteThread');
 
 //$router->respond('GET', '/main-static-call/', '\Prodigy\Router::Main');
+
+$router->respond('GET', '/people/[:user]/', 'profile->show');
 
 
 $router->respond('GET', '/example/', 'main->example');
