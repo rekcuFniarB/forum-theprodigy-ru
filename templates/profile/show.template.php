@@ -231,7 +231,9 @@
                   <font size="2"><b><?= $this->locale->txt[69] ?>: </b></font>
                 </td>
                 <td>
-                  <font size="2"><?= $this->esc($this->meminf['emailAddress']) ?></font>
+                  <font size="2">
+                    <a href="mailto:<?= $this->esc($this->meminf['emailAddress']) ?>"><?= $this->esc($this->meminf['emailAddress']) ?></a>
+                  </font>
                 </td>
               </tr>
           <?php endif; ?>
