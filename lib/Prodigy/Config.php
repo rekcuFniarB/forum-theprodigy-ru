@@ -106,6 +106,9 @@ class Config {
         
         $this->YaBBversion = 'YaBB SE 2.0 alpha';
         
+        if (empty($this->facesurl))
+            $this->facesurl = STATIC_ROOT . "/img/YaBBImages/avatars";
+        
         //if (!empty($config['debug'])) {
             //error_reporting(E_ALL);
             //ini_set('display_errors', 1);
