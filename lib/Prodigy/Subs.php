@@ -413,6 +413,38 @@ class Subs {
         else
             $request = $db->query("UPDATE {$db_prefix}boards SET ID_LAST_TOPIC=0 WHERE ID_BOARD=$board");
     } // UpdateLastMessage()
+    
+    /**
+     * Remove non printable characters from string
+     * @param strin $str  input string
+     * @param array $opt options
+     * @return string
+     */
+    public function clean_string($str, $opt = array()){
+        $default_opt = array(
+            'charset' => $this->charset,
+            // should remove html entities?
+            'html_entities' => true
+        );
+        
+        $opt = array_merge($default_opt, $opt);
+        
+        // remove non printable characters
+        if (strtolower($opt['charset']) != 'utf-8')
+        {
+            $str = preg_replace('/[\x00-\x1F\x98\xA0\xAD]/', ' ', $str);
+        }
+        else
+        {
+            $str = preg_replace('#[^\p{L}\p{M}\p{P}$\^~<>`+=\d ]#u', ' ', $str);
+        }
+        
+        if ($opt['html_entities'])
+        {
+            $str = preg_replace('/&#?[a-z0-9]{2,8};/i', ' ', $str);
+        }
+        
+        return trim($str);
+    }
 }
-
 ?>
