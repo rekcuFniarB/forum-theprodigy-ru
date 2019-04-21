@@ -1,4 +1,5 @@
 <link rel="shortcut icon" href="<?= STATIC_ROOT ?>/img/YaBBImages/proant.ico">
+<link rel="apple-touch-icon" type="image/png" href="<?= STATIC_ROOT ?>/YaBBImages/apple-touch-icon-152x152.png">
 <!--[if lt IE 7.]>
     <script defer type="text/javascript" src="<?= STATIC_ROOT ?>/js/pngfix.js"></script>
 <![endif]-->
