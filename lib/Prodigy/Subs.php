@@ -469,5 +469,18 @@ class Subs {
         else
             return $result;
     }
+    
+    /**
+     * Simple http URL validating
+     * @param string $url
+     * @return boolean
+     */
+    public function ishttpurl($url)
+    {
+         if (stripos($url, 'http://') !== 0 && stripos($url, 'https://') !== 0)
+             return false;
+         else
+             return true;
+    }
 }
 ?>
