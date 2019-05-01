@@ -19,6 +19,13 @@ class Config {
         $this->db_ready = false;
         $this->request = $router->request();
         
+        ## Some default values, may be overriden in config files
+        $this->YaBBversion = 'YaBB SE 2.0 alpha';
+        $this->MaxSigLen = 1000;
+        $this->loginregex = "/^[\s0-9A-Za-z#,-\.:=?@^_àáâãäå¸æçèéêëìíîïðñòóôõö÷øùüûúýþÿÀÁÂÃÄÅ¨ÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÜÛÚÝÞß]+$/";
+        $this->pwseed = 'ys';
+        ## end default values
+        
         require_once(PROJECT_ROOT . '/settings.php');
         
         $vars = get_defined_vars();
@@ -97,14 +104,8 @@ class Config {
             define('STATIC_ROOT', '/static');
         }
         
-        if (empty($vars['pwseed']) && empty($config['pwseed']))
-            $this->pwseed = 'ys';
-        
-        $this->loginregex = "/^[\s0-9A-Za-z#,-\.:=?@^_àáâãäå¸æçèéêëìíîïðñòóôõö÷øùüûúýþÿÀÁÂÃÄÅ¨ÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÜÛÚÝÞß]+$/";
-        
-        $this->pwseed = 'ys';
-        
-        $this->YaBBversion = 'YaBB SE 2.0 alpha';
+        //if (empty($vars['pwseed']) && empty($config['pwseed']))
+            //$this->pwseed = 'ys';
         
         if (empty($this->facesurl))
             $this->facesurl = STATIC_ROOT . "/img/YaBBImages/avatars";
