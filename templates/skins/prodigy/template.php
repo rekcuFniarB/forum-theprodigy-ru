@@ -172,7 +172,7 @@ div.avatar
 
 <?= $this->infopane ?>
 
-<table width="<?php echo ($this->mobileMode?'100%':'92%'); ?>" align="center" border="0" role="presentation">
+<table width="<?= $this->mobileMode?'100%':'92%' ?>" align="center" border="0" role="presentation">
   <tr>
     <td><font size="2">
     <?php $this->yieldView(); ?>
@@ -182,7 +182,7 @@ div.avatar
 </table>
 <BR>
 <footer>
-<table width="<?php echo ($this->mobileMode?'100%':'92%'); ?>" align="center" border="0" role="presentation">
+<table width="<?= $this->mobileMode?'100%':'92%' ?>" align="center" border="0" role="presentation">
   <tr>
     <td align="center"><font class="copyright"><?= $this->yycopyright ?></font></td>
   </tr>
