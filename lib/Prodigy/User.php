@@ -7,7 +7,7 @@ class User {
     private $app;
     private $service;
     private $request;
-    //private $response;
+    private $response;
     private $_settings;
     private $cache;
     private $_membergroups;
@@ -20,7 +20,7 @@ class User {
         $this->app = $router->app();
         $this->service = $router->service();
         $this->request = $router->request();
-        //$this->response = $router->response();
+        $this->response = $router->response();
         $this->cache = array();
         
         // Load cookie {
@@ -171,22 +171,7 @@ class User {
         
         /* If the user is a guest, initialize all the critial user settings */
         if (empty($username) || $username == 'Guest' || empty($this->name)) {
-            $this->name = 'Guest';
-            $this->guest = true;
-            $this->group = null;
-            $this->password = '';
-            $this->_settings = array();
-            $this->realname = $this->app->locale->txt[28];
-            $this->email = '';
-            $this->id = '-1';
-            $this->timeOffset = 0;
-            $this->banned = false;
-            $this->posts = -1;
-            
-            $this->skin = $this->app->conf->get('default_skin', 'default');
-            $this->collapsedBoards = array();
-            $this->collapsedCategories = array();
-            $this->app->locale->set_locale($this->app->conf->language);
+            $this->reset();
         } // If Guest
         
         $SERVER = $this->request->server();
@@ -256,6 +241,29 @@ class User {
         $this->app->conf->imagesdir = $imagesdir;
         // } end load user settings
     } // __construct()
+    
+    /**
+     * init user settings with Guest values
+     */
+    public function reset()
+    {
+        $this->name = 'Guest';
+        $this->guest = true;
+        $this->group = null;
+        $this->passwd = '';
+        $this->_settings = array();
+        $this->realname = $this->app->locale->txt[28];
+        $this->email = '';
+        $this->id = '-1';
+        $this->timeOffset = 0;
+        $this->banned = false;
+        $this->posts = -1;
+        
+        $this->skin = $this->app->conf->get('default_skin', 'default');
+        $this->collapsedBoards = array();
+        $this->collapsedCategories = array();
+        $this->app->locale->set_locale($this->app->conf->language);
+    }
     
     /**
      * cache user info
@@ -866,33 +874,43 @@ class User {
         }
     } // login()
     
-    public function logout($request, $response, $service, $app)
+    /**
+     * Reset user status to "offline"
+     */
+    public function offline()
     {
-        $app->session->check('get');
-        
         // Write log
-        $app->db->query("DELETE FROM {$app->db->prefix}log_online WHERE identity='{$app->user->id}'");
+        $this->app->db->query("DELETE FROM {$this->app->db->prefix}log_online WHERE identity='{$this->id}'");
         
-        $cookie_url = explode('<yse_sep>', $app->subs->url_parts());
+        $cookie_url = explode('<yse_sep>', $this->app->subs->url_parts());
         
-        $SSL = $request->isSecure();
+        $SSL = $this->request->isSecure();
         
-        $response->cookie($app->conf->cookiename, '', time() - 3600, $cookie_url[1], $cookie_url[0], $SSL);
+        $this->response->cookie($this->app->conf->cookiename, '', time() - 3600, $cookie_url[1], $cookie_url[0], $SSL);
         
         if ($SSL) {
             // tell client to cease HSTS
-            $response->header("Strict-Transport-Security", "max-age=0; includeSubDomains");
+            $this->response->header("Strict-Transport-Security", "max-age=0; includeSubDomains");
         }
         
-        $app->session->erase();
+        $this->reset();
+        
+        $this->app->session->erase();
         
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
-            $response->cookie(session_name(), '', time() - 42000,
+            $this->response->cookie(session_name(), '', time() - 42000,
                $params["path"], $params["domain"],
                $params["secure"], $params["httponly"]
             );
         }
+    }
+    
+    public function logout($request, $response, $service, $app)
+    {
+        $app->session->check('get');
+        
+        $this->offline();
 
         //$app->security->banning();
 
