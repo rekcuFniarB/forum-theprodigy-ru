@@ -113,7 +113,7 @@ class User {
                     $this->name = $settings['memberName'];
                     $this->realname = (empty($settings['realName']) ? $username : $settings['realName']);
                     //$this->realNames[$username] = $realname;
-                    $this->email = $settings['emailAddress'];
+                    $this->email = strtolower($settings['emailAddress']);
                     $this->id = $settings['ID_MEMBER'];
                     $this->group = $settings['memberGroup'];
                     $this->guest = false;
