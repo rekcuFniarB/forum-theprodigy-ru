@@ -316,7 +316,7 @@ abstract class Respond {
         $this->service->subs = $this->app->subs;
         $this->service->menusep = $menusep;
         $this->service->skinname = $skinname;
-        $this->service->session_id = $this->app->session->id;
+        $this->service->sessionid = $this->app->session->id;
         $this->service->color = $this->app->conf->color;
         $this->service->imagesdir = $this->app->conf->imagesdir;
         
