@@ -740,7 +740,11 @@ class User {
         
         $service->title = $app->locale->txt[34];
         $service->inputuser = $request->param('user', '');
-        $app->main->render('templates/login.php');
+        
+        if ($request->paramsGet()->get('newpass'))
+            $service->comment = $app->locale->txt[638];
+        
+        return $app->main->render('templates/login.php');
     }
     
     public function login($request, $response, $service, $app) {
