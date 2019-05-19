@@ -72,11 +72,14 @@ abstract class Respond {
      * Custom render method wrapper
      */
     public function render($view, array $data = array()) {
-        if (!self::$layout_ready)
+        //if (!self::$layout_ready)
+            //$this->prepare_layout();
+        if ($this->service->layout() === null)
             $this->prepare_layout();
         $this->service->render($view, $data);
         //return $this->response->send();
         //$this->router->skipRemaining();
+        return $this->response;
     } // render()
     
     /**
