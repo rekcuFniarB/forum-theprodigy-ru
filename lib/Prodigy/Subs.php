@@ -135,28 +135,6 @@ class Subs {
         return strftime($str, $currtime);
     } // lang_strftime()
     
-    public function url_parts()
-    {
-        $cookie_dom = '';
-        $cookie_dir = '/';
-        
-        if ($this->app->conf->localCookies) {
-            $url .= $boardurl . "/";
-            $pos = strpos($url, '//');
-            if ($pos > 0 && strncmp(strtolower($url), 'http:', $pos) == 0)	//Valid protocol
-            {
-                $urlpos = strpos($url, '/', $pos + 2);
-                
-                if ($urlpos > 0)
-                {
-                    $cookie_dom = substr($url, $pos + 2, $urlpos - $pos - 2);
-                    $cookie_dir = substr($url, $urlpos);
-                }
-            }
-        }
-        return "$cookie_dom<yse_sep>$cookie_dir";
-    } // url_parts()
-
     /**
      * HtmlSpecialChars wrapper
      * @param string $str       input string

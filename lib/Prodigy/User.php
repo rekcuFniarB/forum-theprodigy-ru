@@ -833,14 +833,13 @@ class User {
         
         $password = $app->subs->md5_hmac($md5_password, $app->conf->pwseed);
         
-        $cookie_url = explode('<yse_sep>', $app->subs->url_parts());
         $cookie = serialize(array($settings['ID_MEMBER'], $password));
         $ctime = time() + (60 * $Cookie_Length);
         
         $SSL = $request->isSecure();
         
         // Set cookie
-        $response->cookie($app->conf->cookiename, $cookie, $ctime, $cookie_url[1], $cookie_url[0], $SSL);
+        $app->respond->cookie($app->conf->cookiename, $cookie, $ctime, null, null, $SSL);
         
 //         if ($SSL) {
 //             $app->conf->HSTS = true;
@@ -886,11 +885,10 @@ class User {
         // Write log
         $this->app->db->query("DELETE FROM {$this->app->db->prefix}log_online WHERE identity='{$this->id}'");
         
-        $cookie_url = explode('<yse_sep>', $this->app->subs->url_parts());
-        
         $SSL = $this->request->isSecure();
         
-        $this->response->cookie($this->app->conf->cookiename, '', time() - 3600, $cookie_url[1], $cookie_url[0], $SSL);
+        // Delete cookie from client
+        $this->app->respond->cookie($this->app->conf->cookiename, '', null, null, null, $SSL);
         
         if ($SSL) {
             // tell client to cease HSTS

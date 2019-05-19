@@ -475,6 +475,31 @@ abstract class Respond {
     } // redirect()
     
     /**
+     * Custom setcookie wrapper.
+     */
+    public function cookie(
+        $key,
+        $value = '',
+        $expiry = null,
+        $path = '/',
+        $domain = null,
+        $secure = false,
+        $httponly = false)
+    {
+        if ($value === null)
+            // unset cookie if value is null
+            $expiry = 0;
+        
+        if ($this->app->conf->localCookies == 1 && $path === null && $domain === null)
+        {
+            $path = SITE_ROOT . '/';
+            $domain = $this->app->conf->board_hostname;
+        }
+        
+        return $this->app->response->cookie($key, $value, $expiry, $path, $domain, $secure, $httponly);
+    }
+    
+    /**
      * Display error message
      * Just a shortcut for \Prodigy\Errors\errors->abort()
      * @param string $msg error message

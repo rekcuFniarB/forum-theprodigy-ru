@@ -67,8 +67,6 @@ class Config {
             if($HSTSAge !== null && $this->get('HSTS', false))
                 header("Strict-Transport-Security: max-age=$HSTSAge; includeSubDomains");
             
-            //$cookie_url = explode('<yse_sep>', url_parts());
-            //session_set_cookie_params (0, $cookie_url[1], $cookie_url[0], true);
             $this->ssl = true;
         } else {
             $this->ssl = false;
@@ -103,9 +101,6 @@ class Config {
         } else {
             define('STATIC_ROOT', '/static');
         }
-        
-        //if (empty($vars['pwseed']) && empty($config['pwseed']))
-            //$this->pwseed = 'ys';
         
         if (empty($this->facesurl))
             $this->facesurl = STATIC_ROOT . "/img/YaBBImages/avatars";
