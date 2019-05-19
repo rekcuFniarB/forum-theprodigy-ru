@@ -881,7 +881,7 @@ class User {
         
         if ($SSL) {
             // tell client to cease HSTS
-            header("Strict-Transport-Security: max-age=0; includeSubDomains");
+            $response->header("Strict-Transport-Security", "max-age=0; includeSubDomains");
         }
         
         $app->session->erase();
