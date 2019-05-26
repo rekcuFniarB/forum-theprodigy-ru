@@ -517,11 +517,12 @@ class User {
         if ($user === null) $user = $this->id;
         
         $dbst = $this->app->db->prepare("SELECT identity FROM {$this->app->db->prefix}log_online WHERE identity = ? LIMIT 1");
-        $dbst->bind_param('i', $user);
-        $dbst->execute();
-        $dbst->store_result();
-        $result = $dbst->num_rows > 0 ? 1 : 0;
-        $dbst->close();
+        $dbst->execute(array($user));
+        if ($dbst->fetchColumn())
+            $result = 1;
+        else
+            $result = 0;
+        $dbst = null;
         return $result;
     }
     
@@ -705,7 +706,7 @@ class User {
         
         if ($id != $this->id || null === $this->_ignores) {
             $dbst = $this->app->db->prepare("SELECT im_ignore_list FROM {$this->app->db->prefix}members WHERE ID_MEMBER=?");
-            $dbst->execute(array($id))
+            $dbst->execute(array($id));
             $ignore = explode(',', $dbst->fetchColumn());
             $dbst = null;
             foreach ($ignore as $key => $value) {
