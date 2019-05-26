@@ -61,7 +61,7 @@ class User {
         if ($username != 'Guest') {
             /* Only load this stuff if the username isn't Guest */
             $username = (int) $username;
-            $request = $this->app->db->query("SELECT 
+            $dbst = $this->app->db->query("SELECT 
                 passwd,
                 realName,
                 emailAddress,
@@ -92,12 +92,14 @@ class User {
                 collapsedBoardIDs,
                 collapsedCategories,
                 QuickReply
-            FROM {$this->app->db->prefix}members WHERE ID_MEMBER='$username' LIMIT 1;", false);
+            FROM {$this->app->db->prefix}members WHERE ID_MEMBER=$username LIMIT 1;");
             /* If we found the user... */
             error_log('__DEBUG__: User class after db request');
-            if ($request->num_rows != 0) {
+            $settings = $dbst->fetch();
+            $dbst = null; // close statement
+            if ($settings) {
                 /* Initialize the settings array */
-                $settings = $request->fetch_array();
+                
                 /* compare a crypted version of the password in the database
                    with the password stored in the cookie.  Yes, the password
                     stored in the cookie is doubly encrypted
@@ -552,13 +554,13 @@ class User {
         if ($board > 0)
         {
             $db = $this->app->db;
-            $dbrq = $db->query ("SELECT b.moderators FROM {$db->prefix}boards AS b WHERE (b.ID_BOARD='$board')", false);
+            $dbst = $db->prepare("SELECT b.moderators FROM {$db->prefix}boards AS b WHERE (b.ID_BOARD=?)");
+            $dbst->execute(array($board));
             /* if there aren't any, skip */
-            if ($dbrq->num_rows > 0)
-            {
-                $row = $dbrq->fetch_array();
-                $moderators = explode(',', trim($row['moderators']));
-            }
+            $moderators = $dbst->fetchColumn();
+            $dbst = null;
+            if ($moderators)
+                $moderators = explode(',', trim($moderators));
             else
                 return array();
         }
@@ -674,13 +676,11 @@ class User {
         $imember = intval($member);
         if ($imember > 0) {
             // get member by id
-            $request = $this->app->db->query("SELECT memberName{$this->app->db->prefix} FROM members WHERE ID_MEMBER = $imember");
-            if ($request->num_rows > 0) {
-                $row = $request->fetch_row();
-                $member = $row[0];
-            } else {
+            $dbst = $this->app->db->prepare("SELECT memberName FROM {$this->app->db->prefix}members WHERE ID_MEMBER = ?");
+            $dbst->execute(array($imember));
+            $member = $dbst->fetchColumn();
+            if (!$member)
                 return false;
-            }
         }
         
         $ignorelist = $this->getIgnoreList($id);
@@ -704,9 +704,10 @@ class User {
         $ignore = array();
         
         if ($id != $this->id || null === $this->_ignores) {
-            $request = $this->app->db->query("SELECT im_ignore_list FROM {$this->app->db->prefix}members WHERE ID_MEMBER=$id", false);
-            $row = $request->fetch_row();
-            $ignore = explode(',', $row[0]);
+            $dbst = $this->app->db->prepare("SELECT im_ignore_list FROM {$this->app->db->prefix}members WHERE ID_MEMBER=?");
+            $dbst->execute(array($id))
+            $ignore = explode(',', $dbst->fetchColumn());
+            $dbst = null;
             foreach ($ignore as $key => $value) {
                 $ignore[$key] = trim($value);
             }
@@ -884,7 +885,7 @@ class User {
     public function offline()
     {
         // Write log
-        $this->app->db->query("DELETE FROM {$this->app->db->prefix}log_online WHERE identity='{$this->id}'");
+        $this->app->db->prepare("DELETE FROM {$this->app->db->prefix}log_online WHERE identity='{$this->id}'")->execute(array($this->id));
         
         $SSL = $this->request->isSecure();
         
