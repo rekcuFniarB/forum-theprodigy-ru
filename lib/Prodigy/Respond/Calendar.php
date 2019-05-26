@@ -16,14 +16,19 @@ class Calendar extends Respond
         // and having to remember to subtract one from the months is a pain.
         $db_prefix = $this->app->db->prefix;
         $holidays = array();
-        $monthp1 = $this->app->db->escape_string($monthp1);
-        $strSql = "SELECT day,year,title FROM {$db_prefix}calendar_holiday WHERE month=$monthp1 AND ((year Is Null) or year=$year)";
-        if ($day != NULL) {
-            $day = $this->app->db->escape_string($day);
-            $strSql .= " AND day=$day";
+        $strSql = "SELECT day,year,title FROM {$db_prefix}calendar_holiday WHERE month=? AND ((year IS NULL) or year=?)";
+        $qparams = array($monthp1, $year);
+        
+        if ($day != NULL)
+        {
+            $strSql .= " AND day=?";
+            $qparams[] = $day;
         }
-        $rs = $this->app->db->query($strSql, false);
-        while ($row = $rs->fetch_assoc())
+        
+        $dbst = $this->app->db->prepare($strSql);
+        $dbst->execute($qparams);
+        
+        while ($row = $dbst->fetch())
         {
             // The convention in the table is for holidays that always happen on the same date to have NULL for
             // the year value. If a row in the holiday table does have a year value then only print that holiday
@@ -50,27 +55,29 @@ class Calendar extends Respond
         $db_prefix = $this->app->db->prefix;
         // Collect all of the birthdays for this month and precreate the strings to use for display.
         $bday = array();
-        $monthp1 = $this->app->db->escape_string($monthp1);
-        $strSql = "SELECT dayofmonth(birthdate) as dom,membername,realname,year(birthdate) FROM {$db_prefix}members WHERE month(birthdate) = $monthp1";
+        $strSql = "SELECT dayofmonth(birthdate) as dom, membername, realname, year(birthdate) as year FROM {$db_prefix}members WHERE month(birthdate) = ?";
+        $qparams = array($monthp1);
+        
         if ($day != NULL) {
-            $day = $this->app->db->escape_string($day);
-            $strSql .= " AND dayofmonth(birthdate) = $day";
+            $strSql .= " AND dayofmonth(birthdate) = ?";
+            $qparams[] = $day;
         }
-        $rs = $this->app->db->query($strSql, false);
-        while ($row = $rs->fetch_array())
+        
+        $dbst = $this->app->db->prepare($strSql);
+        while ($row = $dbst->fetch())
         {
-            $euser=urlencode($row[1]);
-            if ($row[3] > 0 && $row[3] <= $year)
+            $euser=urlencode($row['membername']);
+            if ($row['year'] > 0 && $row['year'] <= $year)
             {
-                $ageNum = $year - $row[3];
+                $ageNum = $year - $row['year'];
                 $age = " ($ageNum)";
             }
             else
                 $age = '';
-            if (!isset($bday[$row[0]]))
-                $bday[$row[0]] = '<font class="calendar">' . $this->app->locale->calendar3 . '</font> <a href="' . SITE_ROOT . '/people/' . $euser . '/">' . $this->service->esc($row[2]) . $age . '</a>';
+            if (!isset($bday[$row['dom']]))
+                $bday[$row['dom']] = '<font class="calendar">' . $this->app->locale->calendar3 . '</font> <a href="' . SITE_ROOT . '/people/' . $euser . '/">' . $this->service->esc($row['realname']) . $age . '</a>';
             else
-                $bday[$row[0]] .= ', <a href="' . SITE_ROOT . '/people/' . $euser . '/">' . $this->service->esc($row[2]) . '' . $age . '</a>';
+                $bday[$row['dom']] .= ', <a href="' . SITE_ROOT . '/people/' . $euser . '/">' . $this->service->esc($row['realname']) . '' . $age . '</a>';
         }
         return($bday);
     }
@@ -79,18 +86,21 @@ class Calendar extends Respond
     {
         $db_prefix = $this->app->db->prefix;
         
-        $month = $this->app->db->escape_string($month);
-        $year = $this->app->db->escape_string($year);
-        $day = $this->app->db->escape_string($day);
-        
         $events = array();
         $strSql = "SELECT cal.day,cal.title,cal.id_board,b.ID_CAT,cal.id_topic,cal.id_member,cal.id ";
         $strSql .= "FROM {$db_prefix}calendar as cal, {$db_prefix}boards as b ";
-        $strSql .= "WHERE cal.month=$month AND cal.year=$year AND cal.id_board = b.ID_BOARD";
+        $strSql .= "WHERE cal.month=? AND cal.year=? AND cal.id_board = b.ID_BOARD";
+        
+        $qparams = array($month, $year);
+        
         if ($day != NULL)
-            $strSql .= " AND cal.day = $day";
-        $rs = $this->app->db->query($strSql, false);
-        while ($row = $rs->fetch_assoc())
+        {
+            $strSql .= " AND cal.day = ?";
+            $qparams[] = $day;
+        }
+        $dbst = $this->app->db->prepare($strSql);
+        $dbst->execute($qparams);
+        while ($row = $dbst->fetch())
         {
             if ($bPowerUser || $row['id_member'] == $this->app->user->id)
                 $strOwner = '<a href="' . SITE_ROOT . '/calendar/ee/' . $row[id] . '/"><font color="#FF0000">*</font></a>';
@@ -106,6 +116,7 @@ class Calendar extends Respond
                     $events[$row['day']] .= ', ' . $strOwner . '<a href="' . SITE_ROOT . '/b' . $row['id_board'] . '/t' . $row['id_topic'] . '/">' . $this->service->esc($row['title']) . '</a>';
             }
         }
+        $dbst = null;
         return($events);
     }
     
@@ -144,9 +155,9 @@ class Calendar extends Respond
             $bPowerUser = ($this->app->user->accessLevel() > 2);
             $cats = array();
             $db_prefix = $this->app->db->prefix;
-            $rs = $this->app->db->query("SELECT ID_CAT,membergroups FROM {$db_prefix}categories", false);
-            while ($row = $rs->fetch_array())
-                $cats[$row[0]] = explode(',', $row[1]);
+            $rs = $this->app->db->query("SELECT ID_CAT,membergroups FROM {$db_prefix}categories");
+            while ($row = $rs->fetch())
+                $cats[$row['ID_CAT']] = explode(',', $row['membergroups']);
             
             $calendar['events'] = $this->createEventArray($bPowerUser, $cats, $month, $year, $day);
         }

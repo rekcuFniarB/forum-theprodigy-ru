@@ -43,15 +43,15 @@ class Subs {
      * @return string
      */
     public function CensorTxt($text) {
-        if (is_null($this->app->conf->censor_list)) {
+        if (null === $this->app->conf->censor_list) {
             // load censor list
             $db_prefix = $this->app->db->prefix;
-            $request = $this->app->db->query("SELECT vulgar,proper FROM {$db_prefix}censor WHERE 1", false) or database_error(__FILE__, __LINE__, $this->app->db);
+            $request = $this->app->db->query("SELECT vulgar,proper FROM {$db_prefix}censor WHERE 1");
             if (!$request)
                 $this->app->errors->abort('Error', "205 {$this->app->locale->txt[106]}: {$this->app->locale->txt[23]} censor");
             $this->app->conf->censor_list = array();
-            while ($row = $request->fetch_row())
-            $this->app->conf->censor_list[trim($row[0])] = trim($row[1]);
+            while ($row = $request->fetch())
+                $this->app->conf->censor_list[trim($row['vulgar'])] = trim($row['proper']);
         }
         
         foreach ($this->app->conf->censor_list as $vulgar => $proper) {
@@ -400,7 +400,7 @@ class Subs {
      */
     public function clean_string($str, $opt = array()){
         $default_opt = array(
-            'charset' => $this->charset,
+            'charset' => $this->app->conf->charset,
             // should remove html entities?
             'html_entities' => true
         );

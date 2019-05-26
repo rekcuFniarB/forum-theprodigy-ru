@@ -274,10 +274,11 @@ class User {
         if (isset($this->cache[$user]))
             return $this->cache[$user];
         
-        $euser = $this->app->db->escape_string($user);
-        $request = $this->app->db->query("SELECT * FROM {$this->app->db->prefix}members WHERE memberName='$euser' LIMIT 1", false) or database_error(__FILE__, __LINE__, $this->app->db);
-        if ($request->num_rows > 0) {
-            $this->cache[$user] = $request->fetch_array();
+        $dbst = $this->app->db->prepare("SELECT * FROM {$this->app->db->prefix}members WHERE memberName=? LIMIT 1");
+        $dbst->execute(array($user));
+        $info = $dbst->fetch();
+        if ($info) {
+            $this->cache[$user] = $info;
             $this->cache[$user]['found'] = true;
             $this->cache[$user]['name'] = $user;
             $this->cache[$user]['guest'] = false;
@@ -493,15 +494,15 @@ class User {
      */
     public function memberGroups() {
         if (null === $this->_membergroups) {
-            $request = $this->app->db->query("
+            $dbst = $this->app->db->query("
                 SELECT membergroup
                 FROM {$this->app->db->prefix}membergroups
                 ORDER BY ID_GROUP"
             );
 
             $this->_membergroups = array();
-            while ($row = $request->fetch_row())
-                $this->_membergroups[] = $row[0];
+            while ($row = $dbst->fetch())
+                $this->_membergroups[] = $row['membergroup'];
             return $this->_membergroups;
         } else {
             // already cached

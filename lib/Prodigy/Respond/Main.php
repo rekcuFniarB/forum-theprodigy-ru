@@ -21,6 +21,11 @@ class Main extends Respond {
         $ajax = $request->headers()->get('X_REQUESTED_WITH', false);
         $type = $request->param('requesttype');
         $msg = "$agent - $ajax - $type";
+        $response->header('X-TEST-x', 'testResponse; OK');
+        
+        $response->cookie('x-test-cookie', 'testResponse', time() + 60*60*60);
+        //setcookie('TEST', 'aaaa', time() + 60*60*60);
+        $service->test_cookie = $request->cookies()->get('TEST');
         
         $service->sample = array(
             "k1"=> "v1",
@@ -60,6 +65,33 @@ class Main extends Respond {
         
         $service->badmsg = '[code]dick[/code]
         "';
+        
+        $file = $line = '';
+        if (headers_sent($file, $line))
+            error_log("__HEADERS_SENT__: $file, $line");
+        else
+            error_log('__HEADERS_SENT__: NO');
+        
+        //return $this->ajax_response('["dick"]');
+        //return $this->error('testing', 400);
+        
+        // testing prepared statements
+        $dbst = $app->db->prepare("SELECT memberName FROM members WHERE ID_MEMBER > 100 AND ID_MEMBER < 110
+            AND ? LIKE 'dick'");
+        $dbst->execute(array('dicka'));
+        $found = $dbst->fetch();
+        //var_dump($found);
+        $service->found = $found['memberName'];
+        $emul_mode = $app->db->getAttribute(\PDO::ATTR_EMULATE_PREPARES);
+        $dbst2 = $app->db->prepare("SELECT emailAddress FROM members WHERE ID_MEMBER = 182");
+        $dbst2->execute();
+        $email = $dbst2->fetchColumn();
+        $dbst = null;
+        $dbst2 = null;
+        
+        $buffered = $app->db->getAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY);
+        
+        $service->msg = "Emulation mode: $emul_mode, Email: $email, Buffered: $buffered";
         
         //return $app->errors->abort('TEST', $msg, 200);
         $this->render('templates/examples/example.php');
@@ -106,6 +138,24 @@ class Main extends Respond {
         //$this->render('templates/example.php');
     }
     
+    public function simple_example($request, $response, $service, $app)
+    {
+        //$response->chunked = true;
+        error_log("__DEBUG__: Chunked: {$response->chunked}, ob_level: " . ob_get_level() . ", ob_length: " . ob_get_length());
+        $service->msg = 'This is simple example msg';
+        $response->cookie('x-test-cookie', 'simple-example');
+        $response->header('x-test', 'simple-example');
+        $service->layout('templates/examples/simple.layout.php');
+        error_log("__DEBUG__: Chunked: {$response->chunked}, ob_level: " . ob_get_level() . ", ob_length: " . ob_get_length());
+        return $this->ajax_response('["qwerty"]');
+        //var_dump(ini_get('output_buffering'));
+        return $this->render('templates/examples/simple.template.php');
+        error_log("__DEBUG__: Chunked: {$response->chunked}, ob_level: " . ob_get_level() . ", ob_length: " . ob_get_length());
+        
+        //var_dump(ob_get_status(true));
+        //return $response;
+    }
+    
     /**
      * This is board index page
      */
@@ -114,37 +164,50 @@ class Main extends Respond {
         $service->board = -1;
         if ($request->param('markallasread') == 1) {
             // Mark all boards as read and exit
-            $result = $app->db->query("
+            $dbst = $app->db->prepare("
                 SELECT b.ID_BOARD
                 FROM {$db_prefix}categories as c, {$db_prefix}boards as b
                 WHERE c.ID_CAT=b.ID_CAT
-                AND ('{$app->user->group}'='Administrator' OR '{$app->user->group}'='Global Moderator' OR FIND_IN_SET('{$app->user->group}', c.memberGroups) != 0 OR c.memberGroups='')", false);
-        
-            if ($result->num_rows > 0)
+                AND (? = ? OR ? = ? OR FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups = ?)");
+            $dbst->execute(array($app->user->group, 'Administrator', $app->user->group, 'Global Moderator', $app->user->group, ''));
+            $mark_boards = $dbst->fetchAll(\PDO::FETCH_COLUMN);
+            $dbst = null;
+            
+            if ($mark_boards)
             {
-                $queryEntry = array();
-                while ($row = $result->fetch_assoc())
-                    $queryEntry[] = "(" . time() . ", {$app->user->id}, $row[ID_BOARD])";
-                $request = $app->db->query("
-                    REPLACE INTO {$db_prefix}log_mark_read (logTime, ID_MEMBER, ID_BOARD)
-                    VALUES " . implode(',', $queryEntry), false);
+                $dbst = $app->db->prepare("
+                    REPLACE INTO {$db_prefix}log_mark_read
+                    (logTime, ID_MEMBER, ID_BOARD)
+                    VALUES (?, ?, ?)");
+                $time = time();
+                foreach ($mark_boards as $mark_board)
+                {
+                    $dbst->execute(array($time, $app->user->id, $mark_board));
+                }
+                $dbst = null;
             }
     
-            $result = $app->db->query("
+            $dbst = $app->db->prepare("
                 SELECT lt.ID_TOPIC
                 FROM {$db_prefix}log_topics AS lt, {$db_prefix}topics AS t, {$db_prefix}boards AS b, {$db_prefix}categories AS c
                 WHERE t.ID_TOPIC=lt.ID_TOPIC
                 AND b.ID_BOARD=t.ID_BOARD
                 AND c.ID_CAT=b.ID_CAT
-                AND ('{$app->user->group}'='Administrator' OR '{$app->user->group}'='Global Moderator' OR FIND_IN_SET('{$app->user->group}', c.memberGroups) != 0 OR c.memberGroups='')
-                AND lt.ID_MEMBER={$app->user->id}", false);
-            
-            if ($result->num_rows > 0)
+                AND (? = ? OR ? = ? OR FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups=?)
+                AND lt.ID_MEMBER=?");
+            $dbst->execute(array(
+                $app->user->group, 'Administrator',
+                $app->user->group, 'Global Moderator',
+                $app->user->group, '', $app->user->id
+            ));
+            $mark_topics = $dbst->fetchAll(\PDO::FETCH_COLUMN);
+            $dbst = null;
+            if ($mark_topics)
             {
-                $topics = array();
-                while ($row = $result->fetch_assoc())
-                    $topics[] = $row['ID_TOPIC'];
-                $request = $app->db->query("DELETE FROM {$db_prefix}log_topics WHERE ID_MEMBER={$app->user->id} AND ID_TOPIC IN (" . implode(',', $topics) . ")", false);
+                $placeholders = $app->db->build_placeholsers($mark_topics);
+                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}log_topics WHERE ID_MEMBER=? AND ID_TOPIC IN ($placeholders)");
+                $dbst->execute(array_merge(array($app->usr->id), $mark_topics));
+                $dbst = null;
             }
             //return $service->redirect('/');
             return $service->back();
@@ -164,7 +227,13 @@ class Main extends Respond {
             // add new board to list
             $app->user->collapsedBoards[] = $collapseboard;
             
-            $app->db->query("UPDATE {$db_prefix}members SET collapsedBoardIDs = '".implode(",", $app->user->collapsedBoards)."' WHERE ID_MEMBER = {$app->user->id}");
+            $app->db->prepare("UPDATE {$db_prefix}members SET collapsedBoardIDs = ? WHERE ID_MEMBER = ?")
+                ->execute(
+                    array(
+                        implode(",", $app->user->collapsedBoards),
+                        $app->user->id
+                    )
+                );
             
             // Redirect back
             return $service->back();
@@ -185,7 +254,13 @@ class Main extends Respond {
             // add new board to list
             unset($app->user->collapsedBoards[$uncollapseKey]);
             
-            $app->db->query("UPDATE {$db_prefix}members SET collapsedBoardIDs = '".implode(",", $app->user->collapsedBoards)."' WHERE ID_MEMBER = {$app->user->id}");
+            $app->db->prepare("UPDATE {$db_prefix}members SET collapsedBoardIDs = ? WHERE ID_MEMBER = {$app->user->id}")
+                ->execute(
+                    array(
+                        implode(",", $app->user->collapsedBoards),
+                        $app->user->id
+                    )
+                );
             
             // Redirect back
             return $service->back();
@@ -241,20 +316,31 @@ class Main extends Respond {
             }
         }
         
-        $condition = ($app->user->isStaff() ? '1' : "(FIND_IN_SET('{$app->user->group}', c.memberGroups) != 0 || c.memberGroups='')");
-        $result_boards = $app->db->query ("
+        if ($app->user->isStaff())
+        {
+            $condition = '1';
+            $condition_params = array();
+        }
+        else
+        {
+            $condition = "(FIND_IN_SET(?, c.memberGroups) != 0 || c.memberGroups='')";
+            $condition_params = array($app->user->group);
+        }
+                
+        $dbst_boards = $app->db->prepare("
             SELECT DISTINCT c.name AS catName, c.ID_CAT, b.ID_BOARD, b.name AS boardName, b.description, b.moderators, b.numPosts, b.numTopics, c.memberGroups, m.posterName, m.posterTime, m.subject, t.ID_TOPIC, t.numReplies, IFNULL(mem.realName, m.posterName) AS realName, IFNULL(lb.logTime, 0) AS boardTime, IFNULL(lmr.logTime, 0) AS markReadTime, IFNULL(mem.ID_MEMBER, -1) AS ID_MEMBER, IFNULL(lon.viewers, 0) AS numBoardViewers
             FROM {$db_prefix}categories AS c
             LEFT JOIN {$db_prefix}boards AS b ON (b.ID_CAT=c.ID_CAT)
             LEFT JOIN {$db_prefix}topics AS t ON (t.ID_TOPIC=b.ID_LAST_TOPIC)
             LEFT JOIN {$db_prefix}messages AS m ON (m.ID_MSG=t.ID_LAST_MSG)
             LEFT JOIN {$db_prefix}members AS mem ON (mem.ID_MEMBER=m.ID_MEMBER)
-            LEFT JOIN {$db_prefix}log_boards AS lb ON (lb.ID_BOARD=b.ID_BOARD AND lb.ID_MEMBER={$app->user->id})
-            LEFT JOIN {$db_prefix}log_mark_read AS lmr ON (lmr.ID_BOARD=b.ID_BOARD AND lmr.ID_MEMBER={$app->user->id})
+            LEFT JOIN {$db_prefix}log_boards AS lb ON (lb.ID_BOARD=b.ID_BOARD AND lb.ID_MEMBER=?)
+            LEFT JOIN {$db_prefix}log_mark_read AS lmr ON (lmr.ID_BOARD=b.ID_BOARD AND lmr.ID_MEMBER=?)
             LEFT JOIN {$db_prefix}log_online AS lo ON (b.ID_BOARD = lo.ID_BOARD)
             LEFT JOIN (SELECT lo.ID_BOARD, count(*) AS viewers FROM {$db_prefix}log_online AS lo GROUP BY lo.ID_BOARD) AS lon ON (b.ID_BOARD = lon.ID_BOARD)
             WHERE $condition
-            ORDER BY c.catOrder, c.ID_CAT, b.boardOrder, b.ID_BOARD", false) or $app->db->show_error(__FILE__, __LINE__);
+            ORDER BY c.catOrder, c.ID_CAT, b.boardOrder, b.ID_BOARD");
+        $dbst_boards->execute(array_merge(array($app->user->id, $app->user->id), $condition_params));
         
         $curcat = -1;
         $collapsedCategories = (empty($app->conf->collapsedCategories)) ? array() : $app->conf->collapsedCategories;
@@ -263,7 +349,7 @@ class Main extends Respond {
         //$service->cats = array();
         $cats = array();
         $c = 0;
-        while ($row_board = $result_boards->fetch_assoc()) {
+        while ($row_board = $dbst_boards->fetch()) {
             // if this is a new category
             //$service->boards[] = $row_board;
             if ($row_board['ID_CAT'] != $curcat) {
@@ -271,11 +357,13 @@ class Main extends Respond {
                 $cats[$curcat]['boards'] = array();
                 $cats[$curcat]['name'] = $row_board['catName'];
                 
-                $request = $app->db->query("SELECT billboard, billboardAuthor FROM {$db_prefix}categories WHERE ID_CAT = $curcat;");
-                $row = $request->fetch_assoc();
+                $dbst = $app->db->prepare("SELECT billboard, billboardAuthor FROM {$db_prefix}categories WHERE ID_CAT = ?");
+                $dbst->execute(array($curcat));
+                $row = $dbst->fetch();
                 $row['billboard'] = stripslashes($row['billboard']);
                 $cats[$curcat]['billboard'] = $row['billboard'];
                 $cats[$curcat]['billboardAuthor'] = $row['billboardAuthor'];
+                $dbst = null;
             } // row['ID_CAT'] != $curcat
             
             if ($row_board['ID_BOARD'] != '' and !in_array($row_board['ID_CAT'], $collapsedCategories)) {
@@ -360,17 +448,18 @@ class Main extends Respond {
                 $cats[$curcat]['boards'][$curboard]['new_txt'] = $new_txt;
             } // if board and non collapsed
         } // fetch_assoc()
+        $dbst_boards = null; // closing statement
         
         // load the number of users online right now
         $guests = 0;
         $tmpusers = array();
-        $request3 = $app->db->query("
+        $dbst = $app->db->query("
             SELECT m.memberName AS identity,  m.realName,  m.memberGroup
             FROM {$app->db->prefix}log_online AS lo
             LEFT JOIN {$app->db->prefix}members AS m ON (m.ID_MEMBER=lo.identity)
             WHERE 1
-            ORDER BY logTime DESC", false) or database_error(__FILE__, __LINE__, $app->db);
-        while ($tmp = $request3->fetch_assoc()) {
+            ORDER BY logTime DESC");
+        while ($tmp = $dbst->fetch()) {
             $identity = $tmp['identity'];
             $euser = urlencode($identity);
             
@@ -389,6 +478,7 @@ class Main extends Respond {
             else
                 $guests ++;
         }
+        $dbst = null;
         
         //change here
         $service->users = '<font size="1">' . implode(', ', $tmpusers) . '</font>';
@@ -398,8 +488,8 @@ class Main extends Respond {
         $total_users = $guests + $numusersonline;
         $tot_date = time();
         if (($app->conf->trackStats == 1) && ($total_users > $app->conf->mostOnline)) {
-            $result = $app->db->query("UPDATE {$app->db->prefix}settings SET value='$total_users' WHERE variable='mostOnline'", false);
-            $result = $app->db->query("UPDATE {$app->db->prefix}settings SET value='$tot_date' WHERE variable='mostDate'", false);
+            $app->db->query("UPDATE {$app->db->prefix}settings SET value='$total_users' WHERE variable='mostOnline'");
+            $app->db->query("UPDATE {$app->db->prefix}settings SET value='$tot_date' WHERE variable='mostDate'");
         }
         
         if ($app->conf->trackStats == 1) {
@@ -409,14 +499,15 @@ class Main extends Respond {
                 FROM {$app->db->prefix}log_activity
                 WHERE month = $mdate[mon]
                     AND day = $mdate[mday]
-                    AND year = $mdate[year]", false);
-            echo $app->db->error;
-            $temp = $monthquery->fetch_row();
-            $oldMost = $temp[0];
+                    AND year = $mdate[year]");
+            
+            $oldMost = $monthquery->fetchColumn();
+            $monthquery = null; // closing statement
             if ($total_users > $oldMost) {
-                $statsquery = $app->db->query("UPDATE {$app->db->prefix}log_activity SET mostOn = $total_users WHERE month = $mdate[mon] AND day = $mdate[mday] AND year = $mdate[year]") or database_error(__FILE__, __LINE__, $app->db);
-                if ($app->db->affected_rows == 0)
-                    $statsquery = $app->db->query("INSERT INTO {$app->db->prefix}log_activity (month, day, year, mostOn) VALUES ($mdate[mon], $mdate[mday], $mdate[year], $total_users)", false);
+                $statsquery = $app->db->query("UPDATE {$app->db->prefix}log_activity SET mostOn = $total_users WHERE month = $mdate[mon] AND day = $mdate[mday] AND year = $mdate[year]");
+                if ($statsquery->rowCount() == 0)
+                    $app->db->query("INSERT INTO {$app->db->prefix}log_activity (month, day, year, mostOn) VALUES ($mdate[mon], $mdate[mday], $mdate[year], $total_users)");
+                $statsquery = null; // closing statement
             }
         }
 
@@ -457,19 +548,21 @@ class Main extends Respond {
         
         $usergroup = $this->app->user->group;
         
-        $request = $this->app->db->query("
+        $dbst = $this->app->db->prepare("
             SELECT m.posterTime, m2.subject, m.ID_TOPIC, t.ID_BOARD, m.posterName, t.numReplies, t.ID_FIRST_MSG
             FROM {$db_prefix}boards AS b
             JOIN {$db_prefix}categories AS c ON (c.ID_CAT = b.ID_CAT)
             LEFT JOIN {$db_prefix}topics AS t ON (t.ID_TOPIC=b.ID_LAST_TOPIC)
             LEFT JOIN {$db_prefix}messages AS m ON (m.ID_MSG=t.ID_LAST_MSG)
             LEFT JOIN {$db_prefix}messages AS m2 ON (m2.ID_MSG=t.ID_FIRST_MSG)
-            WHERE (FIND_IN_SET('$usergroup', c.memberGroups) != 0 OR c.memberGroups='' OR '$usergroup' LIKE 'Administrator' OR '$usergroup' LIKE 'Global Moderator')
+            WHERE (FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups='' OR ? LIKE 'Administrator' OR ? LIKE 'Global Moderator')
             RDER BY m.posterTime DESC
-            LIMIT 1;", false) or database_error(__FILE__, __LINE__, $this->app->db);
-        if ($request->num_rows == 0)
+            LIMIT 1");
+        $dbst->execute(array($usergroup, $usergroup, $usergroup));
+        $row = $dbst->fetch();
+        $dbst = null;
+        if (empty($row))
             return '';
-        $row = $request->fetch_array();
         $row['subject'] = $this->app->subs->CensorTxt($row['subject']);
         if ($recentsender == 'admin') {
             $row['subject'] = ((strlen($this->app->subs->un_html_entities($row['subject']))>25) ? ($this->app->subs->htmlescape(substr($this->app->subs->un_html_entities($row['subject']), 0, 22)) . "...") : $row['subject']);
@@ -493,7 +586,7 @@ class Main extends Respond {
         // ($showlatestcount) topics a user is allowed to see.
         
         $db_prefix = $this->app->db->prefix;
-        $usergroup = $this->app->db->escape_string($this->app->user->group);
+        $usergroup = $this->app->user->group;
         //$scripturl = $this->app->conf->scripturl;
         $siteroot = SITE_ROOT;
         
@@ -501,37 +594,45 @@ class Main extends Respond {
             SELECT m.ID_MSG
             FROM {$db_prefix}messages AS m
             ORDER BY m.posterTime DESC
-            LIMIT 0, " . ($showlatestcount * 4), false);
-        $messages = array();
-        while ($row = $request->fetch_array())
-            $messages[] = $this->app->db->escape_string($row['ID_MSG']);
+            LIMIT 0, " . ($showlatestcount * 4));
+        $messages = $request->fetchAll(\PDO::FETCH_COLUMN);
+        $request = null;
         
-        if (count($messages)) {
-            $request = $this->app->db->query("
+        if ($messages)
+        {
+            $msg_placeholders = $this->app->db->build_placeholders($messages);
+            $request = $this->app->db->prepare("
                 SELECT m.ID_MSG, m.posterTime, m.subject, m.ID_TOPIC, m.posterName, m.ID_MEMBER, IFNULL(mem.realName, m.posterName) AS posterDisplayName, t.numReplies, t.ID_BOARD, t.ID_FIRST_MSG, b.name AS bName
                     FROM {$db_prefix}messages AS m
                     JOIN {$db_prefix}topics AS t ON (m.ID_TOPIC = t.ID_TOPIC)
                     JOIN {$db_prefix}boards AS b ON (t.ID_BOARD = b.ID_BOARD)
                     JOIN {$db_prefix}categories AS c ON (b.ID_CAT = c.ID_CAT)
                     LEFT JOIN {$db_prefix}members AS mem ON (mem.ID_MEMBER=m.ID_MEMBER)
-                    WHERE m.ID_MSG IN (" . implode(',', $messages) . ")
-                        AND (FIND_IN_SET('$usergroup', c.memberGroups) != 0 OR c.memberGroups='' OR '$usergroup' LIKE 'Administrator' OR '$usergroup' LIKE 'Global Moderator')
+                    WHERE m.ID_MSG IN ($msg_placeholders)
+                        AND (FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups='' OR ? LIKE 'Administrator' OR ? LIKE 'Global Moderator')
                     ORDER BY m.posterTime DESC
-                    LIMIT 0, $showlatestcount;");
-
-            if ($request->num_rows > 0) {
-                $post = '<table width="100%" border="0">';
-                while ($row = $request->fetch_array()) {
-                    if ($this->app->user->inIgnore($row['posterName'])) continue;
-                    $post .= '<tr>';
-                    if ($row['ID_MEMBER'] != -1) {
-                        $euser = urlencode($row['posterName']);
-                        $dummy = "<a href=\"$siteroot/people/$euser/\">".$this->service->esc($row['posterDisplayName'])."</a>";
-                    }
-                    else
-                        $dummy = $this->service->esc($row['posterName']);
-                    //$row['subject'] = $this->app->subs->htmlescape($row['subject']);
-                    $post .= '
+                    LIMIT 0, ?");
+            $request->execute(
+                array_merge(
+                    $messages, array($usergroup, $usergroup, $usergroup, $showlatestcount)
+                )
+            );
+            
+            $post = '';
+            while ($row = $request->fetch())
+            {
+                if ($this->app->user->inIgnore($row['posterName']))
+                    continue;
+                
+                $post .= '<tr>';
+                if ($row['ID_MEMBER'] != -1) {
+                    $euser = urlencode($row['posterName']);
+                    $dummy = "<a href=\"$siteroot/people/$euser/\">".$this->service->esc($row['posterDisplayName'])."</a>";
+                }
+                else
+                    $dummy = $this->service->esc($row['posterName']);
+                //$row['subject'] = $this->app->subs->htmlescape($row['subject']);
+                $post .= '
                         <td align="right" valign="top" nowrap="nowrap" class="info_board">
                             [<a href="' . $siteroot . '/b' . $row['ID_BOARD'] . '/">' . $this->service->esc($row['bName']) . '</a>]
                         </td>
@@ -542,11 +643,14 @@ class Main extends Respond {
                             ' . $this->app->subs->timeformat($row['posterTime']) . '
                         </td>
                     </tr>';
-                } // while
-                $post .= '</table>';
-            } // if num_rows > 0
-            else
+            } // while
+            
+            if ($post == '')
                 $post = '---';
+            else
+            {
+                $post = '<table width="100%" border="0">' . $post . '</table>';
+            }
         } // if count($messages)
         else $post = '---';
 
@@ -559,7 +663,7 @@ class Main extends Respond {
         $showlatestcount = 15;
         
         $db_prefix = $this->app->db->prefix;
-        $usergroup = $this->app->db->escape_string($this->app->user->group);
+        $usergroup = $this->app->user->group;
         $siteroot = SITE_ROOT;
         
         $this->service->recentCommentsTable = ($this->request->cookies()->get('recentCommentsTable') == "show" ? true : false);
@@ -570,36 +674,41 @@ class Main extends Respond {
         $request = $this->app->db->query("
             SELECT MSG
             FROM {$db_prefix}log_last_comments ORDER BY last_comment_time DESC
-            LIMIT ".($showlatestcount*2), false) or database_error(__FILE__, __LINE__, $this->app->db);
-        $messages = array();
-        while ($row = $request->fetch_array())
-            $messages[] = $this->app->db->escape_string($row['MSG']);
+            LIMIT ".($showlatestcount*2));
+        $messages = $request->fetchAll(\PDO::FETCH_COLUMN);
+        $request = null;
         
-        if (count($messages)) {
-            $request = $this->app->db->query("
+        if ($messages) {
+            $msg_placeholders = $this->app->db->build_placeholsers($messages);
+            $request = $this->app->db->prepare("
                     SELECT m.ID_MSG, m.last_comment_time LAST_COMMENT_TIME, m.comments COMMENTS, m.subject, m.ID_TOPIC, m.posterName, m.ID_MEMBER, IFNULL(mem.realName, m.posterName) AS posterDisplayName, t.numReplies, t.ID_BOARD, t.ID_FIRST_MSG, b.name AS bName
                     FROM {$db_prefix}messages AS m
                     JOIN {$db_prefix}topics AS t ON (m.ID_TOPIC = t.ID_TOPIC)
                     JOIN {$db_prefix}boards AS b ON (t.ID_BOARD = b.ID_BOARD)
                     JOIN {$db_prefix}categories AS c ON (b.ID_CAT = c.ID_CAT)
                     LEFT JOIN {$db_prefix}members AS mem ON (mem.ID_MEMBER=m.ID_MEMBER)
-                    WHERE m.ID_MSG IN (" . implode(',', $messages) . ")
-                        AND (FIND_IN_SET('$usergroup', c.memberGroups) != 0 OR c.memberGroups='' OR '$usergroup' LIKE 'Administrator' OR '$usergroup' LIKE 'Global Moderator')
+                    WHERE m.ID_MSG IN ($msg_placeholders)
+                        AND (FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups='' OR ? LIKE 'Administrator' OR ? LIKE 'Global Moderator')
                     ORDER BY m.last_comment_time DESC
-                    LIMIT 0, $showlatestcount;", false) or database_error(__FILE__, __LINE__, $this->app->db);
+                    LIMIT 0, ?");
+            $request->excute(
+                array_merge(
+                    $messages, array($usergroup, $usergroup, $usergroup, $showlatestcount)
+                )
+            );
             
-            if ($request->num_rows > 0) {
-                $post = '<div id="recentcommentstable" style="display: '.($this->service->recentCommentsTable ? "block" : "none").';"><table width="100%" border="0">';
-                while ($row = $request->fetch_array()) {
-                    $csvlines = explode("\r\n", $row['COMMENTS']);
-                    end($csvlines);
-                    $lastcsvline = explode("#;#", prev($csvlines));
-                    if ($this->app->user->inIgnore($lastcsvline[1])) continue;
-                    $euser = urlencode($lastcsvline[1]);
-                    $dummy = "<a href=\"$siteroot/people/$euser/\">".$this->service->esc($lastcsvline[0])."</a>";
-                    //$row['subject'] = htmlspecialchars($row['subject'], ENT_COMPAT, $config['charset'], false);
-                    $post .= '<tr>';
-                    $post .= '
+            $post = '';
+            while ($row = $request->fetch_array()) {
+                $csvlines = explode("\r\n", $row['COMMENTS']);
+                end($csvlines);
+                $lastcsvline = explode("#;#", prev($csvlines));
+                if ($this->app->user->inIgnore($lastcsvline[1]))
+                    continue;
+                $euser = urlencode($lastcsvline[1]);
+                $dummy = "<a href=\"$siteroot/people/$euser/\">".$this->service->esc($lastcsvline[0])."</a>";
+                //$row['subject'] = htmlspecialchars($row['subject'], ENT_COMPAT, $config['charset'], false);
+                $post .= '<tr>';
+                $post .= '
                         <td align="right" valign="top" nowrap="nowrap" class="info_board">
                             [<a href="' . $siteroot . '/b' . $row['ID_BOARD'] . '/">' . $this->service->esc($row['bName']) . '</a>]
                         </td>
@@ -610,11 +719,14 @@ class Main extends Respond {
                             ' . $this->app->subs->timeformat($lastcsvline[2]) . '
                         </td>
                     </tr>';
-                } // while
-                $post .= '</table></div>';
-            } // if num_rows
-            else
+            } // while
+            
+            if ($post == '')
                 $post = '---';
+            else
+                $post =  '<div id="recentcommentstable" style="display: '.($this->service->recentCommentsTable ? "block" : "none").';"><table width="100%" border="0">
+                ' . $post . '
+                </table></div>';
         } // if $messages
         else
             $post = '---';

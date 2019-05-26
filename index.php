@@ -112,7 +112,7 @@ $router->respond(function($request, $response, $service, $app, $router) {
     
     $app->register('db', function() use ($router, $app) {
         // Lazy class init
-        $db = new \Prodigy\MySQLDatabase($router);
+        $db = new \Prodigy\PDOWrapper($router);
         $app->conf->db_ready = $db->connect();
         return $db;
     });

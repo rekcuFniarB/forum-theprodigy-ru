@@ -393,14 +393,16 @@ abstract class Respond {
 
         if ($identity == -1 && !empty($REMOTE_ADDR) && ip2long($REMOTE_ADDR) != -1)
         {
-            $this->app->db->query ("
+            $this->app->db->prepare ("
                 DELETE FROM {$db_prefix}log_online
-                WHERE logTime < " . ($logTime - 900) . "
-                OR identity=IFNULL(INET_ATON('$REMOTE_ADDR'), -1)", false);
-            $this->app->db->query ("
+                WHERE logTime < ?
+                OR identity=IFNULL(INET_ATON(?), -1)")->execute(array($logTime - 900, $REMOTE_ADDR));
+            
+            $dbst = $this->app->db->prepare("
                 REPLACE INTO {$db_prefix}log_online
                   (identity, logTime, ID_BOARD)
-                VALUES (IFNULL(INET_ATON('$REMOTE_ADDR'), -1), $logTime, $board)", false);
+                VALUES (IFNULL(INET_ATON(?), -1), ?, ?)")
+                ->execute(array($REMOTE_ADDR, $logTime, $board));
         }
         else
         {
