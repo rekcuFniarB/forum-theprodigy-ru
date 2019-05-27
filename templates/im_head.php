@@ -3,7 +3,7 @@
 <?php if ($this->user->name != 'Guest'): ?>
   <span id="instantMessages">
     <?php if ($this->imcount[1] == 0): ?>
-        <?= $this->locale->txt(152) ?> <a href="<?= SITE_ROOT ?>/im/"><?= $this->imcount[0] ?> <?= $this->locale->txt(153) ?></a>
+        <?= $this->locale->txt[152] ?> <a href="<?= SITE_ROOT ?>/im/"><?= $this->imcount[0] ?> <?= $this->locale->txt[153] ?></a>
     <?php elseif ($this->imcount[0] == '1'): ?>
         <?= $this->locale->txt(152) ?> <a href="<?= SITE_ROOT ?>/im/"><?= $this->imcount[0] ?> <?= $this->locale->txt(471) ?></a> <?= $this->locale->newmessages2 ?><?= $this->imcount[1] ?>)
     <?php else: ?>
