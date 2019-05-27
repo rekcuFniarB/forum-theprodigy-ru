@@ -317,7 +317,7 @@
                   <?php else: ?>
                       <form action="<?= SITE_ROOT ?>/security/ban/<?= $this->meminf['ID_MEMBER'] ?>/" name="banform" method="POST">
                   <?php endif; ?>
-                  <input type="hidden" name="sc" value="<?= $this->session_id ?>">
+                  <input type="hidden" name="sc" value="<?= $this->sessionid ?>">
                   
                   <script language="JavaScript1.2" type="text/javascript"><!--
                     function Set_Enable (oControl,oObject)
@@ -490,7 +490,7 @@
               var url = "<?= SITE_ROOT ?>/people/<?= $this->meminf['memberName'] ?>/activate/";
               $.ajax(url,{
                   type: 'POST',
-                  data: {requesttype: "ajax", sc: "<?= $this->session_id ?>"},
+                  data: {requesttype: "ajax", sc: "<?= $this->sessionid ?>"},
                   timeout: 10000,
                   error: function(){alert("Произошла ошибка, повторите позже.");},
                   success: function(result){
