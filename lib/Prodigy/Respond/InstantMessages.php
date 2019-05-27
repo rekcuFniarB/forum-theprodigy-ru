@@ -15,13 +15,13 @@ class InstantMessages extends Respond
         $cgi = SITE_ROOT . '/';
         
         $request = $this->app->db->query("SELECT COUNT(*), readBy FROM {$db_prefix}instant_messages 
-            WHERE (ID_MEMBER_TO={$ID_MEMBER} AND deletedBy != 1) GROUP BY readBy", false);
-        
-        if ($request->num_rows == 0)
+            WHERE (ID_MEMBER_TO={$ID_MEMBER} AND deletedBy != 1) GROUP BY readBy");
+        $rows = $request->fetchAll(\PDO::FETCH_NUM);
+        if (!$rows)
             $munred = $mnum = 0;
-        elseif ($request->num_rows == 1)
+        elseif (count($rows) == 1)
         {
-            list($mnum, $readBy) = $request->fetch_row();
+            list($mnum, $readBy) = $rows[0];
             if ($readBy == 0)
                 $munred = $mnum;
             else
@@ -29,8 +29,8 @@ class InstantMessages extends Respond
         }
         else
         {
-            list($munred, $dummy) = $request->fetch_row();
-            list($mnum, $dummy) = $request->fetch_row();
+            list($munred, $dummy) = $rows[0];
+            list($mnum, $dummy) = $rows[1];
             $mnum += $munred;
         }
         
@@ -66,30 +66,31 @@ class InstantMessages extends Respond
     {
         $db_prefix = $this->app->db->prefix;
         
-        $threadid = $this->app->db->escape_string($threadid);
-        
-        $dbrq = $this->app->db->query("
+        $dbrq = $this->app->db->prepare("
             SELECT notifies
             FROM {$db_prefix}topics
             WHERE (ID_TOPIC = $threadid
                 AND notifies != '')
             LIMIT 1");
-        
-        if ($dbrq->num_rows != 0)
+        $dbrq->execute(array($threadid));
+        $notifies = $dbrq->fetchColumn();
+        $dbrq = null;
+        if ($notifies)
         {
-            $row = $dbrq->fetch_row();
-            
-            $members = $this->app->db->query("
+            $notifies = explode(',', $notifies);
+            $placeholders = $this->app->db->build_placeholders($notifies);
+            $members = $this->app->db->prepare("
                 SELECT emailAddress, notifyOnce, ID_MEMBER, lngfile
                 FROM {$db_prefix}members
-                WHERE ID_MEMBER IN ('" . implode("','", explode(',', $row[0])) . "')
+                WHERE ID_MEMBER IN ($placeholders)
                 AND emailAddress != ''
-                AND ID_MEMBER != {$this->app->user->id}
+                AND ID_MEMBER != ?
                 ORDER BY lngfile");
+            $members->execute(array_merge($notifies, array($this->app->user->id)));
             
             $curlanguage = $this->app->locale->lngfile;
 
-            while ($rowmember = $members->fetch_array())
+            while ($rowmember = $members->fetch())
             {
                 if ($this->app->conf->userLanguage == 1)
                 {
@@ -107,34 +108,41 @@ class InstantMessages extends Respond
                 
                 if ($rowmember['notifyOnce'] == 1)
                 {
-                    $dbrq = $this->app->db->query("
+                    $dbrq = $this->app->db->prepare("
                         SELECT notificationSent
                         FROM {$db_prefix}log_topics
                         WHERE ID_MEMBER={$rowmember['ID_MEMBER']}
                         AND ID_TOPIC = $threadid");
-                    
-                    if ($dbrq->num_rows == 0)
+                    $dbrq->execute(array($rowmember['ID_MEMBER'], $threadid));
+                    $notificationSent = $dbrq->fetchColumn();
+                    $dbrq = null;
+                    if ($notificationSent === false)
+                    {
                         $notificationSent = 0;
+                        $rows = false;
+                    }
                     else
-                        list($notificationSent) = $dbrq->fetch_row();
+                        $rows = true;
                     
-                    if ($notificationSent == 0)
+                    if (!$notificationSent)
                     {
                         $send_body = "$txt[128] $txt[129]
                         " . SITE_URL ."/b{$service->board}/t$threadid/new/\n\n{$txt['notifyXOnce2']}\n\n$txt[130]";
                         $this->app->im->sendmail($rowmember['emailAddress'], $send_subject, $send_body);
                         
-                        if ($dbrq->num_rows == 0)
-                            $dbrq = $db->query("
+                        if (!$rows)
+                            $this->app->db->prepare("
                                 INSERT INTO {$db_prefix}log_topics
                                 (logTime, ID_MEMBER, ID_TOPIC, notificationSent)
-                                VALUES (0, '{$rowmember['ID_MEMBER']}', $threadid, 1)");
+                                VALUES (0, ?, ?, 1)")->
+                                    execute(array($rowmember['ID_MEMBER'], $threadid));
                         else
-                            $dbrq = $db->query("
+                            $this->app->db->prepare("
                                 UPDATE {$db_prefix}log_topics
                                 SET notificationSent = 1
-                                WHERE (ID_MEMBER = '$rowmember[ID_MEMBER]'
-                                AND ID_TOPIC=$threadid)");
+                                WHERE (ID_MEMBER = ?
+                                AND ID_TOPIC=?)")->
+                                    execute(array($rowmember['ID_MEMBER'], $threadid));
                     }
                 }
                 else
@@ -142,7 +150,8 @@ class InstantMessages extends Respond
                     $send_body = "$txt[128] $txt[129]  " . SITE_URL . "/b{$service->board}/t$threadid/new/\n\n$txt[130]";
                     $this->app->im->sendmail($rowmember['emailAddress'], $send_subject, $send_body);
                 }
-            } // while fetch_array()
+            } // while fetch()
+            $members = null;
         } // if num_rows
     } // NotifyUsers()
     
@@ -158,12 +167,13 @@ class InstantMessages extends Respond
         
         $threadid = $this->app->db->escape_string($threadid);
         
-        $dbrq = $this->app->db->query("
+        $dbrq = $this->app->db->prepare("
             SELECT notifies FROM {$db_prefix}topics
-            WHERE (ID_TOPIC = $threadid)
+            WHERE (ID_TOPIC = ?)
             LIMIT 1");
-        
-        list($notification) = $dbrq->fetch_row();
+        $dbrq->excute(array($threadid));
+        $notification = $dbrq->fetchColumn();
+        $dbrq = null;
         $notifies = explode(',', $notification);
         $notifications2 = array();
         
@@ -175,10 +185,11 @@ class InstantMessages extends Respond
             $notifications2[] = $this->app->user->id;
         
         $notification = implode(",", $notifications2);
-        $dbrq = $this->app->db->query("
+        $dbrq = $this->app->db->prepare("
             UPDATE {$db_prefix}topics
-            SET notifies = '$notification'
-            WHERE ID_TOPIC = $threadid");
+            SET notifies = ?
+            WHERE ID_TOPIC = ?")->
+                execute(array($notification, $threadid));
     } // Notify2()
     
     public function sendmail()

@@ -141,9 +141,10 @@ abstract class Respond {
         if ($this->app->user->name != 'Guest') {
             $service->imcount = $this->app->im->getCount();
 
-            $request = $this->app->db->query("SELECT SUM(unreadComments) as numUnreadComments, SUM(otherComments) + SUM(subscribedComments) as numOtherComments FROM {$db_prefix}log_topics WHERE ID_MEMBER=$ID_MEMBER;", false);
-            $row = $request->fetch_assoc();
+            $dbst = $this->app->db->query("SELECT SUM(unreadComments) as numUnreadComments, SUM(otherComments) + SUM(subscribedComments) as numOtherComments FROM {$db_prefix}log_topics WHERE ID_MEMBER=$ID_MEMBER");
+            $row = $dbst->fetch();
             $numComments = $row['numUnreadComments'] + $row['numOtherComments'];
+            $dbst = null;
             
             $service->numComments = $numComments;
             $service->numUnreadComments = $row['numUnreadComments'];
@@ -229,27 +230,24 @@ abstract class Respond {
             $receivers = array();
             if (empty($board) and empty($action)) {
                 // Get receiver member names array
-                $request = $this->app->db->query("
+                $dbst = $this->app->db->query("
                     SELECT m.memberName AS identity
                     FROM {$db_prefix}log_online AS lo
                     JOIN {$db_prefix}members AS m ON (m.ID_MEMBER=lo.identity)
                     LEFT JOIN {$db_prefix}extended_member_settings as ems ON (m.ID_MEMBER = ems.ID_MEMBER)
-                    WHERE ems.disable_congratulations IS NULL OR ems.disable_congratulations = 0;", false) or $this->app->db->show_error(__FILE__, __LINE__);
-                while ($tmp = $request->fetch_assoc())
-                    if ($tmp['identity'] != $this->app->user->name)
-                        $receivers[] = $tmp['identity'];
+                    WHERE ems.disable_congratulations IS NULL OR ems.disable_congratulations = 0");
+                while ($tmp = $dbst->fetchColumn())
+                    if ($tmp != $this->app->user->name)
+                        $receivers[] = $tmp;
+                $dbst = null;
                 
                 // Get number of congratulations sent
-                $request = $this->app->db->query("
-                    SELECT COUNT(*) AS num FROM {$db_prefix}log_congratulations", false) or database_error(__FILE__, __LINE__, $this->app->db);
-                $tmp = $request->fetch_assoc();
-                $numCongratulations = $tmp['num'];
+                $numCongratulations = $this->app->db->query("
+                    SELECT COUNT(*) FROM {$db_prefix}log_congratulations")->fetchColumn();
                 
                 // Get receive congratulations profile setting
-                $request = $this->app->db->query("
-                    SELECT disable_congratulations FROM {$db_prefix}extended_member_settings WHERE ID_MEMBER = {$ID_MEMBER};", false) or database_error(__FILE__, __LINE__, $db);
-                $tmp = $request->fetch_assoc();
-                $disableCongratulations = $tmp['disable_congratulations'];
+                $disableCongratulations = $this->app->db->query("
+                    SELECT disable_congratulations FROM {$db_prefix}extended_member_settings WHERE ID_MEMBER = {$ID_MEMBER}")->fetchColumn();
                 
                 $infopane = '<a href="'.$cgi.';action=imsend;form_type=ny;to='.implode(",",$receivers).';form_subject=С%20Новым%20Годом!" style="font-size: 20pt;" title="Отправленных поздравлений">'.$numCongratulations.'</a> x <a href="'.$cgi.';action=imsend;form_type=ny;to='.implode(",",$receivers).';form_subject=С%20Новым%20Годом!"><img src="YaBBImages/new-year-letter.png" title="Поздравить с Новым Годом форумчан, которые находятся в данную минуту на Форуме!" with="48" height="48" border="0" /></a>'.($this->app->user->name == 'Guest' ? '' : ' <input type="checkbox" name="disable_congratulations" title="Отключить/Включить получение поздравлений" onclick="Forum.Profile.toggleCongratulations(this);"'.($disableCongratulations!=1?' checked="checked"':'').'/>');
             }
@@ -344,25 +342,28 @@ abstract class Respond {
     
     public function prepareJumpToForm($currentboard) {
         $db_prefix = $this->app->db->prefix;
-        $rq = $this->app->db->query("
+        $dbst = $this->app->db->prepare("
             SELECT name,ID_CAT
             FROM {$db_prefix}categories
-            WHERE (FIND_IN_SET('{$this->app->user->group}',memberGroups) != 0 OR memberGroups='' OR '{$this->app->user->group}'='Administrator' OR '{$this->app->user->group}'='Global Moderator')
+            WHERE (FIND_IN_SET(?, memberGroups) != 0 OR memberGroups='' OR ? = 'Administrator' OR ? = 'Global Moderator')
             ORDER BY catOrder");
+        $dbst->execute(array($this->app->user->group, $this->app->user->group, $this->app->user->group));
         $cats = array();
-        while ($row = $rq->fetch_row())
+        while ($row = $rq->fetch())
         {
-            $cats[$row[1]] = array ('name' => $row[0], 'boards' => array());
-            $rq2 = $this->app->db->query("SELECT name,ID_BOARD FROM {$db_prefix}boards WHERE ID_CAT=$row[1] ORDER BY boardOrder");
-            while ($row2 = $rq2->fetch_row())
+            $cats[$row['ID_CAT']] = array ('name' => $row['name'], 'boards' => array());
+            $dbst2 = $this->app->db->query("SELECT name,ID_BOARD FROM {$db_prefix}boards WHERE ID_CAT={$row['ID_CAT']} ORDER BY boardOrder");
+            while ($row2 = $dbst2->fetch())
             {
-                $cats[$row[1]]['boards'][$row2[1]] = array('name' => $row2[0]);
-                if ($row2[1] == $currentboard)
-                    $cats[$row[1]]['boards'][$row2[1]]['current'] = true;
+                $cats[$row['ID_CAT']]['boards'][$row2['ID_BOARD']] = array('name' => $row2['name']);
+                if ($row2['ID_BOARD'] == $currentboard)
+                    $cats[$row['ID_CAT']]['boards'][$row2['ID_BOARD']]['current'] = true;
                 else
-                    $cats[$row[1]]['boards'][$row2[1]]['current'] = false;
+                    $cats[$row['ID_CAT']]['boards'][$row2['ID_BOARD']]['current'] = false;
             }
+            $dbst2 = null;
         }
+        $dbst = null;
         return $cats;
     } // prepareJumpToForm()
     
@@ -408,14 +409,15 @@ abstract class Respond {
         {
             if (!is_numeric($identity))
                 $identity = -1;
-            $this->app->db->query ("
+            $this->app->db->query("
                 DELETE FROM {$db_prefix}log_online
                 WHERE logTime < " . ($logTime - 900) . "
-                OR identity=$identity", false);
-            $this->app->db->query ("
+                OR identity=$identity");
+            $this->app->db->prepare("
                 REPLACE INTO {$db_prefix}log_online
                 (identity, logTime, ID_BOARD)
-                VALUES ($identity, $logTime, $board)", false);
+                VALUES (?,?,?)")->
+                    execute(array($identity, $logTime, $board));
         }
     } // WriteLog()
     
@@ -426,9 +428,9 @@ abstract class Respond {
     public function getCurrentDBTimeString()
     {
         $result = null;
-        $rq = $this->app->db->query("SELECT NOW() as currentTime;");
-        if ($dbData = $rq->fetch_assoc())
-            $result = $dbData['currentTime'];
+        $dbData = $this->app->db->query("SELECT NOW()")->fetchColumn();
+        if ($dbData)
+            $result = $dbData;
         return $result;
     }
     
@@ -498,7 +500,10 @@ abstract class Respond {
             $domain = $this->app->conf->board_hostname;
         }
         
-        return $this->app->response->cookie($key, $value, $expiry, $path, $domain, $secure, $httponly);
+        if ($path === null)
+            $path = '/';
+        
+        return $this->response->cookie($key, $value, $expiry, $path, $domain, $secure, $httponly);
     }
     
     /**
