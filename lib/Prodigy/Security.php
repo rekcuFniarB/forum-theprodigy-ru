@@ -36,11 +36,14 @@ class Security
         $db_prefix = $db->prefix;
         $timeout = $this->app->conf->timeout;
         
-        $db->query("DELETE FROM {$db_prefix}log_floodcontrol WHERE ($time-logTime > $timeout)");
-        $dbrq = $db->query("SELECT ip FROM {$db_prefix}log_floodcontrol WHERE ip='$IP' LIMIT 1");
-        if ($dbrq->num_rows == 0)
+        $db->prepare("DELETE FROM {$db_prefix}log_floodcontrol WHERE ($time-logTime > ?)")->
+            execute(array($timeout));
+        $dbrq = $db->prepare("SELECT ip FROM {$db_prefix}log_floodcontrol WHERE ip=? LIMIT 1")->
+            execute(array($IP));
+        if (!$dbrq->fetchColumn())
         {
-            $db->query("INSERT INTO {$db_prefix}log_floodcontrol (ip,logTime) VALUES ('$IP',$time)");
+            $db->prepare("INSERT INTO {$db_prefix}log_floodcontrol (ip,logTime) VALUES (?,?)")->
+                execute(array($IP, $time));
             return (false);
         }
         else
