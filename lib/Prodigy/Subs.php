@@ -340,7 +340,7 @@ class Subs {
                 $memberCount = $result->fetchColumn();
                 $result = null;
                 
-                $db->query("
+                $db->prepare("
                     REPLACE INTO {$db_prefix}settings (variable,value)
                     VALUES ('latestMember',?), ('latestRealName',?),('memberCount',?)")->
                         execute(array($latestmember, $latestRealName, $memberCount));
