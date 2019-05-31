@@ -334,34 +334,35 @@ class Subs {
         {
             case 'member' :
                 $result = $db->query("SELECT memberName,realName FROM {$db_prefix}members WHERE posts > 0 ORDER BY dateRegistered DESC LIMIT 1");
-                list($latestmember,$latestRealName) = $result->fetch_row();
+                list($latestmember,$latestRealName) = $result->fetch(\PDO::FETCH_NUM);
+                $result = null;
+                $result = $db->query("SELECT COUNT(*) FROM {$db_prefix}members");
+                $memberCount = $result->fetchColumn();
+                $result = null;
                 
-                $result = $db->query("SELECT COUNT(*) FROM {$db_prefix}members;");
-                list($memberCount) = $result->fetch_row();
-                
-                $latestmember = $db->escape_string($latestmember);
-                $latestRealName = $db->escape_string($latestREalName);
-                
-                $request = $db->query("
+                $db->query("
                     REPLACE INTO {$db_prefix}settings (variable,value)
-                    VALUES ('latestMember','$latestmember'),('latestRealName','$latestRealName'),('memberCount','$memberCount')");
+                    VALUES ('latestMember',?), ('latestRealName',?),('memberCount',?)")->
+                        execute(array($latestmember, $latestRealName, $memberCount));
                 break;
             case 'message' :
                 $result = $db->query("
-                    SELECT COUNT(*) as totalMessages
+                    SELECT COUNT(*)
                     FROM {$db_prefix}messages");
-                $row = $result->fetch_assoc();
-                $request = $db->query("
-                    UPDATE {$db_prefix}settings SET value='{$row['totalMessages']}'
+                $totalMessages = $result->fetchColumn();
+                $result = null;
+                $db->query("
+                    UPDATE {$db_prefix}settings SET value='$totalMessages'
                     WHERE variable='totalMessages'");
                 break;
             case 'topic' :
                 $result = $db->query("
-                    SELECT COUNT(*)  as totalTopics
+                    SELECT COUNT(*)
                     FROM {$db_prefix}topics");
-                $row = $result->fetch_assoc();
-                $request = $db->query("
-                    UPDATE {$db_prefix}settings SET value='{$row['totalTopics']}'
+                $totalTopics = $result->fetchColumn();
+                $result = null;
+                $db->query("
+                    UPDATE {$db_prefix}settings SET value='$totalTopics'
                     WHERE variable='totalTopics'");
                 break;
         }
