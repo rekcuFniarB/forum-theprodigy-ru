@@ -46,8 +46,12 @@ class Errors {
             // Otherwise generate error page.
             $respond->render('templates/error.php');
         }
+        
         if(!$this->response->isSent())
             $this->response->send();
+        else
+            $this->log('__DEBUG__: errors->abort(): response already sent.');
+        
         //return $this->response;
         exit();
     }

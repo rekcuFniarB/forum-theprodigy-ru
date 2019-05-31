@@ -79,7 +79,7 @@ class Main extends Respond {
         $dbst = $app->db->prepare("SELECT memberName FROM members WHERE ID_MEMBER > 100 AND ID_MEMBER < 110
             AND ? LIKE 'dick'");
         $dbst->execute(array('dicka'));
-        $found = $dbst->fetch();
+        $found = $dbst->fetchColumn();
         //var_dump($found);
         $service->found = $found['memberName'];
         $emul_mode = $app->db->getAttribute(\PDO::ATTR_EMULATE_PREPARES);
@@ -91,7 +91,9 @@ class Main extends Respond {
         
         $buffered = $app->db->getAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY);
         
-        $service->msg = "Emulation mode: $emul_mode, Email: $email, Buffered: $buffered";
+        $placeholders = $app->db->build_placeholders(array('dick' => 'DICK', 'ass' => 'ASS', 'cunt' => 'CUNT'), true, false);
+        error_log("__DEBUG__: PLACEHOLDERS: $placeholders");
+        $service->msg = "Emulation mode: $emul_mode, Email: $email, Buffered: $buffered, Placeholders: ($placeholders)";
         
         //return $app->errors->abort('TEST', $msg, 200);
         $this->render('templates/examples/example.php');
@@ -204,7 +206,7 @@ class Main extends Respond {
             $dbst = null;
             if ($mark_topics)
             {
-                $placeholders = $app->db->build_placeholsers($mark_topics);
+                $placeholders = $app->db->build_placeholders($mark_topics);
                 $dbst = $app->db->prepare("DELETE FROM {$db_prefix}log_topics WHERE ID_MEMBER=? AND ID_TOPIC IN ($placeholders)");
                 $dbst->execute(array_merge(array($app->usr->id), $mark_topics));
                 $dbst = null;
@@ -679,7 +681,7 @@ class Main extends Respond {
         $request = null;
         
         if ($messages) {
-            $msg_placeholders = $this->app->db->build_placeholsers($messages);
+            $msg_placeholders = $this->app->db->build_placeholders($messages);
             $request = $this->app->db->prepare("
                     SELECT m.ID_MSG, m.last_comment_time LAST_COMMENT_TIME, m.comments COMMENTS, m.subject, m.ID_TOPIC, m.posterName, m.ID_MEMBER, IFNULL(mem.realName, m.posterName) AS posterDisplayName, t.numReplies, t.ID_BOARD, t.ID_FIRST_MSG, b.name AS bName
                     FROM {$db_prefix}messages AS m
