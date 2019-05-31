@@ -28,7 +28,7 @@
   <?= $this->menusep ?>
   <a href="<?= SITE_ROOT ?>/people/<?= $this->e_username ?>/"><span class="dig_big">Профиль</span></a>
   <?= $this->menusep ?>
-  <a href="<?= SITE_ROOT ?>/people/<?= $this->e_username ?>/edit/"><?= $this->locale->txt('profile') ?></a>
+  <a href="<?= SITE_ROOT ?>/people/<?= $this->e_username ?>/modify/"><?= $this->locale->txt('profile') ?></a>
   
   <?php if ($this->conf->enable_notification): ?>
     <?= $this->menusep ?>
