@@ -349,7 +349,7 @@ abstract class Respond {
             ORDER BY catOrder");
         $dbst->execute(array($this->app->user->group, $this->app->user->group, $this->app->user->group));
         $cats = array();
-        while ($row = $rq->fetch())
+        while ($row = $dbst->fetch())
         {
             $cats[$row['ID_CAT']] = array ('name' => $row['name'], 'boards' => array());
             $dbst2 = $this->app->db->query("SELECT name,ID_BOARD FROM {$db_prefix}boards WHERE ID_CAT={$row['ID_CAT']} ORDER BY boardOrder");

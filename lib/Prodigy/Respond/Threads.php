@@ -49,21 +49,18 @@ class Threads extends Respond
             //$error = ($start === 'prev') ? $app->locale->txt['a1'] : $app->locale->txt['a2'];
             
             $query = "SELECT t2.ID_TOPIC FROM {$db_prefix}topics as t, {$db_prefix}topics as t2, {$db_prefix}messages as mes, {$db->db_prefix}messages as mes2
-                WHERE (mes.ID_MSG=t.ID_LAST_MSG && t.ID_BOARD=$currentboard && t.ID_TOPIC=$threadid && ((mes2.posterTime $gt_lt mes.posterTime && t2.isSticky $gt_lt= t.isSticky) || t2.isSticky $gt_lt t.isSticky) && t2.ID_LAST_MSG=mes2.ID_MSG && t2.ID_BOARD=t.ID_BOARD)
+                WHERE (mes.ID_MSG=t.ID_LAST_MSG && t.ID_BOARD=? && t.ID_TOPIC=? && ((mes2.posterTime $gt_lt mes.posterTime && t2.isSticky $gt_lt= t.isSticky) || t2.isSticky $gt_lt t.isSticky) && t2.ID_LAST_MSG=mes2.ID_MSG && t2.ID_BOARD=t.ID_BOARD)
                 ORDER BY t2.isSticky $order, mes2.posterTime $order LIMIT 1";
 
             $dbst = $db->prepare($query);
-            $dbst->bind_param('ii', $currentboard, $threadid);
-            $dbst->execute();
-            $dbrs = $dbst->get_result();
-            $dbst->close();
-            if ($dbrs->num_rows > 0){
-                list ($threadid) = $dbrs->fetch_row();
-                $dbrs->free();
-                return $service->redirect("/b$currentboard/t$threadid/");
+            $dbst->execute(array($currentboard, $threadid));
+            $threadid = $dbst->fetchColumn();
+            $dbst = null;
+            if ($threadid){
+                return $this->redirect("/b$currentboard/t$threadid/");
             }
-            elseif($dbrs->num_rows == 0)
-                return $app->errors->abort('', 'You have reached the end of the topic list');
+            else
+                return $this->error('You have reached the end of the topic list');
         }
         
         // at this point it is certain that $threadid holds the correct ID_TOPIC
@@ -71,14 +68,18 @@ class Threads extends Respond
         //$viewnum = $threadid;
         
         //check for blog board
-        $dbrq = $db->query("SELECT ID_BOARD FROM {$db_prefix}boards WHERE ID_BOARD=$currentboard AND isBlog=1;", false);
-        $service->isBlog = ($dbrq->num_rows > 0) ? true : false;
+        $dbst = $db->prepare("SELECT ID_BOARD FROM {$db_prefix}boards WHERE ID_BOARD=? AND isBlog=1;");
+        $dbst->execute(array($currentboard));
+        $service->isBlog = ($dbst->fetchColumn()) ? true : false;
+        $dbst = null;
         if ($service->isBlog && $app->conf->blogmod_newblogontop)
             $app->conf->viewNewestFirst = 1;
 
-        $dbrq = $db->query("SELECT b.ID_CAT,b.name,c.name,c.memberGroups FROM {$db_prefix}boards as b,{$db_prefix}categories as c WHERE (b.ID_BOARD=$currentboard && b.ID_CAT=c.ID_CAT)", false);
-        list($curcat,$boardname,$cat,$temp2) = $dbrq->fetch_row();
+        $dbst = $db->prepare("SELECT b.ID_CAT,b.name,c.name,c.memberGroups FROM {$db_prefix}boards as b,{$db_prefix}categories as c WHERE (b.ID_BOARD=? && b.ID_CAT=c.ID_CAT)");
+        $dbst->execute(array($currentboard));
+        list($curcat,$boardname,$cat,$temp2) = $dbst->fetch(\PDO::FETCH_NUM);
         $memgroups = explode(',',$temp2);
+        $dbst = null;
         
         $service->curcat = $curcat;
         $service->boardname = $boardname;
@@ -93,27 +94,29 @@ class Threads extends Respond
         if ($start === 'new')
         {
             // Check if a log exists, so we can go to next unreaded message page
-            $dbrq = $db->query("
+            $dbst = $db->prepare("
                 SELECT GREATEST(IFNULL(lt.logTime, 0), IFNULL(lmr.logTime,0)) AS logtime, COUNT(m.ID_MSG), MAX(m.ID_MSG)
                 FROM {$db_prefix}topics AS t
-                LEFT JOIN {$db_prefix}log_topics AS lt ON (lt.ID_TOPIC=t.ID_TOPIC AND lt.ID_MEMBER=$ID_MEMBER)
-                LEFT JOIN {$db_prefix}log_mark_read AS lmr ON (lmr.ID_BOARD=t.ID_BOARD AND lmr.ID_MEMBER=$ID_MEMBER)
+                LEFT JOIN {$db_prefix}log_topics AS lt ON (lt.ID_TOPIC=t.ID_TOPIC AND lt.ID_MEMBER=?)
+                LEFT JOIN {$db_prefix}log_mark_read AS lmr ON (lmr.ID_BOARD=t.ID_BOARD AND lmr.ID_MEMBER=?)
                 LEFT JOIN {$db_prefix}messages AS m ON (m.ID_TOPIC=t.ID_TOPIC)
-                WHERE (t.ID_TOPIC = $threadid)
-                GROUP BY t.ID_TOPIC", false);
+                WHERE (t.ID_TOPIC = ?)
+                GROUP BY t.ID_TOPIC");
+            $dbst->execute(array($ID_MEMBER, $ID_MEMBER, $threadid));
+            list($ltLastRead, $numMessages, $newestMessage) = $dbst->fetch(\PDO::FETCH_NUM);
+            $dbst = null;
             
-            list($ltLastRead, $numMessages, $newestMessage) = $dbrq->fetch_row();
+            if (empty($newestMessage))
+                return $this->error($app->locale->txt[472]);
             
-            if ($dbrq->num_rows == 0)
-                return $app->errors->abort($app->locale->txt[106], $app->locale->txt[472]);
-            
-            $dbrq = $db->query("
+            $dbst = $db->prepare("
                 SELECT COUNT(*)
                 FROM {$db_prefix}messages
-                WHERE ID_TOPIC = $threadid
-                AND posterTime <= $ltLastRead", false);
-            
-            list($numReadMessages) = $dbrq->fetch_row();
+                WHERE ID_TOPIC = ?
+                AND posterTime <= ?");
+            $dbst->execute(array($threadid, $ltLastRead));
+            $numReadMessages = $dbst->fetchColumn();
+            $dbst = null;
             $numUnreadMessages = $numMessages - $numReadMessages;
             
             if ($app->conf->viewNewestFirst)
@@ -123,12 +126,14 @@ class Threads extends Respond
             
             if ($numUnreadMessages > 0)
             {
-                $dbrq = $db->query("
+                $dbst = $db->prepare("
                     SELECT MIN(ID_MSG)
                     FROM {$db_prefix}messages
-                    WHERE ID_TOPIC = $threadid
-                    AND posterTime > $ltLastRead");
-                list($firstUnreadMessage) = $dbrq->fetch_row();
+                    WHERE ID_TOPIC = ?
+                    AND posterTime > ?");
+                $dbst->execute(array($threadid, $ltLastRead));
+                $firstUnreadMessage = $dbrq->fetchColumn();
+                $dbst = null;
                 $newMsgID = "#msg$firstUnreadMessage";
             }
             elseif ($app->conf->viewNewestFirst)
@@ -139,17 +144,20 @@ class Threads extends Respond
             if (!$app->user->guest)
             {
                 // mark board as seen if we came using notification
-                $db->query("
+                $db->prepare("
                     REPLACE INTO {$db->db_prefix}log_boards (logTime, ID_MEMBER, ID_BOARD)
-                    VALUES (" . time() . ", $ID_MEMBER, $currentboard)", false);
+                    VALUES (?, ?, ?)")->
+                    execute(array(time(), $ID_MEMBER, $currentboard));
             }
             return $service->redirect("/b$currentboard/t$threadid/$Page2Show/$newMsgID");
         } // if start = new
         elseif (substr($start, 0, 3) == 'msg')
         {
             $msg = (int) substr($start, 3);
-            $dbrq = $db->query("SELECT COUNT(*) FROM {$db_prefix}messages WHERE (ID_MSG < $msg && ID_TOPIC=$threadid)", false);
-            list($start) = $dbrq->fetch_row();
+            $dbst = $db->prepare("SELECT COUNT(*) FROM {$db_prefix}messages WHERE (ID_MSG < ? && ID_TOPIC=?)");
+            $dbst->execute(array($msg, $threadid));
+            $start = $dbst->fetchColumn();
+            $dbst = null;
         }
         
         // do the previous next stuff
@@ -161,20 +169,22 @@ class Threads extends Respond
         $service->membergroups = $app->user->memberGroups();
         
         // get all the topic info
-        $dbrq = $db->query("
+        $dbst = $db->prepare("
             SELECT t.numReplies, t.numViews, t.locked, ms.subject, t.isSticky, ms.posterName, ms.ID_MEMBER, t.ID_POLL, t.ID_MEMBER_STARTED, tr.POSITIVE AS topicPosRating, tr.NEGATIVE AS topicNegRating
             FROM {$db_prefix}topics as t
             JOIN {$db_prefix}messages as ms ON (t.ID_FIRST_MSG = ms.ID_MSG)
             LEFT JOIN {$db_prefix}topic_ratings AS tr ON (t.ID_TOPIC = tr.TOPIC_ID)
-            WHERE t.ID_BOARD = $currentboard
-                AND t.ID_TOPIC = $threadid
-                AND ms.ID_MSG = t.ID_FIRST_MSG", false);
-
-        if ($dbrq->num_rows == 0) {
+            WHERE t.ID_BOARD = ?
+                AND t.ID_TOPIC = ?
+                AND ms.ID_MSG = t.ID_FIRST_MSG");
+            $dbst->execute(array($currentboard, $threadid));
+        
+        $topicinfo = $dbst->fetch();
+        $dbst = null;
+        
+        if (!$topicinfo) {
             return $this->findBoard($currentboard, $threadid);
         }
-        
-        $topicinfo = $dbrq->fetch_assoc();
         
         // read topic rating
         $service->topicPosRating = !isset($topicinfo['topicPosRating']) ? 0 : $topicinfo['topicPosRating'];
@@ -183,25 +193,27 @@ class Threads extends Respond
         if (!$app->user->guest)
         {
             // mark the topic as read :)
-            $db->query("
+            $db->prepare("
                 REPLACE INTO {$db->db_prefix}log_topics (logTime, ID_MEMBER, ID_TOPIC, notificationSent,unreadComments,otherComments,subscribedComments)
-                VALUES (" . time() . ", $ID_MEMBER, $threadid, 0,0,0,0)", false);
+                VALUES (?, ?, ?, 0,0,0,0)")->
+                execute(array(time(), $ID_MEMBER, $threadid));
             
             $referer = $SERVER->get('HTTP_REFERER');
             // mark board as seen if we came using last post link from BoardIndex
             //if (isset($boardseen))
             if ($referer == "{$service->siteurl}/") {
                 // if came from main page
-                $db->query("
+                $db->prepare("
                     REPLACE INTO {$db->db_prefix}log_boards (logTime, ID_MEMBER, ID_BOARD)
-                    VALUES (" . time() . ", $ID_MEMBER, $currentboard)", false);
+                    VALUES (?, ?, ?)")->
+                    execute(array(time(), $ID_MEMBER, $currentboard));
             }
             
             // Add 1 to the number of views of this thread.
-            $db->query("
+            $db->prepare("
                 UPDATE {$db->db_prefix}topics
                 SET numViews = numViews + 1
-                WHERE ID_TOPIC = $threadid");
+                WHERE ID_TOPIC = ?")->execute(array($threadid));;
         }
         
         // Check to make sure this thread isn't locked.
@@ -345,12 +357,16 @@ class Threads extends Respond
         //chatWall mod by dig7er
         if ($app->conf->boardBillsEnabled)
         {
-            $dbrq = $db->query("SELECT chatWall, chatWallMsgAuthor FROM {$db->db_prefix}boards WHERE ID_BOARD = $currentboard;");
-            $row = $dbrq->fetch_assoc();
+            $dbst = $db->prepare("SELECT chatWall, chatWallMsgAuthor FROM {$db->db_prefix}boards WHERE ID_BOARD = ?");
+            $dbst->execute(array($currentboard));
+            $row = $dbst->fetch();
+            $dbst = null;
             $row['chatWall'] = $service->unicodeentities($row['chatWall']);
             
-            $dbrq = $db->query("SELECT billboard, billboardAuthor, realName, gender FROM {$db_prefix}topics AS t LEFT JOIN {$db_prefix}members AS m ON (t.billboardAuthor = m.memberName) WHERE ID_TOPIC = $threadid;");
-            $row2 = $dbrq->fetch_assoc();
+            $dbst = $db->prepare("SELECT billboard, billboardAuthor, realName, gender FROM {$db_prefix}topics AS t LEFT JOIN {$db_prefix}members AS m ON (t.billboardAuthor = m.memberName) WHERE ID_TOPIC = ?");
+            $dbst->execute(array($threadid));
+            $row2 = $dbst->fetch();
+            $dbst = null;
             $row['topicBillboard'] = stripslashes($row2['billboard']);
             $row['topicBillboardAuthor'] = $row2['billboardAuthor'];
             $row['topicBillboardAuthorName'] = $row2['realName'];
@@ -363,13 +379,14 @@ class Threads extends Respond
         
         if ($topicinfo['ID_POLL'] != '-1' && $app->conf->pollMode)
         {
-            $dbrq = $db->query("
+            $dbst = $db->prepare("
                 SELECT question, votingLocked, votedMemberIDs, option1, option2, option3, option4, option5, option6, option7, option8, option9, option10, option11, option12, option13, option14, option15, option16, option17, option18, option19, option20, votes1, votes2, votes3, votes4, votes5, votes6, votes7, votes8, votes9, votes10, votes11, votes12, votes13, votes14, votes15, votes16, votes17, votes18, votes19, votes20
                 FROM {$db_prefix}polls
-                WHERE ID_POLL = '$topicinfo[ID_POLL]'
-                LIMIT 1", false);
-            
-            $pollinfo = $dbrq->fetch_assoc();
+                WHERE ID_POLL = ?
+                LIMIT 1");
+            $dbst->execute(array($topicinfo['ID_POLL']));
+            $pollinfo = $dbst->fetch();
+            $dbst = null;
             $pollinfo['image'] = ($pollinfo['votingLocked'] != '0' )?'locked_poll':'poll';
             
             $pollinfo['totalvotes'] = 0;
@@ -394,17 +411,15 @@ class Threads extends Respond
         $counter = $start;
     
         # For each post in this thread
-        $dbrq = $db->query("
+        $dbrq = $db->prepare("
             SELECT ID_MSG
             FROM {$db_prefix}messages
-            WHERE ID_TOPIC=$threadid
+            WHERE ID_TOPIC=?
             ORDER BY ID_MSG " . ($app->conf->viewNewestFirst ? 'DESC' : '') . "
-            LIMIT $start,$maxmessagedisplay");
-
-        $messages = array();
-        
-        while ($row = $dbrq->fetch_assoc())
-            $messages[] = $row['ID_MSG'];
+            LIMIT ?,?");
+        $dbrq->execute(array($threadid, $start, $maxmessagedisplay));
+        $messages = $dbrq->fetchAll(\PDO::FETCH_COLUMN);
+        $dbrq = null; // closing statement
         
         if (count($messages))
             $dbrq = $db->query("
@@ -415,11 +430,11 @@ class Threads extends Respond
                 LEFT JOIN {$db->db_prefix}quickpolls AS qpolls ON (m.ID_MSG = qpolls.ID_MSG)
                 LEFT JOIN {$db->db_prefix}comment_subscriptions AS cs ON (m.ID_MSG = cs.messageID AND cs.memberID = {$ID_MEMBER})
                 WHERE m.ID_MSG IN (" . implode(',', $messages) . ")
-                ORDER BY ID_MSG " . ($app->conf->viewNewestFirst ? 'DESC' : ''), false);
+                ORDER BY ID_MSG " . ($app->conf->viewNewestFirst ? 'DESC' : ''));
         
         $messages = array();
         
-        while ($message = $dbrq->fetch_array())
+        while ($message = $dbrq->fetch())
         {
             if ($app->conf->hard_ignore && $app->user->inIgnore($message['posterName'])) {
                 // Skip ignored
@@ -437,9 +452,9 @@ class Threads extends Respond
                 $message['quickpoll']['voters']['no'] = array();
                 $message['quickpoll']['voters']['neutral'] = array();
                 
-                $req = $db->query("SELECT qvotes.POLL_OPTION, qvotes.MEMBER_NAME, m.memberName, m.realName FROM {$db_prefix}quickpoll_votes AS qvotes LEFT JOIN {$db_prefix}members AS m ON (qvotes.ID_USER = m.ID_MEMBER) WHERE qvotes.ID_MSG = $msgID", false);
+                $req = $db->query("SELECT qvotes.POLL_OPTION, qvotes.MEMBER_NAME, m.memberName, m.realName FROM {$db_prefix}quickpoll_votes AS qvotes LEFT JOIN {$db_prefix}members AS m ON (qvotes.ID_USER = m.ID_MEMBER) WHERE qvotes.ID_MSG = $msgID");
                 
-                while ($vote = $req->fetch_assoc())
+                while ($vote = $req->fetch())
                 {
                     if (!empty($vote['memberName']))
                         $voter = array($vote['memberName'], $vote['realName']);
@@ -453,6 +468,7 @@ class Threads extends Respond
                    else if ($vote['POLL_OPTION'] == "neutral")
                        $message['quickpoll']['voters']['neutral'][] = $voter;
                 }
+                $req = null; // closing this statement
             }
             
             if ($msgID == 1068850)
@@ -506,14 +522,9 @@ class Threads extends Respond
             if (false)
             {
                 $message['karmaModifiers'] = array();
-                $namesQuery = $db->query("SELECT k.user1, m.realName, k.action FROM {$db_prefix}karmawatch as k LEFT JOIN {$db_prefix}members as m ON (k.user1 = m.memberName) WHERE k.ID_MSG = {$message['ID_MSG']}", false);
-                if ($namesQuery->num_rows > 0)
-                {
-                    while( $row = $namesQuery->fetch_assoc() )
-                    {
-                        $message['karmaModifiers'][] = $row;
-                    }
-                }
+                $namesQuery = $db->query("SELECT k.user1, m.realName, k.action FROM {$db_prefix}karmawatch as k LEFT JOIN {$db_prefix}members as m ON (k.user1 = m.memberName) WHERE k.ID_MSG = {$message['ID_MSG']}");
+                $message['karmaModifiers'] = $namesQuery->fetchAll();
+                $namesQuery = null; // closing this statement
             }
             
             // Preparing for  LJ sharing buttons
@@ -525,20 +536,22 @@ class Threads extends Respond
             // Blog Mod
             if($service->isBlog)
             {
-                $requestBlog = $db->query("SELECT m.ID_MEMBER_LAST_COMMENT, m.numComments, IFNULL(lbc.logTime, 0) AS logTime,
+                $requestBlog = $db->prepare("SELECT m.ID_MEMBER_LAST_COMMENT, m.numComments, IFNULL(lbc.logTime, 0) AS logTime,
                         bc.postedTime AS lastPosterTime, bc.posterName, IFNULL(mem.realName, bc.posterName) AS displayName
                     FROM {$db_prefix}messages AS m, {$db_prefix}blog_comments AS bc
-                    LEFT JOIN {$db->db_prefix}log_blog_comments AS lbc ON (lbc.ID_MSG=m.ID_MSG AND lbc.ID_MEMBER=$ID_MEMBER)
+                    LEFT JOIN {$db->db_prefix}log_blog_comments AS lbc ON (lbc.ID_MSG=m.ID_MSG AND lbc.ID_MEMBER=?)
                     LEFT JOIN {$db->db_prefix}members AS mem ON (mem.ID_MEMBER = m.ID_MEMBER_LAST_COMMENT)
-                    WHERE m.ID_MSG=$msgID
-                    AND m.ID_LAST_COMMENT=bc.ID_COMMENT LIMIT 1;", false);
-                $messsage['blog'] = $requestBlog->fetch_assoc();
+                    WHERE m.ID_MSG=?
+                    AND m.ID_LAST_COMMENT=bc.ID_COMMENT LIMIT 1");
+                $requestBlog->execute(array($ID_MEMBER, $msgID));
+                $messsage['blog'] = $requestBlog->fetch();
+                $requestBlog = null; // closing this statement
             }
             
             
             // Karma
-            $karmaQuery = $db->query("SELECT karmaGood, karmaBad, karmaGoodExecutors, karmaBadExecutors FROM `messages` WHERE ID_MSG = {$msgID} LIMIT 1;");
-            $karma = $karmaQuery->fetch_array();
+            $karmaQuery = $db->query("SELECT karmaGood, karmaBad, karmaGoodExecutors, karmaBadExecutors FROM `messages` WHERE ID_MSG = {$msgID} LIMIT 1");
+            $karma = $karmaQuery->fetch();
             if ($karma)
             {
                 $karma['actions'] = false;
@@ -553,6 +566,7 @@ class Threads extends Respond
 
                 $message['karma'] = $karma;
             }
+            $karmaQuery = null; // closing this statement
             
             $message['attachment'] = false;
             // attachments
@@ -642,13 +656,13 @@ class Threads extends Respond
     private function getBoard($threadid)
     {
         $threadid = intval($threadid);
-        $dbrq = $this->app->db->query(
-            "SELECT ID_BOARD FROM {$this->app->db->prefix}topics WHERE ID_TOPIC = $threadid", false
-        );
-        if ($dbrq->num_rows == 0)
-            $this->app->errors->abort($this->app->locale->txt[106], $this->app->locale->txt[472]);
-        else
-            list($board) = $dbrq->fetch_row();
+        $dbrq = $this->app->db->prepare(
+            "SELECT ID_BOARD FROM {$this->app->db->prefix}topics WHERE ID_TOPIC = ?");
+        $dbrq->execute(array($threadid));
+        $board = $dbrq->fetchColumn();
+        if (!board)
+            $this->error($this->app->locale->txt[472]);
+        
         return intval($board);
     }
     
@@ -715,55 +729,66 @@ class Threads extends Respond
         
         //check for blog board
         $blogmod_groups = explode(',', $app->conf->blogmod_groups);
-        $requestBlog = $app->db->query("SELECT ID_BOARD FROM {$db_prefix}boards WHERE ID_BOARD={$service->board} AND isBlog=1", false);
-        $isBlog = ($requestBlog->num_rows > 0) ? true : false;
-        $requestBlog = $app->db->query("SELECT posts FROM {$db_prefix}members WHERE ID_MEMBER={$app->user->id}", false);
-        $post_count = $requestBlog->fetch_row();
-        
+        $requestBlog = $app->db->prepare("SELECT ID_BOARD FROM {$db_prefix}boards WHERE ID_BOARD=? AND isBlog=1");
+        $requestBlog->execute(array($service->board));
+        $isBlog = ($requestBlog->fetchColumn()) ? true : false;
+        $requestBlog = $app->db->prepare("SELECT posts FROM {$db_prefix}members WHERE ID_MEMBER=?");
+        $requestBlog->execute(array($app->user->id));
+        $post_count = $requestBlog->fetchColumn();
+        $requestBlog = null; // closing this statemtnt
         //check posting permission
+        
         if ($isBlog && $app->user->accessLevel() < 2)
         {
         //check for new topic post
-            if ($service->thread == '')
+            if (empty($service->thread))
             {
                 //if postcount not enough and membergroup isn't allowed, show error message
-                if ( ($post_count[0] < $app->conf->blogmod_minpost) && ($app->conf->blogmod_groups == '' || ($app->conf->blogmod_groups != '' && !in_array($app->user->group, $blogmod_groups))) )
+                if ( ($post_count < $app->conf->blogmod_minpost) && ($app->conf->blogmod_groups == '' || ($app->conf->blogmod_groups != '' && !in_array($app->user->group, $blogmod_groups))) )
                     return $app->errors->abort('', $app->locale->blogmod11);
-                $requestBlog = $app->db->query("SELECT COUNT(*) FROM {$db_prefix}topics WHERE ID_BOARD={$service->board} AND ID_MEMBER_STARTED={$app->user->id}", false);
-                $blog_total = $requestBlog->fetch_row();
-                if ($blog_total[0] >= $app->conf->blogmod_maxblogsperuser)
-                    return $app->errors->abort('', $app->locale->blogmod12);
+                $requestBlog = $app->db->prepare("SELECT COUNT(*) FROM {$db_prefix}topics WHERE ID_BOARD=? AND ID_MEMBER_STARTED=?");
+                $requestBlog->execute(array($service->board, $app->user->id));
+                $blog_total = $requestBlog->fetchColumn();
+                $requestBlog = null;
+                if ($blog_total >= $app->conf->blogmod_maxblogsperuser)
+                    return $this->error($app->locale->blogmod12);
             }
             //check for post reply
             else
             {
-                $requestBlog = $app->db->query("SELECT ID_TOPIC FROM {$db_prefix}topics WHERE ID_BOARD={$service->board} AND ID_MEMBER_STARTED={$app->user->id}", false);
-                if ($requestBlog->num_rows == 0)
+                $requestBlog = $app->db->prepare("SELECT ID_TOPIC FROM {$db_prefix}topics WHERE ID_BOARD=? AND ID_MEMBER_STARTED=?");
+                if (!$requestBlog->fetchColumn())
                     return $this->error($app->locale->blogmod13);
+                $requestBlog = null;
             }
         }
         
         if ($service->thread != '')
         {
-            $dbrq = $app->db->query("SELECT * FROM {$db_prefix}topics WHERE ID_TOPIC={$service->thread}");
-            $threadinfo = $dbrq->fetch_array();
+            $dbrq = $app->db->prepare("SELECT * FROM {$db_prefix}topics WHERE ID_TOPIC=?");
+            $dbrq->execute(array($service->thread));
+            $threadinfo = $dbrq->fetch();
+            $dbrq = null;
             $mstate = $threadinfo['locked'];
         }
         else if ($service->action != 'newthread')
-            return $app->errors->abort('', $app->locale->txt[472] . ' Error ' . $service->action);
+            return $this->error($app->locale->txt[472] . ' Error ' . $service->action);
         
         if ($threadinfo['locked'] != 0 && $app->user->accessLevel() < 2)  // don't allow a post if it's locked
             return $app->errors->abort('', $app->locale->txt[90]);
         
         # Determine what category we are in.
-        $dbrq = $app->db->query("
+        $dbrq = $app->db->prepare("
             SELECT b.ID_BOARD as bid, b.name as bname, c.ID_CAT as cid, c.memberGroups, c.name as cname, b.isAnnouncement
             FROM {$db_prefix}boards as b, {$db_prefix}categories as c
-            WHERE (b.ID_BOARD = {$service->board}
-                AND b.ID_CAT=c.ID_CAT)", false);
-        if ($dbrq->num_rows == 0)
-            return $app->errors->abort('', $app->locale->yse232);
-        $bcinfo = $dbrq->fetch_array();
+            WHERE (b.ID_BOARD = ?
+                AND b.ID_CAT=c.ID_CAT)");
+        $dbrq->execute(array($service->board));
+        $bcinfo = $dbrq->fetch();
+        $dbrq = null;
+        if (!$bcinfo)
+            return $this->error($app->locale->yse232);
+        
         $service->cat = $bcinfo['cid'];
         $service->catname = $bcinfo['cname'];
         $service->board = $bcinfo['bid'];
@@ -789,30 +814,35 @@ class Threads extends Respond
         {
             // $app->session->check('get'); // FIXME why do we check session here?
             
-            $dbrq = $app->db->query("
+            $dbrq = $app->db->prepare("
                 SELECT m.subject, m.posterName, m.posterEmail, m.posterTime, m.icon, m.posterIP, m.body, m.smiliesEnabled, m.ID_MEMBER, m.comments
                 FROM {$db_prefix}messages as m, {$db_prefix}topics as t, {$db_prefix}boards as b, {$db_prefix}categories as c
-                WHERE (m.ID_MSG = {$service->quotemsg}
+                WHERE (m.ID_MSG = ?
                     AND m.ID_TOPIC = t.ID_TOPIC
                     AND t.ID_BOARD = b.ID_BOARD
                     AND b.ID_CAT = c.ID_CAT
-                    AND (FIND_IN_SET('{$app->user->group}', c.memberGroups) != 0 || c.memberGroups = '' || '{$app->user->group}' LIKE 'Administrator' || '{$app->user->group}' LIKE 'Global Moderator')
-                )", false);
+                    AND (FIND_IN_SET(?, c.memberGroups) != 0 || c.memberGroups = '' || ? LIKE 'Administrator' || ? LIKE 'Global Moderator')
+                )");
+            $dbrq->execute(array($service->quotemsg, $app->user->group, $app->user->group, $app->user->group));
 
-            if ($dbrq->num_rows == 0)
-                $app->errors->abort('', 'No such post.');
+            list($service->msubject, $service->mname, $service->memail, $service->mdate, $service->micon, $service->mip, $service->mmessage, $service->mns, $service->mi, $service->mcomments) = $dbrq->fetch(\PDO::FETCH_NUM);
+            $dbrq = null;
             
-            list($service->msubject, $service->mname, $service->memail, $service->mdate, $service->micon, $service->mip, $service->mmessage, $service->mns, $service->mi, $service->mcomments) = $dbrq->fetch_row();
+            if (empty($service->mdate))
+                return $this->error('No such post.');
             
             if ($service->mi != '-1')
             {
-                $dbrq = $app->db->query("
+                $dbrq = $app->db->prepare("
                     SELECT realName
                     FROM {$db_prefix}members
-                    WHERE ID_MEMBER='{$service->mi}'
-                    LIMIT 1", false);
-                if ($request->num_rows != 0)
-                    list($service->mname) = $dbrq->fetch_row();
+                    WHERE ID_MEMBER=?
+                    LIMIT 1");
+                $dbrq->execute(array($service->mi));
+                $_realName = $dbrq->fetchColumn();
+                if ($_realName)
+                    $service->mname = $_realname;
+                $dbrq = null; // closing this statement
             }
             
             $service->form_message = $service->un_html_entities(preg_replace("|<br( /)?[>]|","\n",$service->mmessage));
@@ -873,13 +903,15 @@ class Threads extends Respond
         }
         else if ($service->thread != '' && $service->quotemsg == '')
         {
-            $dbrq = $app->db->query("SELECT subject, posterName, posterEmail, posterTime, icon, posterIP, body, smiliesEnabled, ID_MEMBER
+            $dbrq = $app->db->prepare("SELECT subject, posterName, posterEmail, posterTime, icon, posterIP, body, smiliesEnabled, ID_MEMBER
                 FROM {$db_prefix}messages
-                WHERE ID_TOPIC={$service->thread}
+                WHERE ID_TOPIC=?
                 ORDER BY ID_MSG
-                LIMIT 1", false);
+                LIMIT 1");
+            $dbrq->execute(array($service->thread));
             
-            list($service->msubject, $service->mname, $service->memail, $service->mdate, $service->micon, $service->mip, $service->mmessage, $service->mns, $service->mi) = $dbrq->fetch_row();
+            list($service->msubject, $service->mname, $service->memail, $service->mdate, $service->micon, $service->mip, $service->mmessage, $service->mns, $service->mi) = $dbrq->fetch(\PDO::FETCH_NUM);
+            $dbrq = null; // closing this statement
 
             $service->form_subject = $app->subs->CensorTxt($service->msubject);
             
@@ -927,19 +959,20 @@ class Threads extends Respond
         
         $db_prefix = $this->app->db->prefix;
         $usergroup = $this->app->user->group;
-        $dbrq = $this->app->db->query("
+        $dbrq = $this->app->db->prepare("
             SELECT m.posterName, m.posterTime, m.body, m.smiliesEnabled
             FROM {$db_prefix}messages AS m, {$db_prefix}topics as t, {$db_prefix}boards as b, {$db_prefix}categories as c
-            WHERE m.ID_TOPIC='$thread'
+            WHERE m.ID_TOPIC=?
                 AND t.ID_TOPIC=m.ID_TOPIC
                 AND b.ID_BOARD=t.ID_BOARD
                 AND c.ID_CAT=b.ID_CAT
-                AND (FIND_IN_SET('$usergroup', c.memberGroups) != 0 OR c.memberGroups = '' OR '$usergroup' LIKE 'Administrator' OR '$usergroup' LIKE 'Global Moderator')
+                AND (FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups = '' OR ? LIKE 'Administrator' OR ? LIKE 'Global Moderator')
             ORDER BY ID_MSG DESC
-            $limitString", false);
-        
+            $limitString");
+        $dbrq->execute(array($thread, $usergroup, $usergroup, $usergroup));
         $messages = array();
-        while($row = $dbrq->fetch_assoc()) {
+        while($row = $dbrq->fetch())
+        {
             if ($this->app->user->inIgnore($row['posterName']))
                 continue;
             
@@ -950,6 +983,7 @@ class Threads extends Respond
                 'smilies' => $row['smiliesEnabled']
             );
         }
+        $dbrq = null; // closing this statement
         
         return $messages;
     } // thread_summary()
@@ -1013,36 +1047,45 @@ class Threads extends Respond
         $db = $app->db;
         $db_prefix = $app->db->prefix;
         
-        if ($service->thread != '' && $app->user->accessLevel() < 2)
+        if (!empty($service->thread) && $app->user->accessLevel() < 2)
         {
-            $dbrq = $app->db->query("
+            $dbrq = $app->db->prepare("
                 SELECT locked
                 FROM {$db_prefix}topics
-                WHERE ID_TOPIC={$service->thread}", false);
-            list($tmplocked) = $dbrq->fetch_array();
+                WHERE ID_TOPIC=?");
+            $dbrq->execute(array($service->thread));
+            $tmplocked = $dbrq->fetchColumn();
+            $dbrq = null;
             if ($tmplocked != 0)
                 return $this->error($txt[90]); // don't allow a post if it's locked
         }
         
         if (empty($service->thread))
-            $dbrq = $app->db->query("
+        {
+            $dbrq = $app->db->prepare("
                 SELECT b.ID_BOARD
                 FROM {$db_prefix}boards AS b, {$db_prefix}categories AS c
-                WHERE b.ID_BOARD={$service->board}
+                WHERE b.ID_BOARD=?
                 AND c.ID_CAT=b.ID_CAT
-                AND (FIND_IN_SET('{$app->user->group}', c.memberGroups) != 0 OR c.memberGroups = '' OR '{$app->user->group}' LIKE 'Administrator' OR '{$app->user->group}' LIKE 'Global Moderator')", false);
+                AND (FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups = '' OR ? LIKE 'Administrator' OR ? LIKE 'Global Moderator')");
+            $dbrq->execute(array($service->board, $app->user->group, $app->user->group, $app->user->group));
+        }
         else
-            $dbrq = $app->db->query("
+        {
+            $dbrq = $app->db->prepare("
                 SELECT t.ID_TOPIC
                 FROM {$db_prefix}topics AS t, {$db_prefix}boards AS b, {$db_prefix}categories AS c
-                WHERE t.ID_TOPIC={$service->thread}
-                AND b.ID_BOARD={$service->board}
+                WHERE t.ID_TOPIC=?
+                AND b.ID_BOARD=?
                 AND b.ID_BOARD=t.ID_BOARD
                 AND c.ID_CAT=b.ID_CAT
-                AND (FIND_IN_SET('{$app->user->group}', c.memberGroups) != 0 OR c.memberGroups = '' OR '{$app->user->group}' LIKE 'Administrator' OR '{$app->user->group}' LIKE 'Global Moderator')", false);
-        
-        if ($dbrq->num_rows == 0)
+                AND (FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups = '' OR ? LIKE 'Administrator' OR ? LIKE 'Global Moderator')");
+            $dbrq->execute(array($service->thread, $service->board, $app->user->group, $app->user->group, $app->user->group));
+        }
+        if (!$dbrq->fetchColumn())
             return $this->error($txt[1]);
+        
+        $dbrq = null; // closing this statement
         
         // If poster is a Guest then evaluate the legality of name and email
         if ($app->user->name == 'Guest')
@@ -1105,20 +1148,20 @@ class Threads extends Respond
         // Preparse code (zef)
         $input_message = $app->subs->preparsecode($input_message);
         
-        $e_name = $app->db->escape_string($input_name);
-        
         if ($app->user->guest)
         {
             # If user is Guest, then make sure the chosen name
             # is not reserved or used by a member.
             
-            $dbrq = $app->db->query("
+            $dbrq = $app->db->prepare("
                 ELECT ID_MEMBER
                 FROM {$db_prefix}members
-                WHERE (memberName='$e_name' || realName='$e_name')", false);
+                WHERE (memberName=? || realName=?)");
+            $dbrq->execute(array($input_name));
             
-            if ($dbrq->num_rows != 0)
-                $this->error(473);
+            if ($dbrq->fetchColumn())
+                return $this->error(473);
+            $dbrq = null; // closing this statement
             
             //now make sure that guestname is not containing banned nicknames
             if ($app->security->containsBannedNickPart($input_name))
@@ -1128,19 +1171,19 @@ class Threads extends Respond
             $dbrq = $app->db->query("
                 SELECT *
                 FROM {$db_prefix}reserved_names
-                ORDER BY setting", false);
+                ORDER BY setting");
             
             $matchword = $matchcase = $matchuser = $matchname = '';
 
             for ($i = 0; $i < 4; $i++)
             {
-                $tmp = $dbrq->fetch_row();
+                $tmp = $dbrq->fetch(\PDO::FETCH_NUM);
                 ${$tmp[0]}=$tmp[1];
             }
             
             $namecheck = $matchcase ? $name : strtolower ($name);
             
-            while ($tmp = $dbrq->fetch_row())
+            while ($tmp = $dbrq->fetch(\PDO::FETCH_NUM))
             {
                 if ($tmp[0] == 'word')
                 {
@@ -1161,6 +1204,7 @@ class Threads extends Respond
                     }
                 }
             }
+            $dbrq = null;
         } // if guest
         
         // multinick check mod (by dig7er, 14 May 2008)
@@ -1324,14 +1368,14 @@ class Threads extends Respond
             }
             else
             {
-                $attachment['name'] = 'NULL';
+                $attachment['name'] = null;
                 $attachment_size = 0;
             }
         } // if attachment not null
         
         // If no thread specified, this is a new thread.
         // Find a valid random ID for it.
-        $newtopic = ($service->thread == '') ? true : false;
+        $newtopic = empty($service->thread) ? true : false;
         $time = time();
         $se = ($input_ns ? 0 : 1);
         
@@ -1341,15 +1385,9 @@ class Threads extends Respond
         $agent_fp[] = ($POST->get('bfp') === null) ? 'none' : $POST->get('bfp');
         $agent_fp = implode(' #|# ', $agent_fp);
         
-        $naztem = $db->escape_string($input_subject);
-        $message = $db->escape_string($input_message);
-        $nowListening = $db->escape_string($POST->get('nowListening'));
-        $agent_fp = $db->escape_string($agent_fp);
-        $multinick = $db->escape_string($multinick);
-        $e_email = $db->escape_string($input_email);
-        $icon = $db->escape_string($POST->get('icon'));
+        $nowListening = $POST->get('nowListening');
+        $icon = $POST->get('icon');
         $quickPollTitle = $POST->get('quickPoll');
-        $quickPollTitle = $db->escape_string($quickPollTitle);
                 
         // Guest Rules Confirmation mod, by dig7er
         $app->session->store('guestRulesConfirmed', true);
@@ -1359,30 +1397,42 @@ class Threads extends Respond
             if ($app->board->isAnnouncement() && $app->user->accessLevel() < 2)
                 return $this->error('announcement1');
             
-            $tmpname = ($attachment['name'] == 'NULL') ? 'NULL' : "'" . $db->escape_string($attachment['name']) . "'";
-            $dbrq = $db->query("
+            $tmpname = $attachment['name'] == 'NULL' ? null : $attachment['name'];
+            
+            if ($app->user->guest)
+                $_closeComments = 0;
+            else
+                $_closeComments = $app->user->closeCommentsByDefault;
+            
+            $q_params = array($app->user->id, $input_subject, $input_name, $input_email, $time, $REMOTE_ADDR, $se, $input_message, $icon, $attachment_size, $tmpname, $nowListening, $multinick, $_closeComments, $agent_fp);
+            $placeholders = $db->build_placeholders($q_params);
+            
+            $db->prepare("
                 INSERT INTO {$db_prefix}messages (ID_MEMBER, subject, posterName, posterEmail, posterTime, posterIP, smiliesEnabled, body, icon, attachmentSize, attachmentFilename, nowListening, multinick, closeComments, agent)
-                VALUES ({$app->user->id}, '$naztem', '$e_name', '$e_email', $time, '$REMOTE_ADDR', $se, '$message', '$icon', '$attachment_size', $tmpname, '$nowListening', '$multinick', ".($app->user->guest?0:$app->user->closeCommentsByDefault).", '$agent_fp')", false);
-                
-            $ID_MSG = $db->insert_id;
-            if ($ID_MSG > 0)
+                VALUES ($placeholders)")->execute($q_params);
+            $ID_MSG = $db->lastInsertId();
+            $dbrq = null;
+            
+            if ($ID_MSG)
             {
-                $dbrq = $db->query("
+                $db->prepare("
                     INSERT INTO {$db_prefix}topics (ID_BOARD, ID_MEMBER_STARTED, ID_MEMBER_UPDATED, ID_FIRST_MSG, ID_LAST_MSG, locked, numViews)
-                    VALUES ({$service->board}, {$app->user->id}, {$app->user->id}, $ID_MSG, $ID_MSG, $locked, 0)", false);
+                    VALUES (?, ?, ?, ?, ?, ?, ?)")->
+                    execute(array($service->board, $app->user->id, $app->user->id, $ID_MSG, $ID_MSG, $locked, 0));
                 
-                if ($db->insert_id > 0)
+                $_threadid = $db->lastInsertId();
+                if ($_threadid)
                 {
-                    $threadid = $db->insert_id;
-                    $dbrq = $db->query("
+                    $threadid = $_threadid;
+                    $db->query("
                         UPDATE {$db_prefix}messages
                         SET ID_TOPIC = $threadid
-                        WHERE (ID_MSG = $ID_MSG)", false);
+                        WHERE (ID_MSG = $ID_MSG)");
                     
-                    $dbrq = $db->query("
+                    $db->query("
                         UPDATE {$db_prefix}boards
                         SET numPosts = numPosts + 1, numTopics = numTopics + 1
-                        WHERE (ID_BOARD = {$service->board})", false);
+                        WHERE (ID_BOARD = {$service->board})");
                     
                     $mreplies = 0;
                     
@@ -1394,13 +1444,15 @@ class Threads extends Respond
                             SET topics = topics + 1, posts = posts + 1
                             WHERE month = {$date['mon']}
                             AND day = {$date['mday']}
-                            AND year = {$date['year']}", false);
+                            AND year = {$date['year']}");
                         
-                        if ($db->affected_rows == 0)
-                        $statsquery = $db->query("
-                            INSERT INTO {$db_prefix}log_activity
-                            (month, day, year, topics, posts)
-                            VALUES ($date[mon], $date[mday], $date[year], 1, 1)", false);
+                        if ($statsquery->rowCount() == 0)
+                            $db->query("
+                                INSERT INTO {$db_prefix}log_activity
+                                (month, day, year, topics, posts)
+                                VALUES ($date[mon], $date[mday], $date[year], 1, 1)");
+                        
+                        $statsquery = null;
                     }
                     
                     if ($POST->get('linkcalendar') !== null)
@@ -1412,9 +1464,10 @@ class Threads extends Respond
                             SELECT b.notifyAnnouncements
                             FROM {$db_prefix}boards as b, {$db_prefix}categories as c
                             WHERE (b.ID_BOARD = {$service->board}
-                            AND b.ID_CAT = c.ID_CAT)", false);
+                            AND b.ID_CAT = c.ID_CAT)");
                         
-                        $rowAnn = $reqAnn->fetch_array();
+                        $rowAnn = $reqAnn->fetch();
+                        $reqAnn = null; // closing this statement
                         
                         if ($rowAnn['notifyAnnouncements'])
                             $this->NotifyUsersNewAnnouncement();
@@ -1426,11 +1479,12 @@ class Threads extends Respond
                 }
                 
                 // quick poll mod by dig7er, 14.04.2010
-                if ($quickPollTitle !== null)
+                if (!empty($quickPollTitle))
                 {
-                    $request = $db->query("REPLACE INTO {$db_prefix}quickpolls
+                    $dbst = $db->prepare("REPLACE INTO {$db_prefix}quickpolls
                         (ID_MSG, POLL_TITLE)
-                        VALUES ($ID_MSG, '$quickPollTitle')", false);
+                        VALUES (?, ?)")->
+                        execute(array($ID_MSG, $quickPollTitle));
                 }
             } // $ID_MSG > 0
         } // if $newtopic
@@ -1442,91 +1496,106 @@ class Threads extends Respond
                 $csubject = $POST->get('csubject');
                 if(strlen($csubject) >= 3)
                 {
-                    $naztem = $db->escape_string($csubject);
-                    $changesubject = $db->query("UPDATE {$db_prefix}messages SET subject='{$naztem}' WHERE ID_TOPIC='{$service->thread}'");
+                    $db->prepare("UPDATE {$db_prefix}messages SET subject=? WHERE ID_TOPIC=?")->
+                        execute(array($csubject, $service->thread));
                 }
                 $modaction = $POST->get('modaction');
                 if($modaction != 1)
                 {
                     if($modaction == 2)
                     {
-                        $dbrq = $db->query("
+                        $dbrq = $db->prepare("
                             SELECT locked
                             FROM {$db_prefix}topics
-                            WHERE ID_TOPIC={$service->threadid}", false);
-                        $row = $dbrq->fetch_row();
+                            WHERE ID_TOPIC=?")->execute(array($service->thread));
+                        $row = $dbrq->fetchColumn();
+                        $dbrq = null;
                         
-                        $quicklock = ($row[0] != 0) ? 0 : 1;
-                        $dbrq = $db->query("UPDATE {$db_prefix}topics SET locked='{$quicklock}' WHERE ID_TOPIC='{$threadid}'");
+                        $quicklock = ($row != 0) ? 0 : 1;
+                        $db->prepare("UPDATE {$db_prefix}topics SET locked=? WHERE ID_TOPIC=?")->execute(array($quicklock, $service->thread));
                     }
                     elseif($modaction == 3)
                     {
-                        $dbrq = $db->query("
+                        $dbrq = $db->prepare("
                             SELECT isSticky
                             FROM {$db_prefix}topics
-                            WHERE ID_TOPIC={$service->thread}", false);
-                        $row = $dbrq->fetch_row();
+                            WHERE ID_TOPIC=?");
+                        $dbrq->execute(array($service->thread));
+                        $row = $dbrq->fetchColumn();
+                        $dbrq = null;
                         
-                        $quicksticky = ($row[0] != 0) ? 0 : 1;
-                        $dbrq = $db->query("UPDATE {$db_prefix}topics SET isSticky='{$quicksticky}' WHERE ID_TOPIC='{$service->thread}'", false);
+                        $quicksticky = ($row != 0) ? 0 : 1;
+                        $db->prepare("UPDATE {$db_prefix}topics SET isSticky=? WHERE ID_TOPIC=?")->execute(array($quicksticky, $service->thread));
                     }
                     elseif($modaction == 4)
                     {
-                        $dbrq = $db->query("
+                        $dbrq = $db->prepare("
                             SELECT locked,isSticky
                             FROM {$db_prefix}topics
-                            WHERE ID_TOPIC=$threadid") or database_error(__FILE__, __LINE__, $db);
-                        $row = $dbrq->fetch_row();
+                            WHERE ID_TOPIC=?")->execute(array($service->thread));
+                        $row = $dbrq->fetch(\PDO::FETCH_NUM);
+                        $dbrq = null;
                         
                         $quicklock = ($row[0] != 0) ? 0 : 1;
                         $quicksticky = ($row[1] != 0) ? 0 : 1;
-                        $dbrq = $db->query("
-                            UPDATE {$db_prefix}topics SET locked='{$quicklock}',isSticky='{$quicksticky}' WHERE ID_TOPIC='{$service->thread}'", false);
+                        
+                        $db->prepare("
+                            UPDATE {$db_prefix}topics SET locked=?, isSticky=? WHERE ID_TOPIC=?")->
+                            execute(array($quicklock, $quicksticky, $service->thread));
                     }
                 }
                 
-                $movethread = $POST->get('movethread');
+                $movethread = $POST->get('movethread'); // new board where thread is moving to
+                
                 if ($movethread != '' && substr($movethread, 0, 1) != '#' && $movethread != $service->board)
                 {
-                    $dbrq = $db->query("
-                        SELECT numReplies,ID_BOARD FROM {$db_prefix}topics WHERE ID_TOPIC='{$service->thread}'", false);
-                    $row = $dbrq->fetch_row();
+                    $dbrq = $db->prepare("
+                        SELECT numReplies, ID_BOARD FROM {$db_prefix}topics WHERE ID_TOPIC=?")->execute(array($service->thread));
+                    $row = $dbrq->fetch(\PDO::FETCH_NUM);
+                    $dbrq = null;
                     $numReplies = $row[0]+1;
                     $boardid = $row[1];
-                    $updateboards = $db->query("
-                        UPDATE {$db_prefix}boards SET numPosts=numPosts-'{$numReplies}',numTopics=numTopics-1 WHERE ID_BOARD='{$boardid}'");
-                    $newboard = $db->escape_string($movethread);
-                    $updateboards2 = $db->query("
-                        UPDATE {$db_prefix}boards SET numPosts=numPosts+'{$numReplies}',numTopics=numTopics+1 WHERE ID_BOARD='{$newboard}'", false);
-                    $movethread = $db->query("
-                        UPDATE {$db_prefix}topics SET ID_BOARD='{$newboard}' WHERE ID_TOPIC='{$service->thread}'", false);
+                    $db->query("
+                        UPDATE {$db_prefix}boards SET numPosts=numPosts-'{$numReplies}',numTopics=numTopics-1 WHERE ID_BOARD= $boardid");
+                    
+                    $db->prepare("
+                        UPDATE {$db_prefix}boards SET numPosts=numPosts+?, numTopics=numTopics+1 WHERE ID_BOARD=?")->
+                        execute(array($numReplies, $movethread));
+                    
+                    $db->prepare("
+                        UPDATE {$db_prefix}topics SET ID_BOARD=? WHERE ID_TOPIC=?")->
+                        execute(array($movethread, $service->thread));
                     
                     $app->subs->updateStats('topic');
                     $app->subs->updateStats('message');
-                    $app->subs->updateLastMessage($board);
-                    $app->subs->updateLastMessage($newboard);
+                    $app->subs->updateLastMessage($service->board);
+                    $app->subs->updateLastMessage($movethread);
                     
-                    $db->query("
-                         UPDATE {$db_prefix}calendar SET id_board='$newboard' WHERE id_topic='{$service->thread}'", false);
+                    $db->prepare("
+                         UPDATE {$db_prefix}calendar SET id_board=? WHERE id_topic=?")->
+                         execute(array($movethread, $service->thread));
                     
-                    $service->board = $newboard;
+                    $service->board = $movethread;
                 }
             }
             
             // QuickReplyExtended
-            $tmpname = ($attachment['name'] == 'NULL') ? 'NULL' : "'" . $db->escape_string($attachment['name']) . "'";
+            $tmpname = $attachment['name'] == 'NULL' ? null : $attachment['name'];
             //--- Unite two posts if they're last in the topic and made by the same user (by Dig7er)
             $um = false;
             // don't unite messages if we upload an attachment
             if ($attachment['name'] == 'NULL')
             {
-                $query = $db->query("SELECT * FROM `messages` WHERE ID_TOPIC = {$service->thread} ORDER BY ID_MSG DESC LIMIT 1");
-                $lastPost = $query->fetch_array();
-                // return $this->error($lastPost['ID_MEMBER'].' '.$app->user->id);
+                $query = $db->prepare("SELECT * FROM messages WHERE ID_TOPIC = ? ORDER BY ID_MSG DESC LIMIT 1")->
+                    execute(array($service->thread));
+                $lastPost = $query->fetch();
+                $query = null;
+                
                 $lineBreak = "\n\n";
-                if ($lastPost['ID_MEMBER'] == $app->user->id && $lastPost['posterIP'] == $REMOTE_ADDR && (strlen($lastPost['body']) + strlen($message))<65356 && ((time() - $lastPost['posterTime']) < 600))
+                if ($lastPost['ID_MEMBER'] == $app->user->id && $lastPost['posterIP'] == $REMOTE_ADDR && (strlen($lastPost['body']) + strlen($input_message))<65356 && ((time() - $lastPost['posterTime']) < 600))
                 {
-                    $lastMsgEditQuery = $db->query("UPDATE `messages` SET body = CONCAT(body, \"$lineBreak\", \"$message\") WHERE ID_MSG = {$lastPost['ID_MSG']}", false);
+                    $db->prepare("UPDATE messages SET body = CONCAT(body, ?, ?) WHERE ID_MSG = ?")->
+                        execute(array($lineBreak, $input_message, $lastPost['ID_MSG']));
                     $ID_MSG = $lastPost['ID_MSG'];
                     $um = true;
                 }
@@ -1535,82 +1604,91 @@ class Threads extends Respond
             {
                 // if not uniting messages
                 $app->user->closeCommentsByDefault = empty($app->user->closeCommentsByDefault) ? 0 : $app->user->closeCommentsByDefault;
-                $dbrq = $db->query("
+                $q_params = array($service->thread, $app->user->id, $input_subject, $input_name, $input_email, $time, $REMOTE_ADDR, $se, $input_message, $icon, $attachment_size, $tmpname, $nowListening, $multinick, $app->user->closeCommentsByDefault, $agent_fp);
+                $placeholders = $db->build_placeholders($q_params);
+                
+                $dbrq = $db->prepare("
                     INSERT INTO {$db_prefix}messages (ID_TOPIC, ID_MEMBER, subject, posterName, posterEmail, posterTime, posterIP, smiliesEnabled, body, icon, attachmentSize, attachmentFilename, nowListening, multinick, closeComments, agent)
-                    VALUES ({$service->thread}, {$app->user->id}, '$naztem', '$e_name', '$e_email', $time, '$REMOTE_ADDR', $se, '$message', '$icon', '$attachment_size', $tmpname, '$nowListening', '$multinick', {$app->user->closeCommentsByDefault}, '$agent_fp')", false);
-                $ID_MSG = $db->insert_id;
+                    VALUES ($placeholders)")->execute($q_params);
+                $ID_MSG = $db->lastInsertId();
             }
             
             if ($ID_MSG > 0)
             {
                 if (!$um) // united message (dig7er)
-                    $dbrq = $db->query("
+                {    $db->prepare("
                         UPDATE {$db_prefix}topics
-                        SET ID_MEMBER_UPDATED = {$app->user->id}, ID_LAST_MSG = $ID_MSG, numReplies = numReplies + 1 $isLocked
-                        WHERE (ID_TOPIC = {$service->thread})", false);
+                        SET ID_MEMBER_UPDATED = ?, ID_LAST_MSG = $ID_MSG, numReplies = numReplies + 1 $isLocked
+                        WHERE (ID_TOPIC = ?)")->
+                        execute(array($app->user->id, $service->thread));
                 
-                if (!$um) // united message (dig7er)
-                    $dbrq = $db->query("
+                    $db->prepare("
                         UPDATE {$db_prefix}boards
                         SET numPosts = numPosts + 1
-                        WHERE (ID_BOARD = {$service->board})", false);
+                        WHERE (ID_BOARD = ?)")->
+                        execute(array($service->board));
                 
-                if (!$um) // united message (dig7er)
                     $mreplies++;
                 
-                if ($app->conf->trackStats == 1 and !$um)
-                {
-                    $date = getdate(time() + $app->conf->timeoffset * 3600);
-                    $statsquery = $db->query("
-                        UPDATE {$db_prefix}log_activity
-                        SET posts = posts + 1
-                        WHERE month = {$date['mon']}
-                        AND day = {$date['mday']}
-                        AND year = {$date['year']}", false);
-                    
-                    if ($db->affected_rows == 0)
+                
+                    if ($app->conf->trackStats == 1)
+                    {
+                        $date = getdate(time() + $app->conf->timeoffset * 3600);
                         $statsquery = $db->query("
-                            INSERT INTO {$db_prefix}log_activity
-                            (month, day, year, posts)
-                            VALUES ({$date['mon']}, {$date['mday']}, {$date['year']}, 1)", false);
-                }
+                            UPDATE {$db_prefix}log_activity
+                            SET posts = posts + 1
+                            WHERE month = {$date['mon']}
+                            AND day = {$date['mday']}
+                            AND year = {$date['year']}");
+                        
+                        if (!$statsquery->rowCount())
+                            $db->query("
+                                INSERT INTO {$db_prefix}log_activity
+                                (month, day, year, posts)
+                                VALUES ({$date['mon']}, {$date['mday']}, {$date['year']}, 1)");
+                    }
+                } // !$um
                 
                 $app->subs->updateStats('message');
                 $app->subs->UpdateLastMessage($service->board);
                 
                 // quick poll mod by dig7er, 14.04.2010
                 if (!empty($quickPollTitle))
-                    $dbrq = $db->query("
+                    $dbrq = $db->prepare("
                         REPLACE INTO {$db_prefix}quickpolls
                         (ID_MSG, POLL_TITLE)
-                        VALUES ($ID_MSG, '$quickPollTitle')", false);
+                        VALUES (?, ?)")->
+                        execute(array($ID_MSG, $quickPollTitle));
             } // if $ID_MSG > 0
         } // if not $newtopic
         
         if (!$app->user->guest)
 	{
-            $dbrq = $db->query("
+            $dbrq = $db->prepare("
                 SELECT * FROM {$db_prefix}boards
-                WHERE ID_BOARD = '{$service->board}'", false);
+                WHERE ID_BOARD = '{$service->board}'");
+            $dbrq->execute(array($service->board));
             
-            $pcount = $dbrq->fetch_array();
+            $pcount = $dbrq->fetch();
+            $dbrq = null;
             $pcounter = $pcount['count'];
             
             if ($pcounter != 1 and !$um) // united message (dig7er)
             {
                 ++$app->user->posts;
-                $dbrq = $db->query("
+                $db->prepare("
                     UPDATE {$db_prefix}members
                     SET posts = posts + 1
-                    WHERE ID_MEMBER = {$app->user->id}
-                ", false);
+                    WHERE ID_MEMBER = ?
+                ")->execute(array($app->user->id));
             }
             
             # Mark thread as read for the member.
-            $dbrq = $db->query("
+            $dbrq = $db->prepare("
                 REPLACE INTO {$db_prefix}log_topics
                 (logTime, ID_MEMBER, ID_TOPIC)
-                VALUES (" . time() . ", {$app->user->id}, {$service->thread})", false);
+                VALUES (?, ?, ?)")->
+                execute(array(time(), $app->user->id, $service->thread));
         }
         
         # The thread ID, regardless of whether it's a new thread or not.
@@ -1671,7 +1749,8 @@ class Threads extends Respond
             $db_prefix = $app->db->prefix;
             
             $dbrq = $app->db->query("SELECT m.*, t.locked, qpolls.POLL_TITLE FROM {$db_prefix}messages AS m LEFT JOIN {$db_prefix}quickpolls AS qpolls ON (m.ID_MSG = qpolls.ID_MSG), {$db_prefix}topics AS t WHERE (m.ID_MSG=$msg AND m.ID_TOPIC=t.ID_TOPIC) LIMIT 1;");
-            $row = $dbrq->fetch_assoc();
+            $row = $dbrq->fetch();
+            $dbrq = null;
             
             $service->quickPollTitle = $row['POLL_TITLE'];
             $threadid = $row['ID_TOPIC'];
@@ -1720,9 +1799,9 @@ class Threads extends Respond
                 if (!(in_array($app->user->group, explode(',', trim($app->conf->attachmentMemberGroups))) || $app->user->accessLevel > 2))
                     $service->attachment_fields = 0;
             
-            $dbrq = $app->db->query("SELECT b.ID_BOARD AS bid, b.name AS bname, c.ID_CAT AS cid, c.name AS cname, t.ID_MEMBER_STARTED FROM {$db_prefix}boards AS b, {$db_prefix}categories AS c, {$db_prefix}topics AS t WHERE (b.ID_BOARD=t.ID_BOARD AND b.ID_CAT=c.ID_CAT AND t.ID_TOPIC = $threadid)", false);
-            
-            $bcinfo = $dbrq->fetch_array();
+            $dbrq = $app->db->prepare("SELECT b.ID_BOARD AS bid, b.name AS bname, c.ID_CAT AS cid, c.name AS cname, t.ID_MEMBER_STARTED FROM {$db_prefix}boards AS b, {$db_prefix}categories AS c, {$db_prefix}topics AS t WHERE (b.ID_BOARD=t.ID_BOARD AND b.ID_CAT=c.ID_CAT AND t.ID_TOPIC = $threadid)");
+            $bcinfo = $dbrq->fetch();
+            $dbrq = null;
             
             $board = intval($bcinfo['bid']);
             $service->boardname = $bcinfo['bname'];
@@ -1779,7 +1858,6 @@ class Threads extends Respond
             $input['delAttach'] = $POST->get('delAttach', 'off');
             $input['attachOld'] = $POST->attachOld;
             $attachment = $request->files()->get('attachment');
-            error_log("__DEBUG__: INPUT: " . print_r($input, true));
             
             $db_prefix = $app->db->prefix;
             
@@ -1790,12 +1868,9 @@ class Threads extends Respond
                 AND t.ID_TOPIC=m.ID_TOPIC
                 AND b.ID_BOARD=t.ID_BOARD
                 LIMIT 1");
-            $dbst->bind_param('i', $input['msg']);
-            $dbst->execute();
-            $dbrs = $dbst->get_result();
-            $dbst->close();
-            $row = $dbrs->fetch_assoc();
-            $dbrs->free();
+            $dbst->execute(array($input['msg']));
+            $row = $dbst->fetch();
+            $dbst = null; // closing this statement
             
             // whether user edits self message
             if ($row['ID_MEMBER'] == $app->user->id) $self_edit = true;
@@ -1820,10 +1895,8 @@ class Threads extends Respond
                 $service->validate($input['delAttach'], 'Empty filename to remove.')->notEmpty();
                 unlink($app->conf->attachmentUploadDir . "/" . $input['attachOld']);
                 
-                $dbst = $app->db->prepare("UPDATE {$db_prefix}messages SET attachmentSize='0', attachmentFilename=NULL WHERE ID_MSG=?");
-                $dbst->bind_param('i', $input['msg']);
-                $dbst->execute();
-                $dbst->close();
+                $app->db->prepare("UPDATE {$db_prefix}messages SET attachmentSize='0', attachmentFilename=NULL WHERE ID_MSG=?")->
+                    execute(array($input['msg']));
             }
             elseif ($attachment !== null && $attachment['name'] != '' && $app->conf->attachmentEnable > 0 && ($app->conf->attachmentMemberGroups == "" || in_array($app->user->group, explode(',', trim($app->conf->attachmentMemberGroups))) || $app->user->accessLevel() > 2))
             {
@@ -1860,46 +1933,41 @@ class Threads extends Respond
                         return $app->errors->abort('', $app->locale->yse124);
                     chmod("{$app->conf->attachmentUploadDir}/$destName", 0644) || $chmod_failed = 1;
                     
-                    $dbst = $app->db->prepare("UPDATE {$db_prefix}messages SET attachmentSize=?, attachmentFilename=? WHERE ID_MSG=?");
-                    $dbst->bind_param('isi', $attachment['size'], $attachment['name'], $input['msg']);
-                    $dbst->execute();
-                    $dbst->close();
+                    $app->db->prepare("UPDATE {$db_prefix}messages SET attachmentSize=?, attachmentFilename=? WHERE ID_MSG=?")->
+                        execute(array($attachment['size'], $attachment['name'], $input['msg']));
                 }
             }
             
             $modTime = time();
             
             $dbst = $app->db->prepare("UPDATE {$db_prefix}messages SET subject = ?, icon = ?, body = ?, modifiedTime = ?, modifiedName = ?, smiliesEnabled = ?, nowListening = ? WHERE ID_MSG = ?;");
-            $dbst->bind_param('sssisisi', $input['subject'], $input['icon'], $input['message'], $modTime, $app->user->realname, $input['smilies'], $input['nowListening'], $input['msg']);
-            if(!$dbst->execute()) return $app->errors->abort('', $dbst->error, 500);
-            $dbst->close();
+            $qresult = $dbst->execute(array($input['subject'], $input['icon'], $input['message'], $modTime, $app->user->realname, $input['smilies'], $input['nowListening'], $input['msg']));
+            
+            if(!$qresult)
+            {
+                $errmsg = $dbst->errorInfo();
+                return $this->error("[1948] update messages error: {$errmsg[2]}", 500);
+            }
+            $dbst = null;
             
             // quick poll mod by dig7er, 14.04.2010
             if ($input['quickPoll'] != $row['quickPollOld'])
             {
                 if (empty($input['quickPoll']))
                 {
-                    $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG = ?");
-                    $dbst->bind_param('i', $input['msg']);
-                    $dbst->execute();
-                    $dbst->close();
-                    $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG = ?");
-                    $dbst->bind_param('i', $input['msg']);
-                    $dbst->execute();
-                    $dbst->close();
+                    $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG = ?")->
+                        execute(array($input['msg']));
+                    $app->db->prepare("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG = ?")->
+                        execute(array($input['msg']));
                 }
                 else
                 {
-                      $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG = ?");
-                      $dbst->bind_param('i', $input['msg']);
-                      $dbst->execute();
-                      $dbst->close();
-                      $dbst = $app->db->prepare("REPLACE INTO {$db_prefix}quickpolls
+                      $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG = ?")->
+                          execute(array($input['msg']));
+                      $app->db->prepare("REPLACE INTO {$db_prefix}quickpolls
                           (ID_MSG, POLL_TITLE)
-                          VALUES (?, ?)");
-                      $dbst->bind_param('is', $input['msg'], $input['quickPoll']);
-                      $dbst->execute();
-                      $dbst->close();
+                          VALUES (?, ?)")->
+                          execute(array($input['msg'], $input['quickPoll']));
                 }
             }
             
@@ -1944,21 +2012,20 @@ class Threads extends Respond
                 AND t.ID_TOPIC=m.ID_TOPIC
                 AND b.ID_BOARD=t.ID_BOARD
                 LIMIT 1");
-        $dbst->bind_param('i', $msg);
-        $dbst->execute();
-        $dbrs = $dbst->get_result();
-        $dbst->close();
+        $dbst->execute(array($msg));
         
-        if ($dbrs->num_rows == 0) return $this->error("Message $msg not found.");
+        $row = $dbst->fetch();
         
-        $row = $dbrs->fetch_assoc();
-        $dbrs->free();
+        if (!$row)
+            return $this->error("Message $msg not found.");
         
         $threadid = $row['ID_TOPIC'];
         
         // whether user deletes self message
-        if ($row['ID_MEMBER'] == $app->user->id) $selfdel = true;
-        else $selfdel = false;
+        if ($row['ID_MEMBER'] == $app->user->id)
+            $selfdel = true;
+        else
+            $selfdel = false;
         
         // get board id of this thread
         $boardid = $row['ID_BOARD'];
@@ -2017,31 +2084,19 @@ class Threads extends Respond
                 }
                 
                 // quick poll mod by dig7er, 14.04.2010
-                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = ?)");
-                $dbst->bind_param('i', $threadid);
-                $dbst->execute();
-                $dbst->close();
-                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = ?) LIMIT 1");
-                $dbst->bind_param('i', $threadid);
-                $dbst->execute();
-                $dbst->close();
+                $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = ?)")->
+                    execute(array($threadid));
+                $app->db->prepare("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = ?) LIMIT 1")->
+                    execute(array($threadid));
                 
-                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}topics WHERE ID_TOPIC=? LIMIT 1");
-                $dbst->bind_param('i', $threadid);
-                $dbst->execute();
-                $dbst->close();
-                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}polls WHERE ID_POLL=? LIMIT 1");
-                $dbst->bind_param('i', $row['ID_POLL']);
-                $dbst->execute();
-                $dbst->close();
-                $dbst = $app->db->prepare("UPDATE {$db_prefix}boards SET numPosts=numPosts-1, numTopics=numTopics-1 WHERE ID_BOARD=?");
-                $dbst->bind_param('i', $boardid);
-                $dbst->execute();
-                $dbst->close();
-                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}calendar WHERE id_topic = ?");
-                $dbst->bind_param('i', $threadid);
-                $dbst->execute();
-                $dbst->close();
+                $app->db->prepare("DELETE FROM {$db_prefix}topics WHERE ID_TOPIC=? LIMIT 1")->
+                    execute(array($threadid));
+                $app->db->prepare("DELETE FROM {$db_prefix}polls WHERE ID_POLL=? LIMIT 1")->
+                    execute(array($row['ID_POLL']));
+                $app->db->prepare("UPDATE {$db_prefix}boards SET numPosts=numPosts-1, numTopics=numTopics-1 WHERE ID_BOARD=?")->
+                    execute(array($boardid));
+                $app->db->prepare("DELETE FROM {$db_prefix}calendar WHERE id_topic = ?")->
+                    execute(array($threadid));
                 
                 $redirect = "/b$boardid/";
                 $ajaxresponse = '["REDIRECT", "' . SITE_ROOT . '/b' . $boardid . '/"]';            
@@ -2050,67 +2105,47 @@ class Threads extends Respond
             {
                 // this is the last message
                 $dbst = $app->db->prepare("SELECT ID_MSG FROM {$db_prefix}messages WHERE (ID_TOPIC=? AND ID_MSG != ?) ORDER BY ID_MSG DESC LIMIT 1");
-                $dbst->bind_param('ii', $threadid, $msg);
-                $dbst->execute();
-                $dbrs = $dbst->get_result();
-                $dbst->close();
-                $row2 = $dbrs->fetch_assoc();
-                $dbrs->free();
-                $dbst = $app->db->prepare("UPDATE {$db_prefix}topics SET ID_LAST_MSG=?, numReplies=numReplies-1 WHERE ID_TOPIC=?");
-                $dbst->bind_param('ii', $row2['ID_MSG'], $threadid);
-                $dbst->execute();
-                $dbst->close();
-                $dbst = $app->db->prepare("UPDATE {$db_prefix}boards SET numPosts=numPosts-1 WHERE ID_BOARD=?");
-                $dbst->bind_param('i', $boardid);
-                $dbst->execute();
-                $dbst->close();
-                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}calendar WHERE id_topic = ?");
-                $dbst->bind_param('i', $threadid);
-                $dbst->execute();
-                $dbst->close();
+                $dbst->execute(array($threadid, $msg));
+                $row2 = $dbst->fetch();
+                $dbst = null;
+                
+                $app->db->prepare("UPDATE {$db_prefix}topics SET ID_LAST_MSG=?, numReplies=numReplies-1 WHERE ID_TOPIC=?")->
+                    execute(array($row2['ID_MSG'], $threadid));
+                $app->db->prepare("UPDATE {$db_prefix}boards SET numPosts=numPosts-1 WHERE ID_BOARD=?")->
+                    execute(array($boardid));
+                $app->db->prepare("DELETE FROM {$db_prefix}calendar WHERE id_topic = ?")->
+                    execute(array($threadid));
             }
             else
             {
                 // this is just "some" message
-                $dbst = $app->db->prepare("UPDATE {$db_prefix}topics SET numReplies=numReplies-1 WHERE ID_TOPIC=?");
-                $dbst->bind_param('i', $threadid);
-                $dbst->execute();
-                $dbst->close();
-                $dbst = $app->db->prepare("UPDATE {$db_prefix}boards SET numPosts=numPosts-1 WHERE ID_BOARD=?");
-                $dbst->bind_param('i', $boardid);
-                $dbst->execute();
-                $dbst->close();
+                $app->db->prepare("UPDATE {$db_prefix}topics SET numReplies=numReplies-1 WHERE ID_TOPIC=?")->
+                    execute(array($threadid));
+                $app->db->prepare("UPDATE {$db_prefix}boards SET numPosts=numPosts-1 WHERE ID_BOARD=?")->
+                    execute(array($boardid));
             }
             
             if ($row['ID_MEMBER'] != '-1' && $row['count'] != 1)
             {
-                $dbst = $app->db->prepare("UPDATE {$db_prefix}members SET posts=posts-1 WHERE (ID_MEMBER=? && posts > 0)");
-                $dbst->bind_param('i', $row['ID_MEMBER']);
-                $dbst->execute();
-                $dbst->close();
+                $app->db->prepare("UPDATE {$db_prefix}members SET posts=posts-1 WHERE (ID_MEMBER=? && posts > 0)")->
+                    execute(array($row['ID_MEMBER']));
             }
             
             // undelete mod - save message only (if haven't previously saved topic
             if ( !$topicundeleted && $app->conf->enableUnDelete)
                 // $app->undelete->saveMessage($row['ID_MSG']); // TODO implement undelete
             
-            $dbst = $app->db->prepare("DELETE FROM {$db_prefix}messages WHERE ID_MSG=? LIMIT 1");
-            $dbst->bind_param('i', $msg);
-            $dbst->execute();
-            $dbst->close();
+            $app->db->prepare("DELETE FROM {$db_prefix}messages WHERE ID_MSG=? LIMIT 1")->
+                execute(array($msg));
             
             $nowtime = time();
             $app->db->query("DELETE FROM {$db_prefix}log_last_comments WHERE LAST_COMMENT_TIME < FROM_UNIXTIME($nowtime - 7*24*60*60) OR LAST_COMMENT_TIME IS NULL");
             
             // quick poll mod by dig7er, 14.04.2010
-            $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG=?");
-            $dbst->bind_param('i', $msg);
-            $dbst->execute();
-            $dbst->close();
-            $dbst = $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG=?");
-            $dbst->bind_param('i', $msg);
-            $dbst->execute();
-            $dbst->close();
+            $app->db->prepare("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG=?")->
+                execute(array($msg));
+            $app->db->prepare("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG=?")->
+                execute(array($msg));
             
             $app->subs->updateStats('message');
             $app->subs->updateStats('topic');
@@ -2154,18 +2189,19 @@ class Threads extends Respond
             ON t.ID_FIRST_MSG = msg.ID_MSG
             WHERE t.ID_TOPIC = ?
         ");
-        $dbst->bind_param('i', $threadid);
-        $dbst->execute();
-        $dbrs = $dbst->get_result();
-        $dbst->close();
-        if($dbrs->num_rows < 1) return $this->error("No thread with ID $threadid.");
-        $row = $dbrs->fetch_array();
-        $dbrs->free();
+        $dbst->execute(array($threadid));
+        $row = $dbst->fetch();
+        
+        if(!$row)
+            return $this->error("No thread with ID $threadid.");
+        
+        $dbst = null; // closing this statement
         
         $boardid = $row['ID_BOARD'];
         $app->board->load($boardid);
         
-        if ($app->user->accessLevel() < 2) return $this->errors($app->locale->txt[73], 403);
+        if ($app->user->accessLevel() < 2)
+            return $this->errors($app->locale->txt[73], 403);
         
         if ($request->method('GET'))
         {
@@ -2196,33 +2232,28 @@ class Threads extends Respond
             {
                 //Lines 38-43 all there to delete attachments on thread deletion - Jeff
                 $dbst = $app->db->prepare("SELECT attachmentFilename FROM {$db_prefix}messages WHERE (ID_TOPIC=? AND (attachmentFilename IS NOT NULL))");
-                $dbst->bind_param('i', $threadid);
-                $dbst->execute();
-                $dbrs = $dbst->get_result();
-                $dbst->close();
-                if ($dbrs->num_rows > 0)
-                    while ($row = $request->fetch_array())
-                    {
-                        $attachmentFilename = $app->conf->attachmentUploadDir . "/" . $row['attachmentFilename'];
-                        if (file_exists($attachmentFilename))
-                            unlink($attachmentFilename);
-                    }
-                $dbrs->free();
+                $dbst->execute(array($threadid));
+                while ($row = $dbst->fetch())
+                {
+                    $attachmentFilename = $app->conf->attachmentUploadDir . "/" . $row['attachmentFilename'];
+                    if (file_exists($attachmentFilename))
+                        unlink($attachmentFilename);
+                }
+                $dbst = null;
             }
             
             // quick poll mod by dig7er, 14.04.2010
             $app->db->query("DELETE FROM {$db_prefix}quickpoll_votes WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = $threadid)");
             $app->db->query("DELETE FROM {$db_prefix}quickpolls WHERE ID_MSG IN (SELECT ID_MSG FROM {$db_prefix}messages WHERE ID_TOPIC = $threadid)");
             
-            $dbst = $app->db->prepare("DELETE FROM {$db_prefix}polls WHERE ID_POLL=? LIMIT 1");
-            $dbst->bind_param('i', $row['ID_POLL']);
-            $dbst->execute();
-            $dbst->close();
+            $dbst = $app->db->prepare("DELETE FROM {$db_prefix}polls WHERE ID_POLL=? LIMIT 1")->
+                execute(array($row['ID_POLL']));
+            
             $row['numReplies']++;
-            $dbst = $app->db->prepare("UPDATE {$db_prefix}boards SET numTopics=numTopics-1, numPosts=numPosts-? WHERE ID_BOARD=?");
-            $dbst->bind_param('ii', $row['numReplies'], $row['ID_BOARD']);
-            $dbst->execute();
-            $dbst->close();
+            
+            $dbst = $app->db->prepare("UPDATE {$db_prefix}boards SET numTopics=numTopics-1, numPosts=numPosts-? WHERE ID_BOARD=?")->
+                execute(array($row['numReplies'], $row['ID_BOARD']));
+            
             $app->db->query("DELETE FROM {$db_prefix}topics WHERE ID_TOPIC=$threadid");
             $app->db->query("DELETE FROM {$db_prefix}messages WHERE ID_TOPIC=$threadid");
             $app->db->query("DELETE FROM {$db_prefix}calendar WHERE id_topic=$threadid");
@@ -2237,8 +2268,8 @@ class Threads extends Respond
                 SELECT count
                 FROM {$db_prefix}boards
                 WHERE ID_BOARD = $row[ID_BOARD]");
-            list ($pcounter) = $dbrq->fetch_row();
-            $dbrq->free_result();
+            $pcounter = $dbrq->fetchColumn();
+            $dbrq = null;
             
             $subject = null;
             $thread_author = null;
@@ -2247,7 +2278,7 @@ class Threads extends Respond
             
             // Posts *do* count here, do decrease the poster's post counts.
             if (empty($pcounter))
-                while ($temp = $dbrq->fetch_row())
+                while ($temp = $dbrq->fetch(\PDO::FETCH_NUM))
                 {
                     if ($thread_author == null){
                         $thread_author = $temp[0];
@@ -2260,11 +2291,13 @@ class Threads extends Respond
             {
                 if($app->conf->notify_users)
                 {
-                    $temp = $dbrq->fetch_row();
+                    $temp = $dbrq->fetch(\PDO::FETCH_NUM);
                     $thread_author = $temp[0];
                     $subject = $temp[1];
                 }
             }
+            
+            $dbrq = null;
 
             if ($app->conf->notify_users && $thread_author > 0 && $app->user->id != $thread_author)
             {

@@ -382,15 +382,21 @@ class Subs {
                 AND t.ID_BOARD=$board
             ORDER BY m.posterTime DESC
             LIMIT 1");
-        if ($result->num_rows > 0)
+        
+        $lastTopicID = $result->fetchColumn();
+        if ($lastTopicID)
+            $dbst = $db->prepare("UPDATE {$db_prefix}boards SET ID_LAST_TOPIC=? WHERE ID_BOARD=?")->
+                execute(array($lastTopicID, $board));
+        elseif (strlen($dbst->errorCode()))
         {
-            list($lastTopicID) = $result->fetch_array();
-            $request = $db->query("UPDATE {$db_prefix}boards SET ID_LAST_TOPIC=$lastTopicID WHERE ID_BOARD=$board");
+            $errmsg = $dbst->errorInfo();
+            return $this->app->errors->abort('', "UpdateLastMessage() error: $errmsg[2]");
         }
-        elseif (strlen($db->error))
-            return $this->app->errors->abort('', $db->error);
         else
-            $request = $db->query("UPDATE {$db_prefix}boards SET ID_LAST_TOPIC=0 WHERE ID_BOARD=$board");
+            $db->prepare("UPDATE {$db_prefix}boards SET ID_LAST_TOPIC=0 WHERE ID_BOARD=?")->
+                execute(array($board));
+        
+        $dbst = null;
     } // UpdateLastMessage()
     
     /**

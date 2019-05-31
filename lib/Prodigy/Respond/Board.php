@@ -49,12 +49,13 @@ class Board extends Respond
         $this->announcement = false;
         
         $db = $this->app->db;
-        $dbrq = $db->query("SELECT b.moderators, b.isAnnouncement FROM {$db->prefix}boards AS b WHERE (b.ID_BOARD='$board')", false);
-        
+        $dbrq = $db->prepare("SELECT b.moderators, b.isAnnouncement FROM {$db->prefix}boards AS b WHERE (b.ID_BOARD=?)");
+        $dbrq->execute(array($board));
+        $row = $dbrq->fetch();
+        $dbrq = null;
         /* if there aren't any, skip */
-        if ($dbrq->num_rows > 0)
+        if ($row)
         {
-            $row = $dbrq->fetch_array();
             $moderators = explode(',', trim($row['moderators']));
             $this->announcement = $row['isAnnouncement'];
             
@@ -92,18 +93,21 @@ class Board extends Respond
         $db_prefix = $app->db->prefix;
         
         // Get the board and category information
-        $result = $app->db->query("
+        $result = $app->db->prepare("
             SELECT b.name,b.description,b.moderators,c.name,b.ID_CAT,c.memberGroups,b.isAnnouncement,b.numTopics
             FROM {$db_prefix}boards as b,{$db_prefix}categories as c
-            WHERE b.ID_BOARD={$this->board}
+            WHERE b.ID_BOARD=?
             AND b.ID_CAT=c.ID_CAT");
-        if ($result->num_rows == 0)
-            return $app->errors->abort('Error', $app->locale->txt('yse232', 'No such board'));
-        list ($boardname,$bdescrip,$bdmods,$cat,$currcat,$temp2,$isAnnouncement,$topiccount) = $result->fetch_row();
+        $result->execute(array($this->board));
+        $row = $result->fetch(\PDO::FETCH_NUM);
+        $result = null;
+        if (!$row)
+            return $this->error($app->locale->txt('yse232', 'No such board'));
+        list ($boardname,$bdescrip,$bdmods,$cat,$currcat,$temp2,$isAnnouncement,$topiccount) = $row;
         
         $memgroups = explode(',',$temp2);
         if (!(in_array($user->group, $memgroups) || $memgroups[0] == null || $user->accessLevel() > 2))
-            return $app->errors->abort('Error', $app->locale->txt[1]); // access denied
+            return $this->error($app->locale->txt[1]); // access denied
         
         $view = $request->param('start', null);
         $start = intval($view);
@@ -115,8 +119,6 @@ class Board extends Respond
         // are we views all the topics, or just a few?
         $maxindex = ($view === 'all' ? $topiccount : $app->conf->maxdisplay);
         
-        error_log("__DEBUG__: view, start, maxindex: $view, $start, $maxindex, $topiccount, {$app->conf->maxdisplay};");
-        
         // Make sure the starting place makes sense.
         if ($start > $topiccount)
             $start = ( $topiccount % $maxindex ) * $maxindex;
@@ -126,7 +128,7 @@ class Board extends Respond
         $start = (int)($start / $maxindex) * $maxindex;
         
         
-        
+        // FIXME this html shoud be moved to templates
         $pageindex = '';
         // Construct the page links for this board.
         if ($app->conf->compactTopicPagesEnable == 0)
@@ -228,7 +230,8 @@ class Board extends Respond
         
         if ($user->name != 'Guest') {
             // mark current board as seen
-            $app->db->query("REPLACE INTO {$db_prefix}log_boards (logTime,ID_MEMBER,ID_BOARD) VALUES (".time().",{$user->id},{$this->board})", false);
+            $app->db->prepare("REPLACE INTO {$db_prefix}log_boards (logTime,ID_MEMBER,ID_BOARD) VALUES (?,?,?)")->
+                execute(array(time(), $user->id, $this->board));
         }
         
         $service->title = $boardname;
@@ -247,8 +250,9 @@ class Board extends Respond
         // chatWall mod by dig7er
         if ($app->conf->boardBillsEnabled)
         {
-            $dbrequest = $app->db->query("SELECT chatWall, chatWallMsgAuthor FROM {$db_prefix}boards WHERE ID_BOARD = {$this->board}", false);
-            $row = $dbrequest->fetch_assoc();
+            $dbrequest = $app->db->query("SELECT chatWall, chatWallMsgAuthor FROM {$db_prefix}boards WHERE ID_BOARD = {$this->board}");
+            $row = $dbrequest->fetch();
+            $dbrequest = null;
             $row['chatWall'] = $app->subs->unicodeentities(stripslashes($row['chatWall']));
             $service->chatWall = $row;
         }
@@ -267,41 +271,44 @@ class Board extends Respond
         // Grab the appropriate topic information
         $stickyOrder = (($app->conf->enableStickyTopics and empty($service->orderby))? 't.isSticky DESC,' : '');
         /* ### query optimization by dig7er ### */
-        $result = $app->db->query("
+        $dbst = $app->db->prepare("
             SELECT t.ID_TOPIC FROM {$db_prefix}topics t LEFT JOIN {$db_prefix}messages m
-            ON (t.ID_LAST_MSG = m.ID_MSG) WHERE t.ID_BOARD = {$this->board}
-            ORDER BY $stickyOrder m.posterTime DESC LIMIT $start,$maxindex", false);
-        
-        error_log("__DEBUG__: start, maxindex: $start, $maxindex;");
-        
-        $_topics = array();
-        while ($row = $result->fetch_assoc())
-            $_topics[] = $row['ID_TOPIC'];
+            ON (t.ID_LAST_MSG = m.ID_MSG) WHERE t.ID_BOARD = ?
+            ORDER BY $stickyOrder m.posterTime DESC LIMIT ?,?");
+        $dbst->execute(array($this->board, $start, $maxindex));
+        $_topics = $dbst->fetchAll(\PDO::FETCH_COLUMN);
+        $dbst = null;
         
         $topics = array();
         
         if (count($_topics))
         {
             if(!empty($service->search))
-                $search_query = $app->db->escape_string($service->search);
-        
+            {
+                $search_query_part = "AND (m2.subject LIKE '%{$search_query}%' OR mem2.realName LIKE '%{$search_query}%' OR m2.posterName LIKE '%{$search_query}%')";
+                $search_query_params = array("%{$search_query}%","%{$search_query}%","%{$search_query}%");
+            }
+            else
+            {
+                $search_query_part = '';
+                $search_query_params = array();
+            }
+            
             /* ### query optimization by dig7er ### */
-            $result = $app->db->query("
+            $dbst = $app->db->prepare("
                 SELECT t.ID_LAST_MSG, t.ID_TOPIC, t.numReplies, t.locked, m.posterName, m.ID_MEMBER, IFNULL(mem.realName, m.posterName) AS posterDisplayName, t.numViews, m.posterTime, m.modifiedTime, t.ID_FIRST_MSG, t.isSticky, t.ID_POLL, m2.posterName as mname, m2.ID_MEMBER as mid, IFNULL(mem2.realName, m2.posterName) AS firstPosterDisplayName, m2.subject as msub, m2.icon as micon, m2.body as mbody, IFNULL(lt.logTime, 0) AS isRead, IFNULL(lmr.logTime, 0) AS isMarkedRead, tr.POSITIVE AS topicPosRating, tr.NEGATIVE AS topicNegRating
                     FROM {$db_prefix}topics as t JOIN {$db_prefix}messages as m ON (m.ID_MSG=t.ID_LAST_MSG)
                     JOIN {$db_prefix}messages as m2 ON (m2.ID_MSG=t.ID_FIRST_MSG) LEFT JOIN {$db_prefix}topic_ratings as tr ON (t.ID_TOPIC = tr.TOPIC_ID)
                     LEFT JOIN {$db_prefix}members AS mem ON (mem.ID_MEMBER=m.ID_MEMBER)
                     LEFT JOIN {$db_prefix}members AS mem2 ON (mem2.ID_MEMBER=m2.ID_MEMBER)
-                    LEFT JOIN {$db_prefix}log_topics AS lt ON (lt.ID_TOPIC=t.ID_TOPIC AND lt.ID_MEMBER={$app->user->id})
-                    LEFT JOIN {$db_prefix}log_mark_read AS lmr ON (lmr.ID_BOARD={$this->board} AND lmr.ID_MEMBER={$app->user->id})
+                    LEFT JOIN {$db_prefix}log_topics AS lt ON (lt.ID_TOPIC=t.ID_TOPIC AND lt.ID_MEMBER=?)
+                    LEFT JOIN {$db_prefix}log_mark_read AS lmr ON (lmr.ID_BOARD=? AND lmr.ID_MEMBER=?)
                     WHERE t.ID_TOPIC IN (" . implode(',', $_topics) . ")
-                    " . ((!empty($service->search) ) ? "AND (m2.subject LIKE '%{$search_query}%' OR mem2.realName LIKE '%{$search_query}%' OR m2.posterName LIKE '%{$search_query}%')" : "") . "
-                    ORDER BY $orderStr $stickyOrder m.posterTime DESC", false);
+                    $search_query_part
+                    ORDER BY $orderStr $stickyOrder m.posterTime DESC");
+            $dbst->execute(array_merge(array($app->user->id, $this->board, $app->user->id), $search_query_params));
             
-            if ($result->num_rows <= 0 )
-                $service->search_not_found = true;
-            
-            while ($row = $result->fetch_assoc())
+            while ($row = $dbst->fetch())
             {
                 if ($row['ID_POLL'] != '-1' && $app->conf->pollMode == 0)
                     continue;
@@ -360,8 +367,9 @@ class Board extends Respond
                 $topics[$mnum]['new'] = ($row['isRead'] >= $topics[$mnum]['topicEditedTime'] || $row['isMarkedRead'] >= $topics[$mnum]['topicEditedTime'] ? false : true);
                 
                 // Get last comment time
-                $result2 = $app->db->query("SELECT ID_MSG, comments FROM {$db_prefix}messages WHERE ID_TOPIC = $mnum AND last_comment_time IS NOT NULL ORDER BY last_comment_time DESC LIMIT 1", false);
-                list($msgID, $comments) = $result2->fetch_row();
+                $result2 = $app->db->query("SELECT ID_MSG, comments FROM {$db_prefix}messages WHERE ID_TOPIC = $mnum AND last_comment_time IS NOT NULL ORDER BY last_comment_time DESC LIMIT 1");
+                list($msgID, $comments) = $result2->fetch(\PDO::FETCH_NUM);
+                $result2 = null;
                 $topics[$mnum]['topicLastCommentTime'] = 0;
                 if (strlen($comments) > 0) {
                     $csvdata = explode("\r\n", $comments);
@@ -379,8 +387,10 @@ class Board extends Respond
                 
             
             } // while fetch_assoc()
-                
-        } // if count($topics);
+            $dbst = null; // closing statement
+            if (!count($topics))
+                $service->search_not_found = true;
+        } // if count($_topics);
         
         $service->boardviewers = $this->getBoardViewersList($this->board);
         

@@ -165,8 +165,6 @@ class InstantMessages extends Respond
         
         $db_prefix = $this->app->db->prefix;
         
-        $threadid = $this->app->db->escape_string($threadid);
-        
         $dbrq = $this->app->db->prepare("
             SELECT notifies FROM {$db_prefix}topics
             WHERE (ID_TOPIC = ?)
