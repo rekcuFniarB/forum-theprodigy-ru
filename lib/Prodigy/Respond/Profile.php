@@ -23,17 +23,17 @@ class Profile extends Respond
         $input_password = $POST->get('password');
         
         if (empty($input_user))
-            return $app->errors->abort('Error', $app->locale->txt[37] . ' - ' . $input_password);
+            return $this->error($app->locale->txt[37] . ' - ' . $input_password);
         
         if (empty($input_password))
-            $app->errors->abort('Error', $app->locale->txt[38]);
+            return $this->error($app->locale->txt[38]);
         
         $cookielength = $POST->get('cookielength');
         $cookieneverexp = $POST->get('cookieneverexp');
         
         // FIXME cyrillic list
         if (!preg_match($app->conf->loginregex, $input_user))
-            return $app->errors->abort('Error', $app->locale->txt[240]);
+            return $this->error($app->locale->txt[240]);
 
         if ($cookielength == $app->locale->yse50)
         {
@@ -42,7 +42,7 @@ class Profile extends Respond
         }
         
         if (!is_numeric($cookielength) && empty($cookieneverexp))
-            return $app->errors->abort('Error', $cookieLength . ' ' . $app->locale->txt[337]);
+            return $this->error($cookieLength . ' ' . $app->locale->txt[337]);
         
         $db_prefix = $app->db->prefix;
         
@@ -57,7 +57,7 @@ class Profile extends Respond
         $dbst = null; // closing statement
         if (!$settings)
         {
-            return $this->error('Error', $app->locale->txt[40] . ' - ' . $input_user . ': ' . $attempt);
+            return $this->error($app->locale->txt[40] . ' - ' . $input_user . ': ' . $attempt);
         }
         
         if(strpos($settings['passwd'], ':') !== false){
@@ -69,7 +69,7 @@ class Profile extends Respond
                 }
                 else {
                     $app->session->login_second_pass = false;
-                    return $this->error('Error', 'Login failed, maybe profile corrupt.');
+                    return $this->error('Login failed, maybe profile corrupt.');
                 }
             }
         }
@@ -88,7 +88,7 @@ class Profile extends Respond
                 $settings['passwd'] = $md5_password;
             } else {
                 $settings['memberGroup'] = '';
-                return $this->error('Error', "{$app->locale->txt[39]} - $input_user: $attempt");
+                return $this->error("{$app->locale->txt[39]} - $input_user: $attempt");
             }
         }
         
