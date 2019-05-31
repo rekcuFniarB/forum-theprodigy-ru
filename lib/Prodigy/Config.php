@@ -113,8 +113,8 @@ class Config {
     
     private function _load_modsettings() {
         $this->modsettings = array();
-        $request = $this->app->db->query("SELECT variable,value FROM {$this->app->db->prefix}settings WHERE (variable != 'agreement')", false);
-        while ($row = $request->fetch_array())
+        $request = $this->app->db->query("SELECT variable,value FROM {$this->app->db->prefix}settings WHERE (variable != 'agreement')");
+        while ($row = $request->fetch())
             $this->modsettings[$row['variable']] = $row['value'];
         
         $this->modsettings['karmaMemberGroups'] = explode(',', $this->modsettings['karmaMemberGroups']);
