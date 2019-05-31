@@ -429,11 +429,11 @@ class Subs {
     /**
      * Check if value is set.
      * Returns int 0 or 1.
-     * @param mixed &$val        Value to check
+     * @param mixed $val        Value to check
      * @param bool $bool_result  If true, return boolean result instead of int
      * @return integer or bool
      */
-    public function isset(&$val = null, $bool_result = false)
+    public function isset($val = null, $bool_result = false)
     {
         if (is_string($val))
             $val = trim($val);
