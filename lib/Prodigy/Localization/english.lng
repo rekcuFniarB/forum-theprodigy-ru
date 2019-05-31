@@ -577,7 +577,7 @@ $txt[451] = 'Tongue';
 
 $txt[452] = 'Mark ALL messages as read';
 
-$txt[453] = 'The user whose profile you are trying to view does not exist.';
+$txt[453] = 'The user "%s" whose profile you are trying to view does not exist.';
 
 $txt[454] = 'Hot Topic (More than 15 Replies)';
 $txt[455] = 'Very Hot Topic (More than 25 Replies)';
@@ -915,6 +915,9 @@ $txt[1003] = 'File';
 $txt[1004] = 'Line';
 
 $txt[1005] = 'Close window';
+
+$txt['admin'] = 'Администратор';
+$txt['globmod'] = 'Глобальный Модератор';
 
 $txt['main'] = 'Main';
 

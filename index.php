@@ -184,8 +184,8 @@ $router->respond('GET', '/errortest/', function($request, $response, $service, $
 
 // Registering routes
 $router->respond('GET', '/', 'main->index');
-$router->respond(array('GET', 'POST'), '/login/', 'user->loginform');
-$router->respond('GET', '/logout/', 'user->logout');
+$router->respond(array('GET', 'POST'), '/login/', 'profile->loginform');
+$router->respond('GET', '/logout/', 'profile->logout');
 
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/', 'thread->display');
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/[i:page]/', 'thread->display');
@@ -206,11 +206,12 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/delete/', 'threa
 //$router->respond('GET', '/main-static-call/', '\Prodigy\Router::Main');
 
 $router->respond('GET', '/people/[:user]/', 'profile->show');
-
+$router->respond(array('GET', 'POST'), '/people/[:user]/modify/', 'profile->edit');
 
 $router->respond('GET', '/example/', 'main->example');
-$router->respond('GET', '/example/', 'main->example2');
+//$router->respond('GET', '/example/', 'main->example2');
 $router->respond('GET', '/test/', 'main->testResponse');
+$router->respond('GET', '/simple/', 'main->simple_example');
 
 $router->with('/feed', 'lib/Prodigy/Feed/index.php');
 $router->with('/files', 'lib/Prodigy/Cloud/index.php');
