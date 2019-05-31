@@ -48,7 +48,7 @@ class PDOWrapper extends \PDO {
             parent::__construct("{$this->db_driver}:host=$host;dbname=$database;charset={$this->db_charset}", $user, $password,
                 array(
                     // Persistent connections, default FALSE
-                    PDO::ATTR_PERSISTENT         => true,
+                    //PDO::ATTR_PERSISTENT         => true,
                     // Emulated prepared statements, default TRUE
                     PDO::ATTR_EMULATE_PREPARES   => false,
                     // Error mode, default  PDO::ERRMODE_SILENT
@@ -80,11 +80,33 @@ class PDOWrapper extends \PDO {
     /**
      * build placeholders string from array (example: "?, ?, ?")
      * @param array $data Input data
+     * @param bool $assoc if should return assoc placeholders
+     * @param bool $assignment_list whether return format should be in the
+     *             form of assignment list or not.
      * @return string
      */
-    public function build_placeholders(array $data)
+    public function build_placeholders(array $data, bool $assoc = false, bool $assignment_list = true)
     {
-        return str_repeat('?,', count($data) - 1) . '?';
+        if (!$assoc)
+            return str_repeat('?,', count($data) - 1) . '?';
+        else
+        {
+            $keys = array_keys($data);
+            $result = array_map(
+                function($key) use ($assignment_list)
+                {
+                    if ($assignment_list)
+                        // Result should be in the form of "foo = :foo, bar = :bar, baz = :baz"
+                        return "$key = :$key";
+                    else
+                        // Result should be in the form of ":foo, :bar, :baz"
+                        return ":$key";
+                },
+                $keys
+            );
+            
+            return implode(', ', $result);
+        } // if assoc
     }
 }
 ?>
