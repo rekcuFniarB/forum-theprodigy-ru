@@ -16,8 +16,8 @@
                       <?php endif; ?>
                     </td>
                   </tr>
-                  <tr colspan="2">
-                    <td><?= $this->comment ?></td>
+                  <tr>
+                    <td colspan="2"><?= $this->comment ?></td>
                   </tr>
                   <tr>
                     <td align="right" class="windowbg" bgcolor="<?= $this->conf->color['windowbg'] ?>">
