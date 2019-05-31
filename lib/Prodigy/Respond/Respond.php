@@ -394,7 +394,7 @@ abstract class Respond {
 
         if ($identity == -1 && !empty($REMOTE_ADDR) && ip2long($REMOTE_ADDR) != -1)
         {
-            $this->app->db->prepare ("
+            $this->app->db->prepare("
                 DELETE FROM {$db_prefix}log_online
                 WHERE logTime < ?
                 OR identity=IFNULL(INET_ATON(?), -1)")->execute(array($logTime - 900, $REMOTE_ADDR));
@@ -440,29 +440,25 @@ abstract class Respond {
         $guests = 0;
         $tmpusers = array();
         $logTime = time();
-        $rq = $this->app->db->query("
+        $rq = $this->app->db->prepare("
             SELECT m.memberName AS identity,  m.realName,  m.memberGroup
             FROM {$db_prefix}log_online AS lo
             LEFT JOIN {$db_prefix}members AS m ON (m.ID_MEMBER=lo.identity)
-            WHERE ID_BOARD = {$board}
-            ORDER BY logTime DESC", false);
-            while ($tmp = $rq->fetch_assoc())
-            {
-                if ($tmp['realName'] != '')
-                    $tmpusers[] = array(
-                        'identity' => $tmp['identity'],
-                        'realname' => $tmp['realName'], 
-                        'membergroup' => $tmp['memberGroup']
-                    );
-                else
-                    $guests++;
-            }
-            //change here
-            //$guestStr = self::buildGuestString($guests);
-            //if (count($tmpusers) > 0 and strlen($guestStr) > 0)
-            //$guestStr = " и {$guestStr}";
-            error_log("__DEBUG__: Board Wiewers $guests");
-            //return '<font size="1"><b>Сейчас в разделе</b> '. implode(', ', $tmpusers) . $guestStr . '</font>';
+            WHERE ID_BOARD = ?
+            ORDER BY logTime DESC");
+        $rq->execute(array($board));
+        while ($tmp = $rq->fetch())
+        {
+            if ($tmp['realName'] != '')
+                $tmpusers[] = array(
+                    'identity' => $tmp['identity'],
+                    'realname' => $tmp['realName'], 
+                    'membergroup' => $tmp['memberGroup']
+                );
+            else
+                $guests++;
+        }
+        $rq = null;
         return array($tmpusers, $guests);
     } // getBoardViewersList()
     
