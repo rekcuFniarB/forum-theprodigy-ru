@@ -38,8 +38,8 @@ class Security
         
         $db->prepare("DELETE FROM {$db_prefix}log_floodcontrol WHERE ($time-logTime > ?)")->
             execute(array($timeout));
-        $dbrq = $db->prepare("SELECT ip FROM {$db_prefix}log_floodcontrol WHERE ip=? LIMIT 1")->
-            execute(array($IP));
+        $dbrq = $db->prepare("SELECT ip FROM {$db_prefix}log_floodcontrol WHERE ip=? LIMIT 1");
+        $dbrq->execute(array($IP));
         if (!$dbrq->fetchColumn())
         {
             $db->prepare("INSERT INTO {$db_prefix}log_floodcontrol (ip,logTime) VALUES (?,?)")->
