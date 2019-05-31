@@ -65,6 +65,8 @@ class Service extends \Klein\ServiceProvider
     public function esc($string, $charset = null) {
         if (empty($string)) return '';
         
+        $string = strval($string);
+        
         if ($charset === null) {
             if(defined('SITE_CHARSET'))
                 $charset = SITE_CHARSET;
