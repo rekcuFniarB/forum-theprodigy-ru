@@ -245,7 +245,7 @@ $emoji = array(
         '!Ú',
         '(!)',
         '(?)',
-        ';]'
+        ';]' // FIXME trollface not parsed
     ),
     'to' => array(
         'rolleyes.gif',

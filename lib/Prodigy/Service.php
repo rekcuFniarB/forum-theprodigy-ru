@@ -401,6 +401,15 @@ class Service extends \Klein\ServiceProvider
                             $parts[$i]
                         );
                         
+                        // Old quotes format
+                        $parts[$i] = preg_replace_callback(
+                            '/\n?\[(?:quote|q) author=(.+?) link=.+?#msg(\d+?) date=(\d+?)\](?:\n|\<br \/\>)*/i',
+                            function($m) use($locale, $subs) {
+                                return "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" class=\"quote-msg-meta\"><tr><td><font size=\"1\"><b><a href=\"".SITE_ROOT."/{$m[2]}/\">{$locale->yse239}: $m[1] {$locale->txt[176]} " . $subs->timeformat($m[3]) . "</a></b></font></td></tr></table><table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" bgcolor=\"#000000\" role=\"presentation\" class=\"quote-msg\"><tr><td><table border=\"0\" cellspacing=\"1\" cellpadding=\"2\" width=\"100%\" role=\"presentation\"><tr><td class=\"quote\">";
+                            },
+                            $parts[$i]
+                        );
+                        
                         if (!($maxwidth == '0' && $maxheight == '0')) {
                             preg_match_all('/<img src="(http:\/\/.+?)" alt="" border="0" \/>/is', $parts[$i], $imgmatches, PREG_PATTERN_ORDER);
                             $imgnew = array();
