@@ -841,7 +841,7 @@ class Threads extends Respond
                 $dbrq->execute(array($service->mi));
                 $_realName = $dbrq->fetchColumn();
                 if ($_realName)
-                    $service->mname = $_realname;
+                    $service->mname = $_realName;
                 $dbrq = null; // closing this statement
             }
             
