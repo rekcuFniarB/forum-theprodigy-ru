@@ -337,7 +337,7 @@ abstract class Respond {
      */
     protected function addJS($path)
     {
-        $this->css[] = STATIC_ROOT . '/js/' . $path;
+        $this->js[] = STATIC_ROOT . '/js/' . $path;
     }
     
     public function prepareJumpToForm($currentboard) {
