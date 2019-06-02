@@ -397,11 +397,12 @@ class Threads extends Respond
             
             $pollinfo['totalvotes'] = 0;
             
-            for ($i=0; $i<20; $i++) {
+            for ($i=1; $i<21; $i++) {
               $pollinfo['totalvotes'] += $pollinfo["votes$i"];
             }
             $pollinfo['divisor'] = (($pollinfo['totalvotes'] == 0) ? 1 : $pollinfo['totalvotes']);
-                        
+            $pollinfo['pollimage'] = $pollinfo['votingLocked'] != '0'  ? 'locked_poll' : 'poll';
+            
             $service->pollinfo = $pollinfo;
         }
         
@@ -1329,7 +1330,7 @@ class Threads extends Respond
         $FILES = $request->files();
         // replace as much special characters as possible and remove all other characters
         $attachment = $FILES->get('attachment');
-        error_log('__ATTACHMENT__: ' . var_export($attachment, true));
+        
         if (!empty($attachment))
         {
             $attachment['name'] = preg_replace(
@@ -1562,10 +1563,9 @@ class Threads extends Respond
                 }
                 
                 $movethread = $POST->get('movethread'); // new board where thread is moving to
-                error_log("__DEBUG__: MOVETHREAD: " . var_export($movethread, true));
+                
                 if (!empty($movethread) && substr($movethread, 0, 1) != '#' && $movethread != $service->board)
                 {
-                    error_log("__DEBUG__: MOVETHREAD: YES" . var_export($movethread));
                     $dbrq = $db->prepare("
                         SELECT numReplies, ID_BOARD FROM {$db_prefix}topics WHERE ID_TOPIC=?");
                     $dbrq->execute(array($service->thread));
@@ -1596,7 +1596,7 @@ class Threads extends Respond
                     $service->board = $movethread;
                 }
             }
-            error_log("__DEBUG__: ATTACHMENT: " . var_export($attachment, true));
+            
             // QuickReplyExtended
             //--- Unite two posts if they're last in the topic and made by the same user (by Dig7er)
             $um = false;
@@ -1680,6 +1680,40 @@ class Threads extends Respond
             } // if $ID_MSG > 0
         } // if not $newtopic
         
+        // BEGIN Poll mode
+        $isPoll = false;
+        if ($app->subs->isset($POST->poll_question, true))
+        {
+            $poll_vals = array('question' => trim($POST->poll_question));
+            // prepare poll data
+            for ($i = 1; $i < 21; $i++)
+            {
+                $option_name = "poll_option$i";
+                if ($app->subs->isset($POST->{$option_name}))
+                {
+                    $poll_vals["option$i"] = trim($POST->{$option_name});
+                    $isPoll = true;
+                }
+            }
+            
+            if ($isPoll)
+            {
+                $keys = implode(', ', array_keys($poll_vals));
+                $poll_placeholders = $app->db->build_placeholders($poll_vals, true, false);
+                
+                $app->db->prepare("INSERT INTO {$db_prefix}polls ($keys) VALUES ($poll_placeholders)")->
+                    execute($poll_vals);
+                $ID_POLL = $app->db->lastInsertId();
+                error_log("__DEBUG__: POLL: INSERTING: ($poll_placeholders), ($keys), ID_POLL: $ID_POLL");
+                
+                // attach the poll to thread 
+                if ($ID_POLL)
+                    $app->db->query("UPDATE topics SET ID_POLL = $ID_POLL WHERE ID_TOPIC = {$service->thread}");
+            }
+        }
+        
+        // END poll mode
+        
         if (!$app->user->guest)
 	{
             $dbrq = $db->prepare("
@@ -1707,9 +1741,6 @@ class Threads extends Respond
                 VALUES (?, ?, ?)")->
                 execute(array(time(), $app->user->id, $service->thread));
         }
-        
-        # The thread ID, regardless of whether it's a new thread or not.
-        $thread = $service->thread;
         
         # Notify any members who have notification turned on for this thread.
         $app->im->NotifyUsers($service->thread, $input_subject);

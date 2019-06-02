@@ -88,7 +88,7 @@
                                 </td>
                                 <td width="15">&nbsp;</td>
                                 <td valign="bottom">
-                                  <a href="<?= SITE_ROOT ?>/b<?=$this->board ?>/t<?= $this->thread ?>/<?= $this-start ?>/?viewResults=1"><?= $this->locale->yse29 ?></a> <?php $this->get_cache('pollLockEditBtns'); ?>
+                                  <a href="<?= SITE_ROOT ?>/b<?=$this->board ?>/t<?= $this->thread ?>/<?= $this->start ?>/?viewResults=1"><?= $this->locale->yse29 ?></a> <?php $this->get_cache('pollLockEditBtns'); ?>
                                 </td>
                               </tr>
                               <tr>

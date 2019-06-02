@@ -193,7 +193,7 @@
     </table>
     
     <?php if(isset($this->pollinfo)): ?>
-      <?php $this->partial('templates/poll.template.php'); ?>
+      <?php $this->partial('templates/thread/poll.template.php'); ?>
     <?php endif; /* if poll */ ?>
     
     <table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="<?= $this->conf->color['bordercolor'] ?>" class="bordercolor" align="center">

@@ -121,7 +121,52 @@
                         <?php endif; ?>
                       </td>
                     </tr>
-                    
+
+              <?php if($this->action == 'newthread'): ?>
+              <!-- Poll form -->
+              <tr>
+                <td>
+                    <a href="#" onclick="$('.poll-form').toggle()"><?= $this->locale->yse20 ?></a>
+                </td>
+              </tr>
+              
+              <tr class="poll-form" style="display: none;">
+                <td align="right">
+                  <font size="2"><b><?= $this->locale->yse21 ?>:</b></font>
+                </td>
+                <td align="left">
+                  <input type="text" name="poll_question" size="40" />
+                </td>
+              </tr>
+              <tr class="poll-form" style="display: none;">
+                <td>&nbsp;</td>
+                <td>
+                  <font size="2">
+                    <?= $this->locale->yse22 ?> 1: <input type="text" name="poll_option1" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 2: <input type="text" name="poll_option2" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 3: <input type="text" name="poll_option3" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 4: <input type="text" name="poll_option4" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 5: <input type="text" name="poll_option5" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 6: <input type="text" name="poll_option6" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 7: <input type="text" name="poll_option7" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 8: <input type="text" name="poll_option8" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 9: <input type="text" name="poll_option9" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 10: <input type="text" name="poll_option10" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 11: <input type="text" name="poll_option11" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 12: <input type="text" name="poll_option12" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 13: <input type="text" name="poll_option13" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 14: <input type="text" name="poll_option14" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 15: <input type="text" name="poll_option15" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 16: <input type="text" name="poll_option16" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 17: <input type="text" name="poll_option17" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 18: <input type="text" name="poll_option18" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 19: <input type="text" name="poll_option19" size="25" /><br />
+                    <?= $this->locale->yse22 ?> 20: <input type="text" name="poll_option20" size="25" /></font>
+                  </td>
+                </tr>
+                <!-- end poll form -->
+                <?php endif; ?>
+                
                     <?php $this->partial('templates/thread/postbox.template.php'); ?>
                     
                   <?php if($this->conf->nowlistening_enabled): ?>
