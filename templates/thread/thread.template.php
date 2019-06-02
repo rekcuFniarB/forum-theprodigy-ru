@@ -440,7 +440,7 @@
                           <td class="attaches" align="left">
                             <font size="1">
                               <?php if($msg['attachmentSize'] > 0 && $this->conf->attachmentEnable): ?>
-                                <a href="<?= urlencode($this->conf->attachmentUrl) ?>/<?= urlencode($msg['attachmentFilename']) ?>" target="_blank"><img src="<?= $this->conf->imagesdir ?>/clip.gif" align="middle" border="0">&nbsp;<font size="1"><?= $this->esc($msg['attachmentFilename']) ?></font></a>
+                                <a href="<?= $this->conf->attachmentUrl ?>/<?= urlencode($msg['attachmentFilename']) ?>" target="_blank"><img src="<?= $this->conf->imagesdir ?>/clip.gif" align="middle" border="0">&nbsp;<font size="1"><?= $this->esc($msg['attachmentFilename']) ?></font></a>
                                 <br>
                               <?php endif; ?>
                               

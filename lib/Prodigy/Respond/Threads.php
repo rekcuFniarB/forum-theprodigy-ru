@@ -149,7 +149,13 @@ class Threads extends Respond
                     VALUES (?, ?, ?)")->
                     execute(array(time(), $ID_MEMBER, $currentboard));
             }
-            return $service->redirect("/b$currentboard/t$threadid/$Page2Show/$newMsgID");
+            
+            if ($Page2Show == 0)
+                $yySetLocation = "/b$currentboard/t$threadid/$newMsgID";
+            else
+                $yySetLocation = "/b$currentboard/t$threadid/$Page2Show/$newMsgID";
+            
+            return $service->redirect($yySetLocation);
         } // if start = new
         elseif (substr($start, 0, 3) == 'msg')
         {
@@ -1351,9 +1357,6 @@ class Threads extends Respond
                     return $this->error("$failed.<br />{$app->locale->txt['yse130b']}.");
                 }
                 
-                if (file_exists($app->conf->attachmentUploadDir . "/" . $attachment['name']))
-                    return $this->error('yse125');
-                
                 $dirSize = '0';
                 $dir = opendir($app->conf->attachmentUploadDir);
                 while ($file = readdir($dir))
@@ -1362,19 +1365,24 @@ class Threads extends Respond
                 if ($attachment['size'] + $dirSize > $app->conf->attachmentDirSizeLimit * 1024)
                     return $this->error('yse126');
                 
-                $parts = ($attachment !== null) ? preg_split("~(\\|/)~", $_FILES['attachment']['name']) : array();
-                $destName = array_pop($parts);
+                $parts = ($attachment !== null) ? preg_split("~(\\|/)~", $attachment['name']) : array();
                 
-                if (!move_uploaded_file($attachment['tmp_name'], $app->conf->attachmentUploadDir . '/' . $destName))
+                $prefix = base_convert(time(), 10, 36);
+                
+                $attachment['name'] = $prefix . '_' . array_pop($parts) ;
+                
+                if (file_exists($app->conf->attachmentUploadDir . "/" . $attachment['name']))
+                    return $this->error('yse125');
+                
+                if (!move_uploaded_file($attachment['tmp_name'], $app->conf->attachmentUploadDir . '/' . $attachment['name']))
                     return $this->error("yse124");
-                $attachment_size = $attachment['size'];
                 
-                chmod ("{$app->conf->attachmentUploadDir}/$destName",0644) || $chmod_failed = 1;
+                chmod ("{$app->conf->attachmentUploadDir}/{$attachment['name']}", 0644) || $chmod_failed = 1;
             }
             else
             {
                 $attachment['name'] = null;
-                $attachment_size = 0;
+                $attachment['size'] = 0;
             }
         } // if attachment not null
         
@@ -1403,14 +1411,12 @@ class Threads extends Respond
             if ($app->board->isAnnouncement() && $app->user->accessLevel() < 2)
                 return $this->error('announcement1');
             
-            $tmpname = $attachment['name'] == 'NULL' ? null : $attachment['name'];
-            
             if ($app->user->guest)
                 $_closeComments = 0;
             else
                 $_closeComments = (int) $app->user->closeCommentsByDefault;
             
-            $q_params = array($app->user->id, $input_subject, $input_name, $input_email, $time, $REMOTE_ADDR, $se, $input_message, $icon, $attachment_size, $tmpname, $nowListening, $multinick, $_closeComments, $agent_fp);
+            $q_params = array($app->user->id, $input_subject, $input_name, $input_email, $time, $REMOTE_ADDR, $se, $input_message, $icon, $attachment['size'], $attachment['name'], $nowListening, $multinick, $_closeComments, $agent_fp);
             $placeholders = $db->build_placeholders($q_params);
             
             $db->prepare("
@@ -1585,16 +1591,15 @@ class Threads extends Respond
                     $service->board = $movethread;
                 }
             }
-            
+            error_log("__DEBUG__: ATTACHMENT: " . var_export($attachment, true));
             // QuickReplyExtended
-            $tmpname = $attachment['name'] == 'NULL' ? null : $attachment['name'];
             //--- Unite two posts if they're last in the topic and made by the same user (by Dig7er)
             $um = false;
             // don't unite messages if we upload an attachment
-            if ($attachment['name'] == 'NULL')
+            if ($attachment['name'] == null)
             {
-                $query = $db->prepare("SELECT * FROM messages WHERE ID_TOPIC = ? ORDER BY ID_MSG DESC LIMIT 1")->
-                    execute(array($service->thread));
+                $query = $db->prepare("SELECT * FROM messages WHERE ID_TOPIC = ? ORDER BY ID_MSG DESC LIMIT 1");
+                $query->execute(array($service->thread));
                 $lastPost = $query->fetch();
                 $query = null;
                 
@@ -1607,11 +1612,12 @@ class Threads extends Respond
                     $um = true;
                 }
             }
+            
             if (!$um)
             {
                 // if not uniting messages
                 $app->user->closeCommentsByDefault = empty($app->user->closeCommentsByDefault) ? 0 : $app->user->closeCommentsByDefault;
-                $q_params = array($service->thread, $app->user->id, $input_subject, $input_name, $input_email, $time, $REMOTE_ADDR, $se, $input_message, $icon, $attachment_size, $tmpname, $nowListening, $multinick, $app->user->closeCommentsByDefault, $agent_fp);
+                $q_params = array($service->thread, $app->user->id, $input_subject, $input_name, $input_email, $time, $REMOTE_ADDR, $se, $input_message, $icon, $attachment['size'], $attachment['name'], $nowListening, $multinick, $app->user->closeCommentsByDefault, $agent_fp);
                 $placeholders = $db->build_placeholders($q_params);
                 
                 $dbrq = $db->prepare("
@@ -1716,7 +1722,12 @@ class Threads extends Respond
         //  Remove this comment and comment out the other SetLocation so that you are returned
         //  to the same thread after posting.
         if ($app->conf->returnToPost == '1')
-            $yySetLocation = "/b{$service->board}/t{$service->thread}/new/";
+        {
+            if ($newtopic)
+                $yySetLocation = "/b{$service->board}/t{$service->thread}/";
+            else
+                $yySetLocation = "/b{$service->board}/t{$service->thread}/new/";
+        }
         else
             $yySetLocation = "/b{$service->board}/";
         
