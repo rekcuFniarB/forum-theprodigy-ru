@@ -295,7 +295,7 @@
                           <?php endif; ?>
                           
                           <br />
-                          <a class="comments_link" href="<?= SITE_ROOT ?>/people/<?= $this->esc($msg['posterName']) ?>/commentsbyuser/">[Комментарии]</a>
+                          <a class="comments_link" href="<?= SITE_ROOT ?>/comments/by/<?= $this->esc($msg['posterName']) ?>/">[Комментарии]</a>
                           
                           <span class="brs"><br>
                           <br></span>

@@ -151,8 +151,8 @@
                   <?php if($this->self): /* viewing self profile */?>
                       <li><a href="<?= SITE_ROOT ?>/comments/subscribed/">к подписанным сообщениям</a></li>
                   <?php endif; ?>
-                  <li><a href="<?= SITE_ROOT ?>/people/<?= urlencode($this->meminf['memberName']) ?>/comments/subscribed/">к сообщениям <?= $this->esc($this->meminf['realName']) ?></a></li>
-                  <li><a href="<?= SITE_ROOT ?>/people/<?= urlencode($this->meminf['memberName']) ?>/comments/">с участием <?= $this->esc($this->meminf['realName']) ?></a></li>
+                  <li><a href="<?= SITE_ROOT ?>/comments/to/<?= urlencode($this->meminf['memberName']) ?>/">к сообщениям <?= $this->esc($this->meminf['realName']) ?></a></li>
+                  <li><a href="<?= SITE_ROOT ?>/comments/by/<?= urlencode($this->meminf['memberName']) ?>/">с участием <?= $this->esc($this->meminf['realName']) ?></a></li>
                 </ul>
               </font>
             </td>
