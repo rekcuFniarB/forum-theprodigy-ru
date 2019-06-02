@@ -209,6 +209,8 @@ $router->respond('GET', '/people/[:user]/', 'profile->show');
 $router->respond(array('GET', 'POST'), '/people/[:user]/modify/', 'profile->edit');
 
 $router->respond(array('GET', 'POST'), '/comments/subscribed/', 'comments->subscribed');
+$router->respond(array('GET', 'POST'), '/comments/to/[:user]/', 'comments->commentsTo');
+$router->respond(array('GET', 'POST'), '/comments/by/[:user]/', 'comments->commentsBy');
 
 $router->respond('GET', '/example/', 'main->example');
 //$router->respond('GET', '/example/', 'main->example2');

@@ -74,7 +74,7 @@ class Comments extends Respond
         $this->clearNotifications($app->user->id);
         
         $data = array(
-            'title' => 'Последние комментарии к подписанным сообщениям других форумчан',
+            'title' => 'Комментарии, на которые ты подписан',
             'ubbc' => $app->conf->enable_ubbc,
             'notification' => $app->conf->enable_notification,
             'username' => $app->user->name,
@@ -131,6 +131,81 @@ class Comments extends Respond
         $this->addJS('ubbc.js');
         return $this->render('templates/comments/subscribed.template.php', $data);
     } // subscribed()
+    
+    public function commentsTo($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->txt[1]);
+        
+        $app->board->load(-1);
+        
+        $POST = $request->paramsPost();
+        
+        $messageNumber = (int) $POST->viewscount;
+        if ($messageNumber < 1)
+            $messageNumber = 10;
+        
+        // User, comments addressed to
+        $user = $app->user->loadDisplay($request->paramsNamed()->get('user'));
+        
+        if (!$user['found'])
+            return $this->error($app->locale->txt[40]);
+        
+        if ($app->user->inIgnore($user['name']))
+            return $this->error($app->locale->txt['ignore_user1']);
+        
+        $db_prefix = $app->db->prefix;
+        
+        // set to 0 number of unread comments left by other users under your messages
+        if ($user == $app->user->name)
+            $app->db->query("UPDATE {$db_prefix}log_topics SET unreadComments = 0 WHERE ID_MEMBER={$app->user->id}");
+        
+        $data = array(
+            'title' => "Последние комментарии к сообщениям {$user['realName']}",
+            'ubbc' => $app->conf->enable_ubbc,
+            'notification' => $app->conf->enable_notification,
+            'username' => $user['name'],
+            'realname' => $user['realName'],
+            'messageNumber' => $messageNumber,
+            'messages' => array()
+        );
+        
+        $permit = 0;
+        if ($app->user->isStaff())
+            $permit = 1;
+        
+        $dbst = $app->db->prepare("
+            SELECT m.*,t.numReplies,c.memberGroups,c.name as cname,b.name as bname,b.ID_BOARD,m.comments COMMENTS,m.ID_MSG ID_MSG,IFNULL(mem.blockComments,0) AS blockComments,m.closeComments,m.ID_MEMBER, cs.notify
+            FROM {$db_prefix}messages as m
+            JOIN {$db_prefix}topics as t ON (m.ID_TOPIC=t.ID_TOPIC)
+            JOIN {$db_prefix}boards as b ON (t.ID_BOARD=b.ID_BOARD)
+            JOIN {$db_prefix}categories as c ON (b.ID_CAT=c.ID_CAT)
+            LEFT JOIN {$db_prefix}members as mem ON (mem.ID_MEMBER=m.ID_MEMBER)
+            LEFT JOIN {$db_prefix}comment_subscriptions AS cs ON (m.ID_MSG = cs.messageID AND cs.memberID = ?)
+            WHERE m.ID_MEMBER=?
+                AND (FIND_IN_SET(?,c.memberGroups) != 0 || $permit || c.memberGroups='')
+                AND m.comments <> ''
+                AND m.last_comment_time IS NOT NULL
+            ORDER BY m.last_comment_time DESC LIMIT $messageNumber");
+        
+        $dbst->execute(array($app->user->id, $user['ID_MEMBER'], $app->user->group));
+        
+        while ($row = $dbst->fetch())
+        {
+            if ($app->user->inIgnore($row['posterName']))
+                continue;
+            $row['body'] = $app->subs->censorTxt($row['body']);
+            $row['subject'] = $app->subs->censorTxt($row['subject']);
+            $row['comments'] = $this->prepare($row['comments'], $row['posterName'], $row['notify']);
+            $row['posterTime'] = $app->subs->timeformat($row['posterTime']);
+            $row['cmnt_display'] = $row['closeComments'] == 1 ? 'none' : 'inline';
+            $data['messages'][] = $row;
+        }
+        $dbst = null; // closing this statement
+        
+        $this->addJS('ubbc.js');
+        return $this->render('templates/comments/subscribed.template.php', $data);
+    }
     
     /**
      * Clears the list of notifications for new message comments for the user.
