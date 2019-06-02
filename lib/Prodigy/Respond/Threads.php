@@ -1329,13 +1329,13 @@ class Threads extends Respond
         $FILES = $request->files();
         // replace as much special characters as possible and remove all other characters
         $attachment = $FILES->get('attachment');
-        if ($attachment !== null)
+        error_log('__ATTACHMENT__: ' . var_export($attachment, true));
+        if (!empty($attachment))
         {
             $attachment['name'] = preg_replace(
                 array("/\s/", "/[äåãâáà]/", "/[ÄÅÁÂÀÃ]/", "/[öòóôõøð]/", "/[ÖØÔÒÔÕ]/", "/[éèêë]/", "/[ÉÊËÈ]/", "/ [ûüùú]/", "/[ÜÛÚÙ]/", "/[ïîìí]/", "/[ÍÎÏ]/", "/[ç]/", "/[ñ]/",	"/[Ñ]/", "/[^\w_.-]/"),
                 array('_', 'a', 'A', 'o', 'O', 'e', 'E', 'u', 'U', 'i', 'I', 'c', 'n', 'N', ''),
                 $attachment['name']);
-            $FILES->set('attachment', $attachment);
             
             if ($attachment['name'] != '' && $app->conf->attachmentEnable > 0 && ($app->conf->attachmentMemberGroups == "" || in_array($app->user->group, explode(',', trim($app->conf->attachmentMemberGroups))) || $app->user->accessLevel() > 2))
             {
@@ -1385,6 +1385,8 @@ class Threads extends Respond
                 $attachment['size'] = 0;
             }
         } // if attachment not null
+        else
+            $attachment = array('name' => null, 'size' => 0);
         
         // If no thread specified, this is a new thread.
         // Find a valid random ID for it.
@@ -1399,7 +1401,7 @@ class Threads extends Respond
         $agent_fp[] = ($POST->get('bfp') === null) ? 'none' : $POST->get('bfp');
         $agent_fp = implode(' #|# ', $agent_fp);
         
-        $nowListening = $POST->get('nowListening');
+        $nowListening = $POST->get('nowListening', '');
         $icon = $POST->get('icon');
         $quickPollTitle = $POST->get('quickPoll');
                 
@@ -1520,7 +1522,8 @@ class Threads extends Respond
                         $dbrq = $db->prepare("
                             SELECT locked
                             FROM {$db_prefix}topics
-                            WHERE ID_TOPIC=?")->execute(array($service->thread));
+                            WHERE ID_TOPIC=?");
+                        $dbrq->execute(array($service->thread));
                         $row = $dbrq->fetchColumn();
                         $dbrq = null;
                         
@@ -1559,11 +1562,13 @@ class Threads extends Respond
                 }
                 
                 $movethread = $POST->get('movethread'); // new board where thread is moving to
-                
-                if ($movethread != '' && substr($movethread, 0, 1) != '#' && $movethread != $service->board)
+                error_log("__DEBUG__: MOVETHREAD: " . var_export($movethread, true));
+                if (!empty($movethread) && substr($movethread, 0, 1) != '#' && $movethread != $service->board)
                 {
+                    error_log("__DEBUG__: MOVETHREAD: YES" . var_export($movethread));
                     $dbrq = $db->prepare("
-                        SELECT numReplies, ID_BOARD FROM {$db_prefix}topics WHERE ID_TOPIC=?")->execute(array($service->thread));
+                        SELECT numReplies, ID_BOARD FROM {$db_prefix}topics WHERE ID_TOPIC=?");
+                    $dbrq->execute(array($service->thread));
                     $row = $dbrq->fetch(\PDO::FETCH_NUM);
                     $dbrq = null;
                     $numReplies = $row[0]+1;

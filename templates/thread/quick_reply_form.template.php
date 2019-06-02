@@ -7,7 +7,7 @@
         </tr>
         <tr>
           <td width="85%" valign="top" align="center" class="windowbg">
-            <form method="post" action="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/post/" name="postmodify" onSubmit="submitonce(this);">
+            <form method="post" action="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/reply/" name="postmodify" onSubmit="submitonce(this);">
               <br>
               <?php if($this->quickReplyExtendedForm): ?>
                 <table border=0 width="100%" cellpadding="3" class="quick-reply-form-moderator-actions">
@@ -34,9 +34,9 @@
                         <option value="">-----------------------------</option>
                         <?php foreach($jumpcat['boards'] as $jumpboardid => $jumpboard): ?>
                           <?php if($jumpboard['current']): ?>
-                            <option value="b<?= $jumpboardid ?>/" selected="selected"> =><?= $this->esc($jumpboard['name']) ?></option>
+                            <option value="<?= $jumpboardid ?>" selected="selected"> =><?= $this->esc($jumpboard['name']) ?></option>
                           <?php else: ?>
-                            <option value="b<?= $jumpboardid ?>/"> =><?= $this->esc($jumpboard['name']) ?></option>
+                            <option value="<?= $jumpboardid ?>"> =><?= $this->esc($jumpboard['name']) ?></option>
                           <?php endif; ?>
                         <?php endforeach; ?>
                       <?php endforeach; ?>
@@ -54,10 +54,10 @@
                 </table>
               <?php endif; /* extended form */ ?>
               
-              <input type="hidden" name="naztem" value="$subject" />
+              <input type="hidden" name="naztem" value="<?= $this->esc($this->title) ?>" />
               <input type="hidden" name="serial" value="<?= $this->conf->serial ?>" />
               <input type="hidden" name="icon" value="xx" />
-              <input type="hidden" name="sc" value="<?= $this->app->session->id ?>" />
+              <input type="hidden" name="sc" value="<?= $this->sessionid ?>" />
                 
               <table id="quick-reply-form-block" width="100%" border="0" height="150" align="center" cellpadding="0" cellspacing="0">
                 <tbody align="left" valign="bottom">
