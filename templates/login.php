@@ -25,7 +25,7 @@
                     </td>
                     <td class="windowbg" bgcolor="<?= $this->conf->color['windowbg'] ?>">
                       <font size="2">
-                        <input type="text" name="user" size="20" value="<?= $this->get('inputuser') ?>">
+                        <input type="text" name="user" size="20" value="<?= $this->esc($this->inputuser) ?>">
                       </font>
                     </td>
                   </tr>

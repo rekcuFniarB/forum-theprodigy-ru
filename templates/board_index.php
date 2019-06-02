@@ -15,7 +15,7 @@
           <?php if ($this->conf->showlatestmember == 1 && $this->conf->enableSP1Info != 1): ?>
             <br>
             <font size="2">
-              <?= $this->app->locale->txt[201] ?> <a href="<?= SITE_ROOT ?>/people/<?= urlencode($this->thelatestmember) ?>/"><b><?= $this->get('thelatestrealname') ?></b></a>, <?= $this->locale->txt[581] ?>.
+              <?= $this->app->locale->txt[201] ?> <a href="<?= SITE_ROOT ?>/people/<?= urlencode($this->thelatestmember) ?>/"><b><?= $this->esc($this->thelatestrealname) ?></b></a>, <?= $this->locale->txt[581] ?>.
             </font>
           <?php endif; ?>
         </td>
@@ -256,7 +256,7 @@
                       <td>
                         <font size="1">
                           <?= $this->locale->txt(94) ?> <?= $this->locale->txt(19) ?>: <b><a href="<?= SITE_ROOT ?>/allmypeople/"><?= $this->memcount ?></a></b><br>
-                          <?= $this->locale->txt[656] ?> <b><a href="<?= SITE_ROOT ?>/people/profile/<?= urlencode($this->thelatestmembe) ?>/"><?= $this->get('thelatestrealname') ?></a></b>
+                          <?= $this->locale->txt[656] ?> <b><a href="<?= SITE_ROOT ?>/people/profile/<?= urlencode($this->thelatestmembe) ?>/"><?= $this->esc($this->thelatestrealname) ?></a></b>
                           <?= $this->thelatestmember2 ?><br>
                           <?php if ($this->user->name != 'Guest'): ?>
                             <?= $this->locale->txt('yse199') ?>: <b><a href="<?= SITE_ROOT ?>/im/"><?= $this->imcount[0] ?></a></b><?= $this->locale->newmessages3 ?>: <b><a href="<?= SITE_ROOT ?>/im/"><?= $this->imcount[1] ?></a></b>

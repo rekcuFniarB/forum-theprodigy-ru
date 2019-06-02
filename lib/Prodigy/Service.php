@@ -29,30 +29,16 @@ class Service extends \Klein\ServiceProvider
     }
     
     /**
-     * Access shared data by dot notation (e.g. $this->getval('user.name'))
-     * WARNING: don't pass user input here.
-     * @param string $query  query string, e.g. "user.name".
+     * Look for stored key, escape and return corresponding value.
+     * @param string $key key to look for. WARNING: don't pass variables here, it's insecure.
+     * @return string
      */
-    public function getval($query) {
-        if (strpos($query, '.') !== false) {
-            $keys = explode('.', $query);
-            foreach ($keys as $i => $key) {
-                if ($i == 0){
-                    $data = $this->shared_data->get($keys[0]);
-                    continue;
-                }
-                
-                if (is_array($data) && array_key_exists($key, $data))
-                    $data = $data[$key];
-                elseif(is_object($data) && isset($data->$key))
-                    $data = $data->$key;
-                else
-                    return $data;
-            }
-            return $data;
-        } else {
-            return $this->shared_data->get($query);
-        }
+    
+    public function get($key)
+    {
+        if ($this->shared_data->exists($key))
+            $val = $this->shared_data->get($key);
+        return $this->esc($val);
     }
     
     /**
@@ -74,9 +60,6 @@ class Service extends \Klein\ServiceProvider
                 $charset = 'UTF-8';
         }
         
-        if ($this->shared_data->exists($string))
-            $string = $this->shared_data->get($string);
-        
         $string = str_replace(array('<br />', '<br>'), "\n", $string);
         return htmlspecialchars($string, ENT_COMPAT, $charset, false);
     } // escape
@@ -91,21 +74,7 @@ class Service extends \Klein\ServiceProvider
         $string = preg_replace('/\s/', '', trim($string));
         return $this->esc($string, $charset);
     }
-    
-    /**
-     * Escaped getval wrapper e.g. esc(getval()).
-     * WARNING: don't pass user input here.
-     * @param  string $query    same as in $this->getval()
-     * @param  string $charset  charset, same as in $this->esc()
-     * @return string
-     */
-    public function get($query, $charset = null) {
-        $string = $this->getval($query);
-        if(is_null($string))
-            $string = $query;
-        return $this->esc($string, $charset);
-    }
-    
+        
     /**
      * This is $this->partial() wrapper allowing to cache first call output
      * and then just print already rendered part from cache.

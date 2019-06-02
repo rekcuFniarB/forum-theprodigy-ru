@@ -1,7 +1,7 @@
 <div class="error-page">
-  <h1 class="titlebg"><?= $this->get('title') ?></h1>
+  <h1 class="titlebg"><?= $this->esc($this->title) ?></h1>
   <article class="windowbg2">
-    <div class="article-content error-msg"><?= $this->get('message') ?></div><br>
+    <div class="article-content error-msg"><?= $this->esc($this->message) ?></div><br>
     <div class="error-backtrace">
       <?php foreach ($this->backtrace as $n => $bt): ?>
           <span><?= $n ?></span> <span>

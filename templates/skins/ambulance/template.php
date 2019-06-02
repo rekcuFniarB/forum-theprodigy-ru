@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<HTML><HEAD><TITLE><?= $this->get('title') ?></TITLE>
+<HTML><HEAD><TITLE><?= $this->esc($this->title) ?></TITLE>
 <meta charset="windows-1251">
 <META name=Description content="TheProdigy.ru - эксклюзивный сайт, посвященный легендарной британской команде The Prodigy. Полная и достоверная информация о группе и свежие новости. Аудио файлы для скачивания.">
 <META content="Prodigy, The Prodigy, Продиджи, новый трэк Prodigy, Baby's got a temper, baby got a temper, Prodigy, audio, Prodigy mp3, Always Outnumbered, Never Outgunned, BGAT, Prodigy single, Prodigy forum, Prodigy audio, The Prodigy, Prodigy, новая песня Prodigy" name=Keywords>

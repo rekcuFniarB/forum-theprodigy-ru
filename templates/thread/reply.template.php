@@ -6,11 +6,11 @@
                 <?php if($this->conf->enableInlineLinks): ?>
                   <font size="1">
                     <b><a href="<?= SITE_ROOT ?>/" class="nav"><?= $this->esc($this->conf->mbname) ?></a></b>&nbsp;|&nbsp;<!--
-                    --><b><a href="<?= SITE_ROOT ?>/#<?= $this->cat ?>" class="nav"><?= $this->esc('catname') ?></a></b>&nbsp;|&nbsp;<!--
-                    --><b><a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->esc('boardname') ?></a></b>&nbsp;|&nbsp;<!--
-                    --><b><?= $this->esc('title') ?>
+                    --><b><a href="<?= SITE_ROOT ?>/#<?= $this->cat ?>" class="nav"><?= $this->esc($this->catname) ?></a></b>&nbsp;|&nbsp;<!--
+                    --><b><a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->esc($this->boardname) ?></a></b>&nbsp;|&nbsp;<!--
+                    --><b><?= $this->esc($this->title) ?>
                     <?php if(isset($this->sub)): ?>
-                        ( <?= $this->esc('sub') ?> )
+                        ( <?= $this->esc($this->sub) ?> )
                     <?php endif; ?>
                     </b>
                   </font>
@@ -18,9 +18,9 @@
                   <font size="2">
                     <b>
                       <img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="" />&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/" class="nav"><?= $this->esc($this->conf->mbname) ?></a><br />
-                      <img src="<?= $this->conf->imagesdir ?>/tline.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/#<?= $this->cat ?>" class="nav"><?= $this->esc('catname') ?></a><br />
-                      <img src="<?= $this->conf->imagesdir ?>/tline2.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->esc('boardname') ?></a><br />
-                      <img src="<?= $this->conf->imagesdir ?>/tline3.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<?= $this->esc('title') ?> ( <?=$this->esc('sub') ?> )
+                      <img src="<?= $this->conf->imagesdir ?>/tline.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/#<?= $this->cat ?>" class="nav"><?= $this->esc($this->catname) ?></a><br />
+                      <img src="<?= $this->conf->imagesdir ?>/tline2.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->esc($this->boardname) ?></a><br />
+                      <img src="<?= $this->conf->imagesdir ?>/tline3.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<?= $this->esc($this->title) ?> ( <?=$this->esc($this->sub) ?> )
                     </b>
                   </font>
                 <?php endif; ?>
@@ -70,7 +70,7 @@
                       </td>
                       <td>
                         <font size="2">
-                          <input type="text" name="email" size="25" value="<?= $this->get('guestemail') ?>">
+                          <input type="text" name="email" size="25" value="<?= $this->esc($this->guestemail) ?>">
                         </font>
                       </td>
                     </tr>
@@ -85,7 +85,7 @@
                       <td>
                         <input type="hidden" name="serial" value="<?= $this->conf->serial ?>">
                         <font size="2">
-                          <input type="text" name="naztem" value="<?= $this->get('form_subject') ?>" size="40" maxlength="80">
+                          <input type="text" name="naztem" value="<?= $this->esc($this->form_subject) ?>" size="40" maxlength="80">
                         </font>
                       </td>
                     </tr>
@@ -98,8 +98,8 @@
                       <td>
                         <select name="icon" onchange="showimage()">
                           <?php if(!empty($this->icon)): ?>
-                              <option value="<?= $this->esc('icon') ?>"><?= $this->locale->txt[112] ?></option>
-                              <option value="<?= $this->esc('icon') ?>">------------</option>
+                              <option value="<?= $this->esc($this->icon) ?>"><?= $this->locale->txt[112] ?></option>
+                              <option value="<?= $this->esc($this->icon) ?>">------------</option>
                           <?php endif; ?>
                           <option value="xx"><?= $this->locale->txt[281] ?></option>
                           <option value="thumbup"><?= $this->locale->txt[282] ?></option>
@@ -115,7 +115,7 @@
                           <option value="wink"><?= $this->locale->txt[292] ?></option>
                         </select>
                         <?php if(!empty($this->icon)): ?>
-                          <img src="<?= $this->conf->imagesdir ?>/<?= $this->esc('icon') ?>.gif" name="icons" border="0" hspace="15" alt="">
+                          <img src="<?= $this->conf->imagesdir ?>/<?= $this->esc($this->icon) ?>.gif" name="icons" border="0" hspace="15" alt="">
                         <?php else: ?>
                           <img src="<?= $this->conf->imagesdir ?>/xx.gif" name="icons" border="0" hspace="15" alt="">
                         <?php endif; ?>
@@ -269,7 +269,7 @@
                             <br><br>
                           </td>
                           <td>
-                            <input type="hidden" name="attachOld" value="<?= $this->esc('attachmentFilename') ?>">
+                            <input type="hidden" name="attachOld" value="<?= $this->esc($this->attachmentFilename) ?>">
                             <input type="checkbox" name="delAttach" value="on">
                             <font size="1"><?= $this->locale->yse130 ?></font>
                             <br><br>

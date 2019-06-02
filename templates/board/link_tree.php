@@ -7,9 +7,9 @@
       <?php endif; ?>
       
       <?php if($this->conf->enableInlineLinks): ?>
-        <b><a href="<?= SITE_ROOT ?>/#<?= $this->currcat ?>" class="nav"><?= $this->get('catname') ?></a> </b>&nbsp;|&nbsp; 
+        <b><a href="<?= SITE_ROOT ?>/#<?= $this->currcat ?>" class="nav"><?= $this->esc($this->catname) ?></a> </b>&nbsp;|&nbsp; 
       <?php else: ?>
-        <img src="<?= $this->conf->imagesdir ?>/tline.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="" />&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/#<?= $this->currcat ?>" class="nav"><?= $this->get('catname') ?></a><br>
+        <img src="<?= $this->conf->imagesdir ?>/tline.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="" />&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/#<?= $this->currcat ?>" class="nav"><?= $this->esc($this->catname) ?></a><br>
       <?php endif; ?>
       
       <?php if($this->conf->enableInlineLinks): ?>

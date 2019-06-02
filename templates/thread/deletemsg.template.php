@@ -1,5 +1,5 @@
         <h2><?= $this->title ?></h2>
-        <h3><a href="<?= SITE_ROOT ?>/<?= $this->msgid ?>/"><?= $this->esc('subject') ?></a></h3>
+        <h3><a href="<?= SITE_ROOT ?>/<?= $this->msgid ?>/"><?= $this->esc($this->subject) ?></a></h3>
         <div><?= $this->doUBBC($this->body) ?></div>
         
         

@@ -19,7 +19,7 @@
               <table cellpadding="3" cellspacing="0" width="100%">
                 <tr>
                   <td class="bdescrip" width="100%">
-                    <font size="1"><?= $this->get('bdescrip') ?></font>
+                    <font size="1"><?= $this->esc($this->bdescrip) ?></font>
                   </td>
                 </tr>
               </table>
@@ -67,7 +67,7 @@
                   
                   <td class="sphinx-search-topic-form">
                     <form method="POST" action="<?= SITE_ROOT ?>/b<?= $this->board ?>/all/" onsubmit="if (this.elements[0].value == '') this.elements[1].value = 'notAll'" style="margin: 0px; padding: 0px;">
-                      <input type="text" name="search" value="<?= $this->get('search') ?>" placeholder="<?php
+                      <input type="text" name="search" value="<?= $this->esc($this->search) ?>" placeholder="<?php
                       switch ($this->board) {
                         case 2: echo "Поиск новости, статьи или интервью"; break;
                         case 4: echo "Поиск опроса"; break;
@@ -193,7 +193,7 @@
         <tr>
           <td class="windowbg" valign="middle" width="100%" bgcolor="<?= $this->conf->color['windowbg'] ?>" colspan="8" align="center" style="height: 75px;">
             <font size="2">
-              <b>Ни одной темы не найдено <?= !empty($this->search) ? ' по запросу ' . $this->get('search') : '' ?></b>
+              <b>Ни одной темы не найдено <?= !empty($this->search) ? ' по запросу ' . $this->esc($this->search) : '' ?></b>
             </font>
           </td>
         </tr>

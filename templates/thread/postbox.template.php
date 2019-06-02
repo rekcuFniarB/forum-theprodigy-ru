@@ -194,7 +194,7 @@
                   <td valign=top align="right"><font size="2"><b><?= $this->locale->txt[72] ?>:</b></font></td>
               <?php endif; ?>
                   <td>
-                    <textarea class="editor" name="message" id="messagebody" rows="20" cols="120" onselect="javascript:storeCaret(this);" onclick="javascript:storeCaret(this);" onkeyup="javascript:storeCaret(this);" onchange="javascript:storeCaret(this);"><?= $this->get('form_message') ?></textarea>
+                    <textarea class="editor" name="message" id="messagebody" rows="20" cols="120" onselect="javascript:storeCaret(this);" onclick="javascript:storeCaret(this);" onkeyup="javascript:storeCaret(this);" onchange="javascript:storeCaret(this);"><?= $this->esc($this->form_message) ?></textarea>
                     <a href="javascript: tinyMCE.execCommand('mceToggleEditor', false, 'messagebody');void(0);">¬ключить режим WYSIWYG</a>
                   </td>
                 </tr>

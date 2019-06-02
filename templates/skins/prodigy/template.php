@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title><?= $this->get('title') ?></title>
+<title><?= $this->esc($this->title) ?></title>
 <meta charset="windows-1251">
 <?php if(isset($GLOBALS['opengraph'])): ?>
   <meta name="twitter:card" content="summary" />
