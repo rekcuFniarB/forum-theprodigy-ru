@@ -1762,7 +1762,7 @@ $txt['nowListening4'] = 'Text to display (ubbc code enabled)';
 $txt['nowListening5'] = 'Now listening to';
 
 //Ignore User mod
-$txt['ignore_user1'] = '<< You Have Blocked This Message >>';
+$txt['ignore_user1'] = 'You are ignoring this user';
 
 $txt['jsvalidate1'] = 'The Subject field or the Message Body was not filled out. It is required.';
 $txt['jsvalidate2'] = 'The Subject field, the Message Body, or Recipient field was not filled out. It is required.';

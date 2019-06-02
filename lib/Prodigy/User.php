@@ -667,13 +667,6 @@ class User {
             $id = $this->id;
         }
         
-        // search in static predefined ignore list in Config.php
-        $predefined = $this->app->conf->forced_ignore;
-        if (is_null($predefined)) $predefined = array();
-        if (isset($predefined[$id]) && in_array($member, $predefined[$id])) {
-            return true;
-        }
-        
         $imember = intval($member);
         if ($imember > 0) {
             // get member by id
@@ -685,6 +678,7 @@ class User {
         }
         
         $ignorelist = $this->getIgnoreList($id);
+        $member = strtolower($member);
         return in_array($member, $ignorelist);
     } // inIgnore()
     
@@ -703,6 +697,9 @@ class User {
         }
         
         $ignore = array();
+        $predefined = $this->app->conf->forced_ignore;
+        if ($predefined == null)
+            $predefined = array();
         
         if ($id != $this->id || null === $this->_ignores) {
             $dbst = $this->app->db->prepare("SELECT im_ignore_list FROM {$this->app->db->prefix}members WHERE ID_MEMBER=?");
@@ -710,7 +707,15 @@ class User {
             $ignore = explode(',', $dbst->fetchColumn());
             $dbst = null;
             foreach ($ignore as $key => $value) {
-                $ignore[$key] = trim($value);
+                $ignore[$key] = strtolower(trim($value));
+            }
+            
+            // prepare predefined ignore list
+            if (isset($predefined[$id]) && is_array($predefined[$id])) {
+                $predefined[$id] = array_map(
+                    function($val){ return strtolower($val);}, $predefined[$id]
+                );
+                $ignore = array_merge($ignore, $predefined[$id]);
             }
             
             if ($id == $this->id && null === $this->_ignores) { // FIXME
