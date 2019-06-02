@@ -625,6 +625,7 @@
                     <?php endif; ?>
                   <?php endif; ?>
                   
+                  <hr width="100%" size="1" />
                   <?php  $this->_partial('templates/comments/comments.template.php', array('msgid' => $msgid, 'msg' => $msg));  ?>
                 </td>
               </tr>

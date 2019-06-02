@@ -423,7 +423,7 @@ class Threads extends Respond
         
         if (count($messages))
             $dbrq = $db->query("
-                SELECT m.ID_MSG, m.subject, m.posterName, m.posterEmail, m.posterTime, m.ID_MEMBER, m.icon, m.posterIP, m.body, m.smiliesEnabled, m.modifiedTime, m.modifiedName, m.attachmentFilename, m.attachmentSize, m.nowListening, m.multinick, IFNULL(mem.realName, m.posterName) AS posterDisplayName, IFNULL(lo.logTime, 0) AS isOnline, m.comments, mem.blockComments POST_COMMENTS_BLOCKED, m.closeComments CLOSED_COMMENTS, m.agent, qpolls.POLL_TITLE, cs.notify
+                SELECT m.ID_MSG, m.subject, m.posterName, m.posterEmail, m.posterTime, m.ID_MEMBER, m.icon, m.posterIP, m.body, m.smiliesEnabled, m.modifiedTime, m.modifiedName, m.attachmentFilename, m.attachmentSize, m.nowListening, m.multinick, IFNULL(mem.realName, m.posterName) AS posterDisplayName, IFNULL(lo.logTime, 0) AS isOnline, m.comments, mem.blockComments POST_COMMENTS_BLOCKED, m.closeComments, m.agent, qpolls.POLL_TITLE, cs.notify
                 FROM {$db->db_prefix}messages AS m
                 LEFT JOIN {$db->db_prefix}members AS mem ON (mem.ID_MEMBER=m.ID_MEMBER)
                 LEFT JOIN {$db->db_prefix}log_online AS lo ON (lo.identity=mem.ID_MEMBER)
@@ -597,7 +597,7 @@ class Threads extends Respond
                 $app->conf->mediaplayer = true;
             }
 
-            $message['cmnt_display'] = $message['CLOSED_COMMENTS'] == 1 ? 'none' : 'inline';
+            $message['cmnt_display'] = $message['closeComments'] == 1 ? 'none' : 'inline';
             $message['comments'] = $app->comments->prepare($message['comments'], $message['posterName'], $message['notify']);
                         
             $message['agent'] = explode(' #|# ', $message['agent']);

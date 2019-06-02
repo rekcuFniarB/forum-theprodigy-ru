@@ -208,6 +208,8 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/delete/', 'threa
 $router->respond('GET', '/people/[:user]/', 'profile->show');
 $router->respond(array('GET', 'POST'), '/people/[:user]/modify/', 'profile->edit');
 
+$router->respond(array('GET', 'POST'), '/comments/subscribed/', 'comments->subscribed');
+
 $router->respond('GET', '/example/', 'main->example');
 //$router->respond('GET', '/example/', 'main->example2');
 $router->respond('GET', '/test/', 'main->testResponse');

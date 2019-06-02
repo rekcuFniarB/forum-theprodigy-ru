@@ -24,8 +24,6 @@
                     <?php $this->end_cache(); ?>
 
                   <?php if($this->user->showComments == 1 or $this->user->name == "Guest"): ?>
-                    <hr width="100%" size="1" />
-                    
                     <div id="comments<?= $msgid ?>" class="comments">
                       <?php $this->get_cache('post_comments_format'); ?>
                     </div>
@@ -42,7 +40,7 @@
                           <input id="commentBtn<?= $msgid ?>" type="submit" value="&#8629;" style="display: <?= $msg['cmnt_display'] ?>;" />
                         </div>
                         
-                        <?php if($msg['CLOSED_COMMENTS'] == 1): ?>
+                        <?php if($msg['closeComments'] == 1): ?>
                             <?php if($this->user->accessLevel() > 1 or ($this->user->id == $msg['ID_MEMBER'] && $this->user->id != -1)): ?>
                                 <div class="commentLockBtn">
                                   <a href="javascript: lockUnlock(<?= $msgid ?>, <?= $this->board ?>); void(0);"><img src="<?= STATIC_ROOT ?>/img/YaBBImages/lock_closed.png" alt="закрыть/открыть комментирование" border="0" title="закрыть/открыть комментирование" id="lock<?= $msgid ?>" width="18" height="18"/></a>
@@ -77,7 +75,6 @@
                     <?php endif; /* non guest */ ?>
                       
                   <?php else: /* hidden comments */ ?>
-                    <hr width="100%" size="1" />
                     <div> <!-- comments|subscribe buttons -->
                       <a href="javascript: Forum.Utils.MessageCommentsForm.showHide(<?= $msgid ?>);" class="msgCommentBtn">комментариев (<?= $msg['comments']['comment_count'] ?>)</a>
                       <?= $this->menusep ?>
@@ -103,7 +100,7 @@
                         <div>
                           <input id="commentBtn<?= $msgid ?>" type="submit" value="&#8629;" style="display: <?= $msg['cmnt_display'] ?>;" />
                         </div>
-                          <?php if($msg['CLOSED_COMMENTS'] == 1): ?>
+                          <?php if($msg['closeComments'] == 1): ?>
                               <?php if($this->user->accessLevel() > 1 or ($this->user->id == $msg['ID_MEMBER'] && $this->user->id != -1)): ?>
                                   <div class="commentLockBtn">
                                     <a href="javascript: lockUnlock(<?= $msgid ?>, <?= $this->board ?>); void(0);"><img src="<?= STATIC_ROOT ?>/img/YaBBImages/lock_closed.png" alt="закрыть/открыть комментирование" title="закрыть/открыть комментирование" border="0" id="lock<?= $msgid ?>" width="18" height="18"/></a>
