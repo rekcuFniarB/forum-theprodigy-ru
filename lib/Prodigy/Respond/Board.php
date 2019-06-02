@@ -220,7 +220,7 @@ class Board extends Respond
         if (!$isAnnouncement || $user->accessLevel() > 1)
         {
             if ($app->user->allowedToReply($user->id)) {
-                $buttonArray[] = "<a href=\"$site_root/b{$this->board}/post/?title=" . urlencode($app->locale->txt[464]) . "\"><font size=\"1\" class=\"imgcatbg\">{$app->locale->img['newthread']}</font></a>";
+                $buttonArray[] = "<a href=\"$site_root/b{$this->board}/post/\"><font size=\"1\" class=\"imgcatbg\">{$app->locale->img['newthread']}</font></a>";
                 if ($canPostPoll)
                     $buttonArray[] =  "<a href=\"$site_root/b{$this->board}/postpoll/\"><font size=\"1\" class=\"imgcatbg\">{$app->locale->img['newpoll']}</font></a>";
             }

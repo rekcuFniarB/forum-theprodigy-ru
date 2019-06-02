@@ -8,7 +8,11 @@
                     <b><a href="<?= SITE_ROOT ?>/" class="nav"><?= $this->esc($this->conf->mbname) ?></a></b>&nbsp;|&nbsp;<!--
                     --><b><a href="<?= SITE_ROOT ?>/#<?= $this->cat ?>" class="nav"><?= $this->esc('catname') ?></a></b>&nbsp;|&nbsp;<!--
                     --><b><a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->esc('boardname') ?></a></b>&nbsp;|&nbsp;<!--
-                    --><b><?= $this->esc('title') ?> ( <?= $this->esc('sub') ?> )</b>
+                    --><b><?= $this->esc('title') ?>
+                    <?php if(isset($this->sub)): ?>
+                        ( <?= $this->esc('sub') ?> )
+                    <?php endif; ?>
+                    </b>
                   </font>
                 <?php else: ?>
                   <font size="2">

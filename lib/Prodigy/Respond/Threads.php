@@ -277,7 +277,7 @@ class Threads extends Respond
         $service->start = $start;
         
         $maxmessagedisplay = ($start === 'all' ? $mreplies + 1 : $app->conf->maxmessagedisplay);
-        error_log("__DEBUG__: STARTNUM: $start, $maxmessagedisplay,". $app->conf->maxmessagedisplay);
+        
         if ($app->conf->compactTopicPagesEnable == 0)
         {
             $tmpa = $start - $maxmessagedisplay;
@@ -342,7 +342,7 @@ class Threads extends Respond
                 $pageindex .= '<a class="navPages" href="' . SITE_ROOT . "/b$currentboard/t$threadid/$tmpMaxPages/\">$tmpPage</a> ";
             }
         } // building pageindex
-        error_log("__DEBUG__: STARTNUM: $start, $maxmessagedisplay");
+        
         // view all mod
         if ($maxmessagedisplay < $mreplies + 1)
             $pageindex .= '<a class="navPages" href="' . SITE_ROOT . "/b$currentboard/t$threadid/all/\">{$app->locale->txt[190]}</a> ";
@@ -676,6 +676,12 @@ class Threads extends Respond
         return $this->service->redirect($new_uri);
     } // findBoard()
     
+    public function newThread($request, $response, $service, $app)
+    {
+        $service->action = 'newthread';
+        return $this->reply($request, $response, $service, $app);
+    }
+    
     public function reply($request, $response, $service, $app)
     {
         $GET = $request->paramsGet();
@@ -692,7 +698,7 @@ class Threads extends Respond
         
         $service->cValue=(((date('YmdH')%113)*107)%113)+113;
         
-        if ($app->user->name == 'Guest')
+        if ($app->user->guest)
         {
             if ($app->conf->enable_guestposting)
             {
@@ -757,13 +763,14 @@ class Threads extends Respond
             else
             {
                 $requestBlog = $app->db->prepare("SELECT ID_TOPIC FROM {$db_prefix}topics WHERE ID_BOARD=? AND ID_MEMBER_STARTED=?");
+                $requestBlog->execute(array($service->board, $app->user->id));
                 if (!$requestBlog->fetchColumn())
                     return $this->error($app->locale->blogmod13);
                 $requestBlog = null;
             }
         }
         
-        if ($service->thread != '')
+        if (!empty($service->thread))
         {
             $dbrq = $app->db->prepare("SELECT * FROM {$db_prefix}topics WHERE ID_TOPIC=?");
             $dbrq->execute(array($service->thread));
@@ -794,8 +801,8 @@ class Threads extends Respond
         $service->board = $bcinfo['bid'];
         $service->boardname = $bcinfo['bname'];
         
-        if ($bcinfo['isAnnouncement'] && $service->thread == '' && $app->user->accessLevel() < 2)
-            return $app->errors->abort('', $app->locale->announcement1);
+        if ($bcinfo['isAnnouncement'] && empty($service->thread) && $app->user->accessLevel() < 2)
+            return $this->error($app->locale->announcement1);
         
         $memgroups = explode(',', $bcinfo['memberGroups']);
         if (!(in_array($app->user->group, $memgroups) || $memgroups[0] == null || $app->user->accessLevel() > 2))
@@ -810,7 +817,7 @@ class Threads extends Respond
         $service->form_message = '';
         $service->form_subject = '';
         
-        if ($service->thread != '' && $service->quotemsg != '')
+        if (!empty($service->thread) && !empty($service->quotemsg))
         {
             // $app->session->check('get'); // FIXME why do we check session here?
             
@@ -901,7 +908,7 @@ class Threads extends Respond
             if (!empty($service->quickreplyquote))
                 return $this->ajax_response(str_replace(array('&quot;', '&lt;', '&gt;'), array('"', '<', '>'), $service->form_message), 'txt');
         }
-        else if ($service->thread != '' && $service->quotemsg == '')
+        else if (!empty($service->thread) && empty($service->quotemsg))
         {
             $dbrq = $app->db->prepare("SELECT subject, posterName, posterEmail, posterTime, icon, posterIP, body, smiliesEnabled, ID_MEMBER
                 FROM {$db_prefix}messages
@@ -919,10 +926,8 @@ class Threads extends Respond
                 $service->form_subject = '' . $service->form_subject;
         }
         
-        if (!$service->form_subject)
-            $service->sub = '<i>' . $service->esc($app->locale->txt[33]) . '</i>';
-        else
-            $service->sub = $service->esc($service->form_subject);
+        if ($service->form_subject)
+            $service->sub = $service->form_subject;
         
         if ($isBlog)
             $service->form_subject = '';
@@ -941,7 +946,7 @@ class Threads extends Respond
         
         $service->ses_id = $app->session->id;
         
-        if ($service->thread > 0)
+        if (!empty($service->thread))
             $service->thread_summary = $this->thread_summary($service->thread);
         
         $service->threadinfo = $threadinfo;
@@ -1375,7 +1380,8 @@ class Threads extends Respond
         
         // If no thread specified, this is a new thread.
         // Find a valid random ID for it.
-        $newtopic = empty($service->thread) ? true : false;
+        $newtopic = empty($service->thread);
+        
         $time = time();
         $se = ($input_ns ? 0 : 1);
         
@@ -1402,7 +1408,7 @@ class Threads extends Respond
             if ($app->user->guest)
                 $_closeComments = 0;
             else
-                $_closeComments = $app->user->closeCommentsByDefault;
+                $_closeComments = (int) $app->user->closeCommentsByDefault;
             
             $q_params = array($app->user->id, $input_subject, $input_name, $input_email, $time, $REMOTE_ADDR, $se, $input_message, $icon, $attachment_size, $tmpname, $nowListening, $multinick, $_closeComments, $agent_fp);
             $placeholders = $db->build_placeholders($q_params);
@@ -1476,6 +1482,7 @@ class Threads extends Respond
                     $app->subs->updateStats('topic');
                     $app->subs->updateStats('message');
                     $app->subs->UpdateLastMessage($service->board);
+                    $service->thread = $threadid;
                 }
                 
                 // quick poll mod by dig7er, 14.04.2010
@@ -1489,7 +1496,7 @@ class Threads extends Respond
             } // $ID_MSG > 0
         } // if $newtopic
         else
-        {    // This is an old thread. Save it.
+        {   // This is an old thread. Save it.
             // QuickReplyExtended
             if($app->conf->QuickReply && $app->conf->QuickReplyExtended && $app->user->accessLevel() > 1)
             {
@@ -1665,15 +1672,14 @@ class Threads extends Respond
         if (!$app->user->guest)
 	{
             $dbrq = $db->prepare("
-                SELECT * FROM {$db_prefix}boards
-                WHERE ID_BOARD = '{$service->board}'");
+                SELECT count FROM {$db_prefix}boards
+                WHERE ID_BOARD = ?");
             $dbrq->execute(array($service->board));
             
-            $pcount = $dbrq->fetch();
+            $pcounter = $dbrq->fetchColumn();
             $dbrq = null;
-            $pcounter = $pcount['count'];
             
-            if ($pcounter != 1 and !$um) // united message (dig7er)
+            if ($pcounter != 1 and empty($um)) // united message (dig7er)
             {
                 ++$app->user->posts;
                 $db->prepare("
@@ -1710,7 +1716,7 @@ class Threads extends Respond
         //  Remove this comment and comment out the other SetLocation so that you are returned
         //  to the same thread after posting.
         if ($app->conf->returnToPost == '1')
-            $yySetLocation = "/b{$service->board}/t$thread/new/";
+            $yySetLocation = "/b{$service->board}/t{$service->thread}/new/";
         else
             $yySetLocation = "/b{$service->board}/";
         
