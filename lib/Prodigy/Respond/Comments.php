@@ -205,7 +205,78 @@ class Comments extends Respond
         
         $this->addJS('ubbc.js');
         return $this->render('templates/comments/subscribed.template.php', $data);
-    }
+    } // commentsTo()
+    
+    public function commentsBy($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->txt[1]);
+        
+        $app->board->load(-1);
+        
+        $POST = $request->paramsPost();
+        
+        $messageNumber = (int) $POST->viewscount;
+        if ($messageNumber < 1)
+            $messageNumber = 10;
+        
+        // User, comments addressed to
+        $user = $app->user->loadDisplay($request->paramsNamed()->get('user'));
+        
+        if (!$user['found'])
+            return $this->error($app->locale->txt[40]);
+        
+        if ($app->user->inIgnore($user['name']))
+            return $this->error($app->locale->txt['ignore_user1']);
+        
+        $db_prefix = $app->db->prefix;
+        
+        // set to 0 number of unread comments left by other users under your messages
+        if ($user == $app->user->name)
+            $app->db->query("UPDATE {$db_prefix}log_topics SET unreadComments = 0 WHERE ID_MEMBER={$app->user->id}");
+        
+        $data = array(
+            'title' => "Комментарии от {$user['realName']}",
+            'ubbc' => $app->conf->enable_ubbc,
+            'notification' => $app->conf->enable_notification,
+            'username' => $user['name'],
+            'realname' => $user['realName'],
+            'messageNumber' => $messageNumber,
+            'messages' => array()
+        );
+        
+        $permit = 0;
+        if ($app->user->isStaff())
+            $permit = 1;
+        
+        $dbst = $app->db->prepare("
+            SELECT STRAIGHT_JOIN m.*,t.numReplies,c.memberGroups,c.name as cname,b.name as bname,b.ID_BOARD,m.comments,m.ID_MSG,IFNULL(mem.blockComments,0) AS blockComments,m.closeComments,cs.notify AS subscribedToComments
+                FROM {$db_prefix}messages as m
+                JOIN {$db_prefix}topics as t ON (m.ID_TOPIC = t.ID_TOPIC)
+                JOIN {$db_prefix}boards as b ON (t.ID_BOARD = b.ID_BOARD)
+                JOIN {$db_prefix}categories as c ON (b.ID_CAT = c.ID_CAT)
+                LEFT JOIN {$db_prefix}members as mem ON (m.ID_MEMBER = mem.ID_MEMBER)
+                LEFT JOIN {$db_prefix}comment_subscriptions AS cs ON (cs.messageID = m.ID_MSG AND cs.memberID = ?)
+                WHERE m.comments LIKE ?
+                ORDER BY m.last_comment_time DESC LIMIT $messageNumber");
+        $dbst->execute(array($user['ID_MEMBER'], "%#;#{$user['memberName']}#;#%"));
+        
+        while ($row = $dbst->fetch())
+        {
+            if ($app->user->inIgnore($row['posterName']))
+                continue;
+            $row['body'] = $app->subs->censorTxt($row['body']);
+            $row['subject'] = $app->subs->censorTxt($row['subject']);
+            $row['comments'] = $this->prepare($row['comments'], $row['posterName'], $row['subscribedToComments']);
+            $row['posterTime'] = $app->subs->timeformat($row['posterTime']);
+            $row['cmnt_display'] = $row['closeComments'] == 1 ? 'none' : 'inline';
+            $data['messages'][] = $row;
+        }
+        $dbst = null; // closing this statement
+        
+        $this->addJS('ubbc.js');
+        return $this->render('templates/comments/subscribed.template.php', $data);
+    } // commentsBy
     
     /**
      * Clears the list of notifications for new message comments for the user.
