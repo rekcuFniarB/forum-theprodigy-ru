@@ -2255,9 +2255,9 @@ class Threads extends Respond
                 //Lines 38-43 all there to delete attachments on thread deletion - Jeff
                 $dbst = $app->db->prepare("SELECT attachmentFilename FROM {$db_prefix}messages WHERE (ID_TOPIC=? AND (attachmentFilename IS NOT NULL))");
                 $dbst->execute(array($threadid));
-                while ($row = $dbst->fetch())
+                while ($attachment = $dbst->fetch())
                 {
-                    $attachmentFilename = $app->conf->attachmentUploadDir . "/" . $row['attachmentFilename'];
+                    $attachmentFilename = $app->conf->attachmentUploadDir . "/" . $attachment['attachmentFilename'];
                     if (file_exists($attachmentFilename))
                         unlink($attachmentFilename);
                 }
