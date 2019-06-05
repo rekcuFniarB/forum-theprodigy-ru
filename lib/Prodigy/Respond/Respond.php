@@ -468,11 +468,30 @@ abstract class Respond {
      * @return \Kkein\AbstractResponse
      */
     public function redirect($path) {
-        // Note: $this->service->siteurl is set in the index.php
-        $redirect_url = "{$this->service->siteurl}$path";
-        error_log("__REDIRECT__: $redirect_url");
+        if (stripos($path, 'http://') === 0 || stripos($path, 'https://') === 0)
+            // It's not a relative path
+            $redirect_url = $path;
+        else
+            // Note: $this->service->siteurl is set in the index.php
+            $redirect_url = "{$this->service->siteurl}$path";
+        
         return $this->response->redirect("$redirect_url");
     } // redirect()
+    
+    /**
+     * Redirect to referer. This is reimplementation of $service->back()
+     * Here we check if request came from proper hostname.
+     */
+    public function back()
+    {
+        ## Note: $this->service->host is defined in index.php.
+        $_referer = $this->request->server()->get('HTTP_REFERER');
+        $referer = parse_url($_referer);
+        if (!empty($referer['host']) && $referer['host'] == $this->service->host)
+            return $this->redirect($_referer);
+        else
+            return $this->error('Wrong hostname in referer.');
+    }
     
     /**
      * Custom setcookie wrapper.
