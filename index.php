@@ -203,6 +203,9 @@ $router->respond(array('GET', 'POST'), '/modify/[i:msg]/', 'thread->modify');
 $router->respond(array('GET', 'POST'), '/delete/[i:msg]/', 'thread->deleteMsg');
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/delete/', 'thread->deleteThread');
 
+$router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/editpoll/', 'thread->editpoll');
+$router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/vote/[i:poll]/', 'thread->pollVote');
+
 //$router->respond('GET', '/main-static-call/', '\Prodigy\Router::Main');
 
 $router->respond('GET', '/people/[:user]/', 'profile->show');

@@ -28,8 +28,6 @@ class Threads extends Respond
             $start = "msg$startmsg";
         }
         
-        $service->viewResults = $GET->get('viewResults');
-        
         if ($currentboard == 0 || empty($currentboard))
             return $this->findBoard($currentboard, $threadid);
         
@@ -402,6 +400,12 @@ class Threads extends Respond
             }
             $pollinfo['divisor'] = (($pollinfo['totalvotes'] == 0) ? 1 : $pollinfo['totalvotes']);
             $pollinfo['pollimage'] = $pollinfo['votingLocked'] != '0'  ? 'locked_poll' : 'poll';
+            
+            if(($app->user->id == $topicinfo['ID_MEMBER_STARTED'] && $app->conf->pollEditMode == '2') || ($app->user->accessLevel() == 2 && in_array($app->conf->pollEditMode, array('2', '1'))) || $app->user->accessLevel() > 2)
+                $service->editpoll_btn = true;
+            
+            if($app->user->guest || in_array($app->user->id, explode(',', $pollinfo['votedMemberIDs'])) || $pollinfo['votingLocked'] != '0' || $GET->viewResults == '1')
+                $service->viewResults = true;
             
             $service->pollinfo = $pollinfo;
         }
@@ -2367,6 +2371,163 @@ class Threads extends Respond
         } // method POST
         
     } // deleteThread()
+    
+    public function editPoll($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->txt[1]);
+        
+        $PARAMS = $request->paramsNamed();
+
+        $db_prefix = $app->db->prefix;
+        # Determine what category we are in.
+        $dbst = $app->db->prepare("SELECT b.ID_BOARD AS bid, b.name AS bname, c.ID_CAT AS cid, c.name AS cname, t.ID_MEMBER_STARTED, m.subject FROM {$db_prefix}boards AS b, {$db_prefix}categories AS c, {$db_prefix}topics AS t, {$db_prefix}messages AS m WHERE (b.ID_BOARD=t.ID_BOARD AND b.ID_CAT=c.ID_CAT AND m.ID_TOPIC = t.ID_TOPIC AND t.ID_TOPIC=?)");
+        $dbst->execute(array($PARAMS->thread));
+        $bcinfo = $dbst->fetch();
+        $dbst = null;
+        
+        if (!$bcinfo)
+            return $this->error('Topic not found.');
+        
+        $app->board->load($bcinfo['bid']);
+        
+        if (($app->user->id == $bcinfo['ID_MEMBER_STARTED'] && $app->conf->pollEditMode == '2') || $app->user->isStaff() || ($app->user->isBoardModerator() && in_array($app->conf->pollEditMode, array('2','1'))))
+            ;// we're ok
+        else
+            // Access Denied.
+            return $this->error($txt[1]);
+        
+        $keys = array('p.ID_POLL', 'p.question');
+        for ($i = 1; $i < 21; $i++)
+        {
+            $keys[] = "p.option$i";
+            $keys[] = "p.votes$i";
+        }
+        $keys = implode(', ', $keys);
+        
+        $dbst = $app->db->prepare("SELECT p.ID_POLL, p.votingLocked as locked, p.question, $keys FROM {$db_prefix}polls AS p,{$db_prefix}topics AS t WHERE (p.ID_POLL=t.ID_POLL && t.ID_TOPIC=?) LIMIT 1");
+        $dbst->execute(array($PARAMS->thread));
+        $pollinfo = $dbst->fetch();
+        $dbst = null;
+        
+        if (empty($pollinfo))
+            return $this->error('Poll not found.');
+
+        $data = array(
+            'title' => $app->locale->yse39,
+            'sub' => $bcinfo['subject'],
+            'boardname' => $bcinfo['bname'],
+            'catname' => $bcinfo['cname'],
+            'threadid' => $PARAMS->thread,
+            'poll' => $pollinfo
+        );
+        
+        if (!empty($pollinfo['locked']))
+            $data['poll_locked'] = 'checked';
+        else
+            $data['poll_locked'] = '';
+        
+        if ($request->method('GET'))
+        {
+            return $this->render('templates/thread/editpoll.template.php', $data);
+            
+        } // if GET
+        elseif ($request->method('POST'))
+        {
+            $POST = $request->paramsPost();
+            
+            $preparedData = array();
+            for ($i=1; $i<21; $i++)
+            {
+                $val = $POST->get("option$i");
+                $preparedData["option$i"] = empty($val) ? null : trim($val);
+                
+                if ($POST->resetVoteCount == 'on')
+                {
+                    $preparedData["votes$i"] = 0;
+                }
+            }
+            
+            if ($POST->resetVoteCount == 'on')
+            {
+                $preparedData['votedMemberIDs'] = null;
+            }
+            
+            // Lock/unlock voting
+            if ($pollinfo['locked'] == 0 && $POST->votingLocked == 'on')
+            {
+                // Should lock
+                if ($app->user->isAdmin())
+                    $preparedData['votingLocked'] = 2;
+                else
+                    $preparedData['votingLocked'] = 1;
+            }
+            elseif ($pollinfo['locked'] > 0 && empty($POST->votingLocked))
+            {
+                // Should unlock
+                if ($pollinfo['locked'] == 2 && !$app->user->isAdmin())
+                    // Poll locked by admin, disallow unlocking
+                    return $this->error($app->locale->yse31);
+                
+                $preparedData['votingLocked'] = 0;
+            }
+            
+            $preparedData['question'] = $POST->question;
+            
+            $placeholders = $app->db->build_placeholders($preparedData, true, true);
+            
+            $preparedData['idpoll'] = $pollinfo['ID_POLL'];
+            
+            $app->db->prepare("UPDATE {$db_prefix}polls SET $placeholders WHERE ID_POLL=:idpoll")->
+                execute($preparedData);
+            
+            $this->redirect("/b{$bcinfo['bid']}/t{$PARAMS->thread}/");
+        } // if POST
+    } // editPoll()
+    
+    public function pollVote($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->yse28);
+        
+        $POST = $request->paramsPost();
+        $PARAMS = $request->paramsNamed();
+        
+        $db_prefix = $app->db->prefix;
+        $dbst = $app->db->prepare("SELECT votedMemberIDs, votingLocked FROM {$db_prefix}polls WHERE ID_POLL=? AND (FIND_IN_SET(?, votedMemberIDs) = 0 OR votedMemberIDs IS NULL) LIMIT 1");
+        $dbst->execute(array($PARAMS->poll, $app->user->id));
+        $pollinfo = $dbst->fetch();
+        $dbst = null;
+        
+        if (empty($pollinfo))
+            return $this->error($app->locale->yse27);
+        
+        // No option specified
+        if (empty($POST->option))
+            return $this->error($app->locale->yse26);
+        
+        $option = intval($POST->option);
+        
+        if (!empty($pollinfo['votingLocked']) && $pollinfo['votingLocked'] != '0')
+            return $this->error($app->locale->yse27);
+        
+        if (empty($pollinfo['votedmemberIDs']))
+            $votedMemberIDs = array();
+        else
+            $votedMemberIDs = explode(',', $pollinfo['votedmemberIDs']);
+        
+        $votedMemberIDs[] = $app->user->id;
+        $newIDs = implode(",", $votedMemberIDs);
+        if (substr($newIDs,0,1) == ',')
+            $newIDs = substr($newIDs,1);
+
+        $selectedoption = "votes$option";
+        
+        $app->db->prepare("UPDATE {$db_prefix}polls SET $selectedoption = $selectedoption + 1, votedMemberIDs=? WHERE ID_POLL=?")->
+            execute(array($newIDs, $PARAMS->poll));
+        
+        return $this->back();
+    } // pollVote()
 }
 
 ?>

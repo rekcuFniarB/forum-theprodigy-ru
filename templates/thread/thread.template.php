@@ -34,8 +34,8 @@
           <?php if($this->conf->enableInlineLinks): ?>
             <font size="1">
               <b><a href="<?= SITE_ROOT ?>/" class="nav"><?= $this->conf->mbname ?></a> </b>&nbsp;|&nbsp; 
-              <b><a href="<?= SITE_ROOT ?>/#<?= $this->curcat ?>" class="nav"><?= $this->catname ?></a> </b>&nbsp;|&nbsp; 
-              <b><a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->boardname ?></a></b> <?= $this->showmods ?>
+              <b><a href="<?= SITE_ROOT ?>/#<?= $this->curcat ?>" class="nav"><?= $this->get('catname') ?></a> </b>&nbsp;|&nbsp; 
+              <b><a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->get('boardname') ?></a></b> <?= $this->showmods ?>
               <br class="brs">
               <br class="brs">
               <table class="curthread">

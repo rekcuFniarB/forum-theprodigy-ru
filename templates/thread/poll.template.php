@@ -22,30 +22,17 @@
                         </font>
                         
                         <?php $this->start_cache('pollLockEditBtns') ?>
-                          <?php if($this->user->id == $this->topicinfo['ID_MEMBER_STARTED'] || $this->user->accessLevel() > 1): ?>
-                            <br>
-                            <a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/<?= $this->start ?>/lockVoting/?sesc='<?= $this->app->session->id ?>">
-                              <?php if($this->pollinfo['votingLocked'] == '0'): ?>
-                                <?= $this->locale->yse30 ?>
-                              <?php else: ?>
-                                <?= $this->locale->yse30b ?>
-                              <?php endif; ?>
-                            </a>
-                          <?php endif; ?>
-                          
-                          &nbsp;&nbsp; 
-                          
-                          <?php if(($this->user->id == $this->topicinfo['ID_MEMBER_STARTED'] && $this->conf->pollEditMode == '2') || ($this->user->accessLevel() == 2 && in_array($this->conf->pollEditMode, array('2', '1'))) || $this->user->accessLevel() > 2): ?>
-                            <a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/<?= $this->start ?>/editpoll/"><?= $this->locale->yse39 ?></a>
+                          <?php if($this->editpoll_btn): ?>
+                            <a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/editpoll/"><?= $this->locale->yse39 ?></a>
                           <?php endif; ?>
                         <?php $this->end_cache(); ?>
                         
-                        <?php if($this->user->id == '-1' || in_array("{$this->user->id}", explode(',', $this->pollinfo['votedMemberIDs'])) || $this->pollinfo['votingLocked'] != '0' || $this->viewResults == '1'): ?>
+                        <?php if($this->viewResults): ?>
                           <table>
                             <tr>
                               <td>
                                 <br>
-                                <table border="0" cellpadding="0" cellspacing="0">';
+                                <table border="0" cellpadding="0" cellspacing="0">
                                   <?php for ($i = 1; $i <= 20; $i++): ?>
                                     <?php if($this->pollinfo["option$i"] != ''): ?>
                                       <?php 
@@ -75,7 +62,7 @@
                         </table>
                         <br>
                         <?php else: ?>
-                          <form action="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/<?= $this->start ?>/vote/<?= $this->topicinfo['ID_POLL'] ?>/" method="post">
+                          <form action="<?= SITE_ROOT ?>/b<?= $this->board ?>/t<?= $this->thread ?>/vote/<?= $this->topicinfo['ID_POLL'] ?>/" method="post">
                             <table>
                               <tr>
                                 <td>
@@ -88,7 +75,7 @@
                                 </td>
                                 <td width="15">&nbsp;</td>
                                 <td valign="bottom">
-                                  <a href="<?= SITE_ROOT ?>/b<?=$this->board ?>/t<?= $this->thread ?>/<?= $this->start ?>/?viewResults=1"><?= $this->locale->yse29 ?></a> <?php $this->get_cache('pollLockEditBtns'); ?>
+                                  <a href="./?viewResults=1"><?= $this->locale->yse29 ?></a> <?php $this->get_cache('pollLockEditBtns'); ?>
                                 </td>
                               </tr>
                               <tr>
