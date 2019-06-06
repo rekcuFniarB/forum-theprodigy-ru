@@ -671,7 +671,7 @@ class Threads extends Respond
             "SELECT ID_BOARD FROM {$this->app->db->prefix}topics WHERE ID_TOPIC = ?");
         $dbrq->execute(array($threadid));
         $board = $dbrq->fetchColumn();
-        if (!board)
+        if (!$board)
             $this->error($this->app->locale->txt[472]);
         
         return intval($board);
