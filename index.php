@@ -209,6 +209,7 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/vote/[i:poll]/',
 //$router->respond('GET', '/main-static-call/', '\Prodigy\Router::Main');
 
 $router->respond('GET', '/people/[:user]/', 'profile->show');
+$router->respond('GET', '/people/[:user]/messages/[i:start]?/', 'profile->messages');
 $router->respond(array('GET', 'POST'), '/people/[:user]/modify/', 'profile->edit');
 
 $router->respond(array('GET', 'POST'), '/comments/subscribed/', 'comments->subscribed');

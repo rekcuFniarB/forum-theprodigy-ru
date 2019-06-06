@@ -1021,5 +1021,95 @@ class Profile extends Respond
         } // if POST
     } // edit()
 
+    public function messages($request, $response, $service, $app)
+    {
+        $PARAMS = $request->paramsNamed();
+        
+        if ($app->user->inIgnore($PARAMS->user))
+            return $this->error($app->locale->ignore_user1);
+        
+        $profile = $app->user->loadDisplay($PARAMS->user);
+        
+        if(!$profile['found'])
+            return $this->error('Profile not found.');
+        
+        $permit = 0;
+        if ($app->user->isStaff())
+            $permit = 1;
+        
+        $limit = empty($app->conf->maxmessagedisplay) ? 21 : (int) $app->conf->maxmessagedisplay + 1;
+        
+        $start = (int) $PARAMS->start;
+        $q_start = $start > 0 ? "AND m.ID_MSG <= $start" : '';
 
+        $db_prefix = $app->db->prefix;
+        $dbst = $app->db->prepare("
+            SELECT m.*,t.numReplies,c.memberGroups,c.name as cname,b.name as bname,b.ID_BOARD
+            FROM {$db_prefix}messages as m, {$db_prefix}topics as t, {$db_prefix}boards as b, {$db_prefix}categories as c, {$db_prefix}members as mem
+            WHERE m.ID_MEMBER=?
+                AND m.ID_TOPIC=t.ID_TOPIC
+                AND t.ID_BOARD=b.ID_BOARD
+                AND b.ID_CAT=c.ID_CAT
+                AND (FIND_IN_SET(?,c.memberGroups) != 0 || $permit || c.memberGroups='')
+                AND mem.ID_MEMBER=m.ID_MEMBER
+                $q_start
+            ORDER BY m.ID_MSG DESC LIMIT $limit");
+        $dbst->execute(array($profile['ID_MEMBER'], $app->user->group));
+        $messages = array();
+        while ($msg = $dbst->fetch())
+        {
+            $msg['body'] = $app->subs->censorTxt($msg['body']);
+            $msg['subject'] = $app->subs->censorTxt($msg['subject']);
+            $msg['posterTime'] = $app->subs->timeformat($msg['posterTime']);
+            $messages[] = $msg;
+        } // while fetch()
+        $dbst = null; // closig this statement
+        
+        $data = array(
+            'title' => $app->locale->txt[214] . ' ' . $service->esc($profile['realName']),
+            'profile' => $profile,
+            'notify' => $app->conf->enable_notification,
+            'ubbc' => $app->conf->enable_ubbc,
+            'messages' => $messages
+        );
+        unset($data['messages'][$limit - 1]);
+        
+        // BEGIN prepare pagination data
+        if (count($messages) > $app->conf->maxmessagedisplay)
+            $data['page_next'] = $messages[$limit-1]['ID_MSG'];
+        
+        if ($start > 0)
+        {
+            // find start of prev page
+            $dbst = $app->db->prepare("SELECT ID_MSG FROM (SELECT m.ID_MSG FROM {$db_prefix}messages as m, {$db_prefix}topics as t, {$db_prefix}boards as b, {$db_prefix}categories as c
+                WHERE ID_MEMBER = ?
+                AND m.ID_TOPIC=t.ID_TOPIC
+                AND t.ID_BOARD=b.ID_BOARD
+                AND b.ID_CAT=c.ID_CAT
+                AND (FIND_IN_SET(?,c.memberGroups) != 0 || $permit || c.memberGroups='')
+                AND ID_MSG > ?
+                ORDER BY ID_MSG LIMIT {$app->conf->maxmessagedisplay}) AS m
+                ORDER BY ID_MSG DESC LIMIT 1");
+            $dbst->execute(array($profile['ID_MEMBER'], $app->user->group, $messages[0]['ID_MSG']));
+            $prevID = $dbst->fetchColumn();
+            $dbst = null;
+            if (!empty($prevID) && $prevID != $messages[0]['ID_MSG'])
+                $data['page_prev'] = $prevID;
+        }
+        
+        // find start of end page
+        $dbst = $app->db->query("SELECT ID_MSG FROM messages
+            WHERE ID_MEMBER = {$profile['ID_MEMBER']}
+            ORDER BY ID_MSG LIMIT {$app->conf->maxmessagedisplay}");
+        $dbst->execute();
+        $lastID = $dbst->fetchColumn();
+        if (!empty($lastID))
+            $data['page_last'] = $lastID;
+        
+        $data['page_base_url'] = SITE_ROOT . "/people/".urlencode($PARAMS->user)."/messages";
+        
+        // END prepare pagination data
+        
+        return $this->render('templates/profile/messages.template.php', $data);
+    } // messages()
 }
