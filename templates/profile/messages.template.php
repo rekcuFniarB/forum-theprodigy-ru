@@ -6,7 +6,7 @@
       <table border="0" width="100%" cellspacing="1" bgcolor="<?= $this->color['bordercolor'] ?>" class="comments-page">
         <tr>
           <td align=left bgcolor="<?= $this->color['titlebg'] ?>" class="titlebg">
-            <font class="text1" color="<?= $this->color['titletext'] ?>" size="2">&nbsp;<?= $n+1 ?>&nbsp;</font>
+            <font class="text1" color="<?= $this->color['titletext'] ?>" size="2">&nbsp;<?= $n ?>&nbsp;</font>
           </td>
           <td width=75% bgcolor="<?= $this->color['titlebg'] ?>" class="titlebg">
             <font class="text1" color="<?= $this->color['titletext'] ?>" size="2">

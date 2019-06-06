@@ -1028,6 +1028,8 @@ class Profile extends Respond
         if ($app->user->inIgnore($PARAMS->user))
             return $this->error($app->locale->ignore_user1);
         
+        $app->board->load(-1);
+        
         $profile = $app->user->loadDisplay($PARAMS->user);
         
         if(!$profile['found'])
@@ -1037,12 +1039,29 @@ class Profile extends Respond
         if ($app->user->isStaff())
             $permit = 1;
         
+        // get one additional message
         $limit = empty($app->conf->maxmessagedisplay) ? 21 : (int) $app->conf->maxmessagedisplay + 1;
         
         $start = (int) $PARAMS->start;
         $q_start = $start > 0 ? "AND m.ID_MSG <= $start" : '';
 
         $db_prefix = $app->db->prefix;
+        
+        // Get messages number
+        $dbst = $app->db->prepare("
+            SELECT COUNT(*)
+            FROM {$db_prefix}messages as m, {$db_prefix}topics as t, {$db_prefix}boards as b, {$db_prefix}categories as c, {$db_prefix}members as mem
+            WHERE m.ID_MEMBER=?
+                AND m.ID_TOPIC=t.ID_TOPIC
+                AND t.ID_BOARD=b.ID_BOARD
+                AND b.ID_CAT=c.ID_CAT
+                AND (FIND_IN_SET(?,c.memberGroups) != 0 || $permit || c.memberGroups='')
+                AND mem.ID_MEMBER=m.ID_MEMBER
+                $q_start");
+        $dbst->execute(array($profile['ID_MEMBER'], $app->user->group));
+        $number = (int) $dbst->fetchColumn();
+        $dbst = null;
+        
         $dbst = $app->db->prepare("
             SELECT m.*,t.numReplies,c.memberGroups,c.name as cname,b.name as bname,b.ID_BOARD
             FROM {$db_prefix}messages as m, {$db_prefix}topics as t, {$db_prefix}boards as b, {$db_prefix}categories as c, {$db_prefix}members as mem
@@ -1061,9 +1080,13 @@ class Profile extends Respond
             $msg['body'] = $app->subs->censorTxt($msg['body']);
             $msg['subject'] = $app->subs->censorTxt($msg['subject']);
             $msg['posterTime'] = $app->subs->timeformat($msg['posterTime']);
-            $messages[] = $msg;
+            $messages[$number] = $msg;
+            $number--;
         } // while fetch()
         $dbst = null; // closig this statement
+        
+        if (empty($messages))
+            return $this->error('Messages not found.');
         
         $data = array(
             'title' => $app->locale->txt[214] . ' ' . $service->esc($profile['realName']),
@@ -1072,11 +1095,14 @@ class Profile extends Respond
             'ubbc' => $app->conf->enable_ubbc,
             'messages' => $messages
         );
-        unset($data['messages'][$limit - 1]);
         
-        // BEGIN prepare pagination data
+        //// BEGIN prepare pagination data
         if (count($messages) > $app->conf->maxmessagedisplay)
-            $data['page_next'] = $messages[$limit-1]['ID_MSG'];
+        {
+            // we no more need additional msg
+            $msg = array_pop($data['messages']);
+            $data['page_next'] = $msg['ID_MSG'];
+        }
         
         if ($start > 0)
         {
@@ -1088,23 +1114,43 @@ class Profile extends Respond
                 AND b.ID_CAT=c.ID_CAT
                 AND (FIND_IN_SET(?,c.memberGroups) != 0 || $permit || c.memberGroups='')
                 AND ID_MSG > ?
-                ORDER BY ID_MSG LIMIT {$app->conf->maxmessagedisplay}) AS m
-                ORDER BY ID_MSG DESC LIMIT 1");
-            $dbst->execute(array($profile['ID_MEMBER'], $app->user->group, $messages[0]['ID_MSG']));
-            $prevID = $dbst->fetchColumn();
+                ORDER BY ID_MSG LIMIT ?) AS m
+                ORDER BY ID_MSG DESC");
+            $dbst->execute(array($profile['ID_MEMBER'], $app->user->group, reset($messages)['ID_MSG'], $app->conf->maxmessagedisplay + 1));
+            $prevIDs = $dbst->fetchAll(\PDO::FETCH_COLUMN);
             $dbst = null;
-            if (!empty($prevID) && $prevID != $messages[0]['ID_MSG'])
-                $data['page_prev'] = $prevID;
+            
+            $cnt = count($prevIDs);
+            if ($cnt > 0)
+                // Show link to the beginning
+                $data['page_start'] = true;
+            if ($cnt > $app->conf->maxmessagedisplay)
+                // prev page is not a last page, show link to prev page
+                $data['page_prev'] = $prevIDs[1];
         }
         
         // find start of end page
-        $dbst = $app->db->query("SELECT ID_MSG FROM messages
-            WHERE ID_MEMBER = {$profile['ID_MEMBER']}
-            ORDER BY ID_MSG LIMIT {$app->conf->maxmessagedisplay}");
-        $dbst->execute();
+        $dbst = $app->db->prepare("SELECT ID_MSG FROM (SELECT ID_MSG FROM {$db_prefix}messages as m, {$db_prefix}topics as t, {$db_prefix}boards as b, {$db_prefix}categories as c
+            WHERE m.ID_TOPIC=t.ID_TOPIC
+            AND t.ID_BOARD=b.ID_BOARD
+            AND b.ID_CAT=c.ID_CAT
+            AND (FIND_IN_SET(?,c.memberGroups) != 0 || $permit || c.memberGroups='')
+            AND ID_MEMBER = ?
+            ORDER BY ID_MSG LIMIT ?) as m ORDER BY ID_MSG DESC LIMIT 1");
+        $dbst->execute(array($app->user->group, $profile['ID_MEMBER'], $app->conf->maxmessagedisplay ));
         $lastID = $dbst->fetchColumn();
-        if (!empty($lastID))
-            $data['page_last'] = $lastID;
+        $dbst = null;
+        
+        $data['page_last'] = $lastID;
+        
+        if (empty($data['page_next']))
+            // Next page is last, don't show next link.
+            $data['page_last'] = null;
+        elseif ($data['page_next'] == $data['page_last'])
+            // Next page is last, no need for next page link.
+            $data['page_next'] = null;
+            
+        
         
         $data['page_base_url'] = SITE_ROOT . "/people/".urlencode($PARAMS->user)."/messages";
         
