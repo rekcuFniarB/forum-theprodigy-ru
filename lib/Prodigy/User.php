@@ -342,6 +342,7 @@ class User {
             $this->cache[$user]['yimon'] = '';
             $this->cache[$user]['gender'] = '';
             $this->cache[$user]['personalText'] = '';
+            $this->cache[$user]['usertitle'] = '';
             $this->cache[$user]['memberGroup'] = '';
             $this->cache[$user]['websiteUrl_IM'] = '';
             $this->cache[$user]['posts'] = '';
@@ -363,32 +364,42 @@ class User {
         $membergroups = $this->memberGroups();
         $imagesdir = $this->app->conf->imagesdir; //STATIC_ROOT . '/skins/' . $this->skin . '/YaBBImages';
         
+        $websiteUrl = $this->service->esc($this->cache[$user]['websiteUrl']);
+        $websiteTitle = $this->service->esc($this->cache[$user]['websiteTitle']);
         /* Load the website image/link stuff */
-        $this->cache[$user]['websiteUrl_IM'] = (($this->cache[$user]['websiteUrl']  != "") ? "<a href=\"" . $this->cache[$user]['websiteUrl'] . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"{$img['im_website']}\" alt=\"".$this->cache[$user]['websiteTitle']."\" title=\"".$this->cache[$user]['websiteTitle']."\" border=\"0\" /></a>" : "");
+        $this->cache[$user]['websiteUrl_IM'] = (($this->cache[$user]['websiteUrl']  != "") ? "<a href=\"$websiteUrl\" target=\"_blank\" rel=\"nofollow noopener\">{$img['im_website']}</a>" : "");
         if ($this->app->conf->MenuType == 1)
-            $this->cache[$user]['websiteUrl'] = (($this->cache[$user]['websiteUrl'] != "") ? "<a href=\"" . $this->cache[$user]['websiteUrl'] . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"$imagesdir/www_sm.gif\" alt=\"".$this->cache[$user]['websiteTitle']."\" title=\"" . $this->cache[$user]['websiteTitle'] . "\" border=\"0\" /></a>" : "");
+            $this->cache[$user]['websiteUrl'] = (($this->cache[$user]['websiteUrl'] != "") ? "<a href=\"" . $websiteUrl . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"$imagesdir/www_sm.gif\" alt=\"$websiteTitle\" title=\"$websiteTitle\" border=\"0\" /></a>" : "");
         else
-            $this->cache[$user]['websiteUrl'] = (($this->cache[$user]['websiteUrl']  != "") ? "<a href=\"" . $this->cache[$user]['websiteUrl'] . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"{$img[website]}\" alt=\"{$this->cache[$user]['websiteTitle']}\" title=\"{$this->cache[$user]['websiteTitle']}\" border=\"0\" /></a>" : "");
-        
-        /* load the signature, replace the breaks in it */
-        $breaks = array("\n\r", "\r\n", "\n", "\r");
-        $this->cache[$user]['signature'] = str_replace($breaks, '<br>', $this->cache[$user]['signature']);
-        $this->cache[$user]['signature'] = (($this->cache[$user]['signature'] != '') ? '<hr width="100%" size="1" class="windowbg3" style="color: ' . $this->app->conf->color['windowbg3'] . '" /><div class="signature"><font size="1">' . $this->cache[$user]['signature'] . '</font></div>' : '');
+            $this->cache[$user]['websiteUrl'] = (($this->cache[$user]['websiteUrl']  != "") ? "<a href=\"" . $websiteUrl . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"{$img['website']}\" alt=\"$websiteTitle\" title=\"$websiteTitle\" border=\"0\" /></a>" : "");
         
         /* # do some ubbc on the signature if enabled */
         if ($this->app->conf->enable_ubbc)
             $this->cache[$user]['signature'] = $this->service->DoUBBC($this->cache[$user]['signature']);
+        else
+            $this->cache[$user]['signature'] = $this->service->esc($this->cache[$user]['signature']);
+        
+        /* load the signature, replace the breaks in it */
+        $breaks = array("\n\r", "\r\n", "\n", "\r");
+        $this->cache[$user]['signature'] = str_replace($breaks, '<br>', $this->cache[$user]['signature']);
+        $this->cache[$user]['signature'] = (($this->cache[$user]['signature'] != '') ? '<hr width="100%" size="1" class="windowbg3" style="color: ' . $this->app->conf->color['windowbg3'] . '" /><div class="signature"><font size="1">' . $this->cache[$user]['signature'] . '</font></div>' : '');        
         
         /* ICQ and AIM, and YIM should be initialized in load user */
         if ($this->cache[$user]['ICQ'] != "" && is_numeric($this->cache[$user]['ICQ'])) {
             $this->cache[$user]['icqad'] = "<a href=\"http://wwp.icq.com/scripts/search.dll?to=" . $this->cache[$user]['ICQ'] . "\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"{$this->app->conf->imagesdir}/icqadd.gif\" alt=\"" . $this->cache[$user]['ICQ'] . "\" border=\"0\" /></a>";
             $this->cache[$user]['ICQ'] = "<a href=\"{$this->app->conf->cgi}&amp;action=icqpager&amp;UIN=" . $this->cache[$user]['ICQ'] . "\" target=\"_blank\"><img src=\"http://status.icq.com/online.gif?icq=" . $this->cache[$user]['ICQ'] . "&amp;img=5\" alt=\"" . $this->cache[$user]['ICQ'] . "\" title=\"" . $this->cache[$user]['ICQ'] . "\" border=\"0\" /></a>";
         }
-        $this->cache[$user]['AIM'] = (($this->cache[$user]['AIM'] != "") ? "<a href=\"skype:" . $this->cache[$user]['AIM'] . "?chat&topic=Forum.theProdigy.ru\"><img src=\"".STATIC_ROOT."/img/YaBBImages/Skype-icon-x17.png\" alt=\"Skype: " . $this->cache[$user]['AIM'] . "\" border=\"0\" /></a>" : "");
-        if ($this->cache[$user]['YIM'] != "")
-            $this->cache[$user]['yimon'] = "<a href=\"{$this->cache[$user]['YIM']}\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"".STATIC_ROOT."/img/YaBBImages/livejournal.gif\" border=\"0\" alt=\"" . $this->cache[$user]['YIM'] . "\" title=\"" . $txt['lj'] . "\" /></a>";
         
-        $this->cache[$user]['MSN'] = (($this->cache[$user]['MSN'] != '') ? "<a href=\"http://members.msn.com/" . $this->app->subs->htmlescape($this->cache[$user]['MSN']) . "\" target=\"blank\" rel=\"nofollow noopener\"><img src=\"{$this->app->conf->imagesdir}/msntalk.gif\" border=\"0\" alt=\"\" /></a>" : "");
+        // Skype
+        $skype = $this->service->esc($this->cache[$user]['AIM']);
+        $this->cache[$user]['AIM'] = (($this->cache[$user]['AIM'] != "") ? "<a href=\"skype:$skype?chat&topic=Forum.theProdigy.ru\"><img src=\"".STATIC_ROOT."/img/YaBBImages/Skype-icon-x17.png\" alt=\"Skype: $skype\" border=\"0\" /></a>" : "");
+        
+        // LJ
+        $LJ = $this->service->esc($this->cache[$user]['YIM']);
+        if ($this->cache[$user]['YIM'] != "")
+            $this->cache[$user]['yimon'] = "<a href=\"$LJ\" target=\"_blank\" rel=\"nofollow noopener\"><img src=\"".STATIC_ROOT."/img/YaBBImages/livejournal.gif\" border=\"0\" alt=\"$LJ\" title=\"" . $txt['lj'] . "\" /></a>";
+        
+        $this->cache[$user]['MSN'] = (($this->cache[$user]['MSN'] != '') ? "<a href=\"http://members.msn.com/" . $this->service->esc($this->cache[$user]['MSN']) . "\" target=\"blank\" rel=\"nofollow noopener\"><img src=\"{$this->app->conf->imagesdir}/msntalk.gif\" border=\"0\" alt=\"\" /></a>" : "");
 
         /* if showing the gender image, and if the gender is specified */
         if ($this->app->conf->showgenderimage && $this->cache[$user]['gender'] != "") {
@@ -404,7 +415,7 @@ class User {
         
         /* user pics is enabled */
         if ($this->app->conf->showuserpic && $this->app->conf->allowpics) {
-            $this->cache[$user]['avatar'] = (($this->cache[$user]['avatar'] == '') ? 'blank.gif' : $this->cache[$user]['avatar']);
+            $this->cache[$user]['avatar'] = $this->cache[$user]['avatar'] == '' ? 'blank.gif' : $this->service->esc($this->cache[$user]['avatar']);
             $this->cache[$user]['avatar'] = (preg_match('~^https?://~', $this->cache[$user]['avatar']) ? "<br /><div class=\"avatar\"><img src=\"{$this->cache[$user]['avatar']}\" border=\"0\" alt=\"\" /></div><br />" : "<br /><img src=\"{$this->app->conf->facesurl}/{$this->cache[$user]['avatar']}\" border=\"0\" alt=\"\" /><br /><br />");
         }
         else

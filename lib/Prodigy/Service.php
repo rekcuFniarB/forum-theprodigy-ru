@@ -577,7 +577,7 @@ class Service extends \Klein\ServiceProvider
      * Used in templates like this:
      * <?php $this->menu_begin() ?>
      * <?php foreach($this->menu as $item) ?>
-     *   <? $this->menusep() ?>
+     *   <?= $this->menusep() ?>
      *   <?= $item ?>
      * <?php endforeach; ?>
      * @param string $menusep  optional menu separator
