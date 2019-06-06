@@ -187,6 +187,8 @@ $router->respond('GET', '/', 'main->index');
 $router->respond(array('GET', 'POST'), '/login/', 'profile->loginform');
 $router->respond('GET', '/logout/', 'profile->logout');
 
+$router->respond('GET', '/[i:msg]/', 'thread->gotomsg');
+
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/', 'thread->display');
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/[i:page]/', 'thread->display');
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/msg[i:startmsg]/', 'thread->display');
@@ -215,6 +217,8 @@ $router->respond(array('GET', 'POST'), '/people/[:user]/modify/', 'profile->edit
 $router->respond(array('GET', 'POST'), '/comments/subscribed/', 'comments->subscribed');
 $router->respond(array('GET', 'POST'), '/comments/to/[:user]/', 'comments->commentsTo');
 $router->respond(array('GET', 'POST'), '/comments/by/[:user]/', 'comments->commentsBy');
+
+$router->respond(array('GET', 'POST'), '/im/', 'im->inbox');
 
 $router->respond('GET', '/example/', 'main->example');
 //$router->respond('GET', '/example/', 'main->example2');

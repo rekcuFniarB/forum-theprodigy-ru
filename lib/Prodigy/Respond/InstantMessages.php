@@ -199,6 +199,95 @@ class InstantMessages extends Respond
     {
         // TODO
     }
-
+    
+    public function inbox($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->txt[147]);
+        
+        $GET = $request->paramsGet();
+        
+        $service->shownum = empty($GET->shownum) ? 30 : (int) $GET->shownum;
+        
+        $bgcolors = array($app->conf->color['windowbg'], $app->conf->color['windowbg2']);
+        $bgstyles = array('windowbg', 'windowbg2');
+        $bgcolornum = sizeof($bgcolors);
+        $bgstylenum = sizeof($bgstyles);
+        
+        $db_prefix = $app->db->prefix;
+        
+        $dbst = $app->db->prepare("
+            SELECT im.fromName, im.subject, im.msgtime, im.body, im.ID_IM, IFNULL(mem.ID_MEMBER, 0) AS ID_MEMBER_FROM, IFNULL(mem.realName,im.fromName) AS fromDisplayName, IFNULL(lo.logTime, 0) AS isOnline
+            FROM {$db_prefix}instant_messages AS im
+            LEFT JOIN {$db_prefix}members AS mem ON (mem.ID_MEMBER=im.ID_MEMBER_FROM)
+            LEFT JOIN {$db_prefix}log_online AS lo ON (lo.identity=mem.ID_MEMBER)
+            WHERE ID_MEMBER_TO=? AND deletedBy != 1
+            ORDER BY im.ID_IM DESC LIMIT {$service->shownum}");
+        $dbst->execute(array($app->user->id));
+        $counter = 0;
+        $messages = array();
+        while ($msg = $dbst->fetch())
+        {
+            $counter++;
+            $msg['windowbg'] = $bgcolors[($counter % $bgcolornum)];
+            $msg['windowcss'] = $bgstyles[($counter % $bgstylenum)];
+            
+            if (empty($msg['subject']))
+                $msg['subject'] = $app->locale->txt[24];
+            
+            if (strpos($msg['subject'], '[NOTICE]') === 0)
+            {
+                $msg['notice'] = true;
+                $msg['subject'] = str_replace('[NOTICE]', '', $msg['subject']);
+            }
+            else
+                $msg['notice'] = false;
+            
+            $msg['subject'] = $app->subs->censorTxt($msg['subject']);
+            $msg['body'] = $app->subs->censorTxt($msg['body']);
+            
+            $msg['msgtime'] = $app->subs->timeformat($msg['msgtime']);
+            
+            $msg['author'] = $app->user->loadDisplay($msg['fromName']);
+            
+            $msg['show_email'] = false;
+            
+            if ($msg['author']['emailAddress'])
+            {
+                if (empty($msg['author']['hideEmail']) || $app->user->isStaff() || empty($app->conf->allow_hide_email))
+                    $msg['show_email'] = true;
+            }
+            
+            $messages[$counter] = $msg;
+        } // while fetch()
+        $dbst = null;
+        
+        if (empty($messages))
+            $service->nomessages = true;
+        
+        $data = array(
+            'title' => $app->locale->txt[143],
+            'catname' => $app->locale->txt[144],
+            'boardname' => $app->locale->txt[316],
+            'windowbg' => $bgcolors[(++ $counter % $bgcolornum)],
+            'messages' => $messages
+        );
+        
+        if ($app->conf->profilebutton && !$app->user->guest)
+            $data['profilebutton'] = true;
+        
+        // Mark as read after response finished
+        if (!empty($service->imcount) && $service->imcount > 0)
+        {
+            register_shutdown_function(function() use ($app, $service)
+            {
+                if(session_id()) session_write_close();
+                $app->db->query("UPDATE {$db_prefix}instant_messages SET readBy=1 WHERE ID_MEMBER_TO=? AND readBy='0' LIMIT ?")->
+                execute(array($app->user->id, $service->imcount));
+            });
+        }
+        
+        return $this->render('templates/im/inbox.template.php', $data);
+    } // inbox()
 }
 ?>
