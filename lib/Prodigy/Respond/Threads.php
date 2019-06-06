@@ -2528,6 +2528,42 @@ class Threads extends Respond
         
         return $this->back();
     } // pollVote()
+    
+    // redirect to message
+    public function gotomsg($request, $response, $service, $app)
+    {
+        $msg = $request->paramsNamed()->get('msg');
+        
+        if (empty($msg))
+            return $this->redirect('/');
+        
+        if (strpos($msg, "-"))
+        {
+            $gomsg = explode("-", $msg);
+            $anchor = "comment" .$msg;
+            $msg = $gomsg[0];
+            if (intval($gomsg[1]) == 0) {
+                return $this->redirect('/');
+            }
+        }
+        else $anchor = "msg$msg";
+        
+        $msg = intval($msg);
+        
+        if ($msg == 0) {
+            return $this->redirect('/');
+        }
+        
+        $dbst = $app->db->query("SELECT m.ID_TOPIC thread, t.ID_BOARD board FROM messages m LEFT JOIN topics t ON (m.ID_TOPIC = t.ID_TOPIC) WHERE m.ID_MSG = $msg LIMIT 1");
+        $row = $dbst->fetch();
+        $dbst = null;
+        if (!empty($row))
+            $yySetLocation = "/b{$row['board']}/t{$row['thread']}/msg$msg/#$anchor";
+        else
+            $yySetLocation = '/';
+        
+        return $this->redirect($yySetLocation);
+    } // gotomsg
 }
 
 ?>
