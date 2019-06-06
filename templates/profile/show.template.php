@@ -140,6 +140,14 @@
               </tr>
           <?php endif; ?>
           
+          <!-- last messages link -->
+          <tr>
+            <td colspan="2" align="center">
+              <font size="2"><a href="./messages/"><?= $this->locale->txt[214] ?></a></font>
+            </td>
+          </tr>
+          
+          <?php if(!$this->user->guest): ?>
           <!-- Comments -->
           <tr>
             <td>
@@ -157,6 +165,7 @@
               </font>
             </td>
           </tr>
+          <?php endif; ?>
           
           <!-- Date registered -->
           <tr>
@@ -451,34 +460,19 @@
       
       <tr>
         <td bgcolor="<?= $this->color['windowbg2'] ?>" class="windowbg2 userinfo" valign="top">
-          <form action="' . $cgi . ';action=usersrecentposts;userid=' . $memsettings[20] . ';user=' . $user . '" method="post">
-            <font size="2">
-              <?= $this->locale->txt['113'] ?>
-              <i><a href="<?= SITE_ROOT ?>/im/send/<?= urlencode($this->meminf['memberName']) ?>/"><!--
-              <?php if($this->meminf['online'] > 0): ?>
+          <font size="2">
+            <?= $this->locale->txt['113'] ?>
+            <i><a href="<?= SITE_ROOT ?>/im/send/<?= urlencode($this->meminf['memberName']) ?>/"><!--
+            <?php if($this->meminf['online'] > 0): ?>
                 --><?= $this->locale->online2 ?><!--
-              <?php else: ?>
+            <?php else: ?>
                 --><?= $this->locale->online3 ?><!--
-              <?php endif; ?>
-              --></a></i>
-              <br><br>
-              <a href="<?= SITE_ROOT ?>/im/send/<?= urlencode($this->meminf['memberName']) ?>/"><?= $this->locale->txt[688] ?></a>.
-              <br><br>
-              <?= $this->locale->txt[460] ?>
-              <select name="viewscount" size="1">
-                <option value="5">5</option>
-                <option value="10" selected="selected">10</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-                <option value="200">200</option>
-                <option value="500">500</option>
-                <option value="1000">1000</option>
-                <option value="0"><?= $this->locale->txt[190] ?></option>
-              </select>
-              <?= $this->locale->txt[461] ?>
-              <input type="submit" value="<?= $this->locale->txt[462] ?>">
-            </font>
-          </form>
+            <?php endif; ?>
+            --></a></i>
+            <br><br>
+            <a href="<?= SITE_ROOT ?>/im/send/<?= urlencode($this->meminf['memberName']) ?>/"><?= $this->locale->txt[688] ?></a>.
+            <br><br>
+          </font>
         </td>
       </tr>
     </table>
