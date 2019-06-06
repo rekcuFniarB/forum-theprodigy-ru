@@ -41,7 +41,9 @@
       </table>
       <br>
     <?php endforeach; ?>
+    
+    <?php $this->partial('templates/parts/simple_pagination.template.php') ?>
+    
     <p align=left>
       <a href="<?= SITE_ROOT ?>/people/<?= urlencode($this->profile['name']) ?>/"><font size="2"><b><?= $this->locale->txt[92] ?> <?= $this->esc($this->profile['realName']) ?></b></font></a>
     </p>
-    <?php $this->partial('templates/parts/simple_pagination.template.php') ?>
