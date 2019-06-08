@@ -499,5 +499,111 @@ class InstantMessages extends Respond
         
         return $this->render('templates/im/inbox.template.php', $data);
     } // outbox
+    
+    public function quote($request, $response, $service, $app)
+    {
+        $service->quote = true;
+        return $this->impost($request, $response, $service, $app);
+    }
+    
+    public function report($request, $response, $service, $app)
+    {
+        $service->report_msgid = $request->paramsNamed()->get('msgid');
+        $service->report = true;
+        return $this->impost($request, $response, $service, $app);
+    }
+    
+    public function impost($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->txt[147]);
+        
+        $GET = $request->paramsGet();
+        $PARAMS = $request->paramsNamed();
+        $COOKIES = $request->cookies();
+        
+        $form_subject = $GET->form_subject;
+        
+        $db_prefix = $app->db->prefix;
+        
+        if (!empty($PARAMS->imsg))
+        {
+            $dbst = $app->db->prepare("SELECT * FROM {$db_prefix}instant_messages WHERE (ID_IM=? AND (ID_MEMBER_TO=? || ID_MEMBER_FROM=?))");
+            $dbst->execute(array($PARAMS->imsg, $app->user->id, $app->user->id));
+            $imsg = $dbst->fetch();
+            $dbst = null; // closing this statement
+            if (empty($imsg))
+                return $this->error('Hacker?');
+            
+            $imsg['msgtime'] = $app->subs->timeformat($imsg['msgtime']);
+            $form_subject = $imsg['subject'];
+            if (!stristr(substr($form_subject,0,3), 're:'))
+                $form_subject = "Re: $form_subject";
+            
+            $service->imto = $imsg['fromName'];
+            $imsg['author'] = $app->user->loadDisplay($imsg['fromName']);
+            
+            if ($service->quote)
+            {
+                $msg['body'] =  preg_replace("|<br( /)?[>]|","\n", $imsg['body']);
+                if ($app->conf->removeNestedQuotes)
+                {
+                    $imsg['body'] = preg_replace("-\n*\[quote([^\\]]*)\]((.|\n)*?)\[/quote\]([\n]*)-", '', $imsg['body']);
+                    $imsg['body'] = preg_replace("/\n*\[\/quote\]\n*/", '', $imsg['body']);
+                }
+                $form_message = "[quote] {$imsg['body']} [/quote]\n";
+            }
+            
+            $service->reply_msg = $imsg;
+            $service->is_reply = true;
+        } // if is reply or quote
+        
+        if ($service->report)
+        {
+            $cookieName = "reportedTopicsByUser";
+            $topicSignature = $service->board . "|" . $service->threadid;
+            
+            $service->show_warning = false;
+            
+            $report_cookie = $COOKIES->get($cookieName);
+            if (is_array($report_cookie))
+                if (in_array($topicSignature, $report_cookie))
+                    $service->show_warning = true;
+            
+            $response->cookie($cookieName."[]", $topicSignature, time()+900);  /* expire in 15 minutes */
+            
+            $service->report_msgid = intval($service->report_msgid);
+            if ($service->report_msgid == 0)
+                return $this->error('Bad Request.');
+            
+            $dbst = $app->db->query("SELECT * FROM {$db_prefix}messages WHERE ID_MSG={$service->report_msgid}");
+            $report_msg = $dbst->fetch();
+            $dbst = null; // closing this statement
+            if (empty($report_msg))
+                return $this->error('Hacker?');
+            
+            $report_msg['body'] =  preg_replace("|<br( /)?[>]|","\n", $report_msg['body']);
+            $form_message = "[quote] {$report_msg['body']} [/quote]\n";
+            $form_message .= "[iurl]". SITE_URL . "/{$service->report_msgid}/[/iurl]";
+            $form_subject = $service->form_subject;
+            
+            $service->is_report_field = true;
+        } // if is report
+        
+        $form_subject = !empty($form_subject) ? $form_subject : $app->locale->txt[24];
+        
+        $data = array(
+            'title' => $app->locale->txt[148],
+            'catname' => $app->locale->txt[144],
+            'boardname' => $app->locale->txt[321],
+            'form_subject' => $form_subject,
+            'form_message' => empty($form_message) ? '' : $form_message,
+            'switch_folder' => '',
+            'switch_folder_name' => $app->locale->txt[316],
+        );
+        
+        $this->addJS('ubbc.js');
+        return $this->render('templates/im/impost.template.php', $data);
+    } // impost()
 }
 ?>
