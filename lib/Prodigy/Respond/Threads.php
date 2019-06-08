@@ -1708,7 +1708,6 @@ class Threads extends Respond
                 $app->db->prepare("INSERT INTO {$db_prefix}polls ($keys) VALUES ($poll_placeholders)")->
                     execute($poll_vals);
                 $ID_POLL = $app->db->lastInsertId();
-                error_log("__DEBUG__: POLL: INSERTING: ($poll_placeholders), ($keys), ID_POLL: $ID_POLL");
                 
                 // attach the poll to thread 
                 if ($ID_POLL)
@@ -2564,6 +2563,81 @@ class Threads extends Respond
         
         return $this->redirect($yySetLocation);
     } // gotomsg
+    
+    public function report($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->txt[1]);
+        
+        if ($app->conf->enableReportToMod != '1')
+            return $this->error($app->locale->txt[1]);
+        
+        $msgid = (int) $request->paramsNamed()->get('msgid');
+        if (empty($msgid))
+            return $this->error('Bad request.');
+        
+        $db_prefix = $app->db->prefix;
+        
+        // Get message board ID
+        $dbst = $app->db->query("SELECT t.ID_BOARD, m.posterName FROM {$db_prefix}messages AS m
+            JOIN topics AS t ON m.ID_TOPIC = t.ID_TOPIC
+            WHERE ID_MSG = $msgid");
+        $msg_info = $dbst->fetch();
+        $dbst = null;
+        
+        if (empty($msg_info) || empty($msg_info['ID_BOARD']))
+            return $this->error("Board not found.");
+        
+        // lets get some mods...
+        $themoderators = $app->board->moderators($msg_info['ID_BOARD']);
+        $themoderators = array_keys($themoderators);
+        
+        $skip_admins = $app->conf->get('dontNotifyAdmins', array());
+        
+        // Get admins
+        $dbst = $app->db->query("SELECT ID_MEMBER, memberName FROM {$db_prefix}members WHERE memberGroup = 'Administrator'");
+        
+        while ($row = $dbst->fetch())
+        {
+            if (!in_array($row['memberName'], $themoderators) && !in_array($row['ID_MEMBER'], $skip_admins))
+                $themoderators[] = $row['memberName'];
+        }
+        $dbst = null;
+        
+        // Жалобы из раздела Флейм только для модераторов и админа
+        if ($msg_info['ID_BOARD'] != 16)
+        {
+            // loop through global moderators
+            $dbst = $app->db->query("SELECT memberName FROM {$db_prefix}members WHERE (memberGroup='Global Moderator')");
+            
+            while ($row = $dbst->fetch())
+                if (!in_array ($row['memberName'], $themoderators))
+                    $themoderators[] = $row['memberName'];
+            $dbst = null;
+            
+            $secretModerators = $app->conf->get('hiddenModerators', array());
+            if(is_array($secretModerators) && sizeof($secretModerators) > 0)
+            {
+                $placeholders = $app->db->build_placeholders($secretModerators);
+                $dbst = $app->db->prepare("SELECT memberName FROM {$db_prefix}members WHERE ID_MEMBER in ($placeholders)");
+                $dbst->execute($secretModerators);
+                while ($row = $dbst->fetchColumn())
+                {
+                    if (!in_array($row, $themoderators))
+                        $themoderators[] = $row;
+                }
+                $dbst = null;
+            }
+        } // board ! 16
+        
+        $poster = $app->user->loadDisplay($msg_info['posterName']);
+        $service->form_subject = "Обратите внимание на сообщение {$poster['realName']}";
+        $service->imto = implode(',', $themoderators);
+        $service->report = true;
+        $service->report_msgid = $msgid;
+        
+        return $app->im->impost($request, $response, $service, $app);
+    }
 }
 
 ?>

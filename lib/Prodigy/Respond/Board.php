@@ -67,6 +67,8 @@ class Board extends Respond
             }
             $this->moderators = $this->service->board_moderators = $_moderators;
         }
+        
+        return $this;
     } // load()
     
     public function isAnnouncement($board = null)

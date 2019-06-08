@@ -536,7 +536,7 @@
                             
                             <?php if($this->conf->enableReportToMod && $this->user->name != 'Guest' && $msg['ID_MEMBER'] != $this->user->id): ?>
                               <font size="1">
-                                <a class="reportToModerator" href="<?= SITE_ROOT ?>/report/t<?= $this->thread ?>/<?= $msg['counter'] ?>/?subject=<?= urlencode($msg['subject']) ?>&amp;poster=<?= $msg['posterName'] ?>&amp;msgid=<?= $msgid ?>" target="_blank"><?= $this->locale->rtm1 ?></a>
+                                <a class="reportToModerator" href="<?= SITE_ROOT ?>/report/<?= $msgid ?>/" target="_blank"><?= $this->locale->rtm1 ?></a>
                               </font>&nbsp;&nbsp;
                             <?php endif; ?>
                             
