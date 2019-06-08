@@ -218,7 +218,8 @@ $router->respond(array('GET', 'POST'), '/comments/subscribed/', 'comments->subsc
 $router->respond(array('GET', 'POST'), '/comments/to/[:user]/', 'comments->commentsTo');
 $router->respond(array('GET', 'POST'), '/comments/by/[:user]/', 'comments->commentsBy');
 
-$router->respond(array('GET', 'POST'), '/im/', 'im->inbox');
+$router->respond(array('GET', 'POST'), '/im/[i:start]?/', 'im->inbox');
+$router->respond(array('GET', 'POST'), '/im/outbox/[i:start]?/', 'im->outbox');
 
 $router->respond('GET', '/example/', 'main->example');
 //$router->respond('GET', '/example/', 'main->example2');

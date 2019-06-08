@@ -916,6 +916,8 @@ $txt[1004] = 'Line';
 
 $txt[1005] = 'Close window';
 
+
+$txt['whom'] = 'Whom';
 $txt['admin'] = 'Администратор';
 $txt['globmod'] = 'Глобальный Модератор';
 
