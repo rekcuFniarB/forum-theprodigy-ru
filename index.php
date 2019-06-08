@@ -210,14 +210,18 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/vote/[i:poll]/',
 
 //$router->respond('GET', '/main-static-call/', '\Prodigy\Router::Main');
 
+
+// User Profile
 $router->respond('GET', '/people/[:user]/', 'profile->show');
 $router->respond('GET', '/people/[:user]/messages/[i:start]?/', 'profile->messages');
 $router->respond(array('GET', 'POST'), '/people/[:user]/modify/', 'profile->edit');
 
+// Comments
 $router->respond(array('GET', 'POST'), '/comments/subscribed/', 'comments->subscribed');
 $router->respond(array('GET', 'POST'), '/comments/to/[:user]/', 'comments->commentsTo');
 $router->respond(array('GET', 'POST'), '/comments/by/[:user]/', 'comments->commentsBy');
 
+// Instant Messages
 $router->respond('GET', '/im/[i:start]?/', 'im->inbox');
 $router->respond('GET', '/im/outbox/[i:start]?/', 'im->outbox');
 $router->respond(array('GET', 'POST'), '/im/new/', 'im->impost');

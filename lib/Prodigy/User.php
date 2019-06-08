@@ -264,6 +264,7 @@ class User {
         $this->skin = $this->app->conf->get('default_skin', 'default');
         $this->collapsedBoards = array();
         $this->collapsedCategories = array();
+        $this->lngfile = $this->app->conf->language;
         $this->app->locale->set_locale($this->app->conf->language);
     }
     

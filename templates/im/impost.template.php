@@ -77,7 +77,7 @@
             </td>
           </tr>
         </table>
-        <input type="hidden" name="sc" value="'<?= $this->sessionid ?>"/>
+        <input type="hidden" name="sc" value="<?= $this->sessionid ?>"/>
         <?php if($this->is_report_field): ?>
           <input type="hidden" name="is_report" value="1">
         <?php endif; ?>

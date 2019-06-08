@@ -337,15 +337,16 @@ class InstantMessages extends Respond
             $data['profilebutton'] = true;
         
         // Mark as read after response finished
-        if (!empty($service->imcount) && $service->imcount > 0)
+        register_shutdown_function(function() use ($app, $service)
         {
-            register_shutdown_function(function() use ($app, $service)
+            if (is_array($service->imcount) && $service->imcount[1] > 0)
             {
-                if(session_id()) session_write_close();
-                $app->db->query("UPDATE {$db_prefix}instant_messages SET readBy=1 WHERE ID_MEMBER_TO=? AND readBy='0' LIMIT ?")->
-                execute(array($app->user->id, $service->imcount));
-            });
-        }
+                if(session_id())
+                    session_write_close();
+                $app->db->prepare("UPDATE {$app->db->prefix}instant_messages SET readBy=1 WHERE ID_MEMBER_TO=? AND readBy='0' LIMIT ?")->
+                    execute(array($app->user->id, $service->imcount[1]));
+            }
+        });
         
         return $this->render('templates/im/inbox.template.php', $data);
     } // inbox()
@@ -486,17 +487,6 @@ class InstantMessages extends Respond
         if ($app->conf->profilebutton && !$app->user->guest)
             $data['profilebutton'] = true;
         
-        // Mark as read after response finished
-        if (!empty($service->imcount) && $service->imcount > 0)
-        {
-            register_shutdown_function(function() use ($app, $service)
-            {
-                if(session_id()) session_write_close();
-                $app->db->query("UPDATE {$db_prefix}instant_messages SET readBy=1 WHERE ID_MEMBER_TO=? AND readBy='0' LIMIT ?")->
-                execute(array($app->user->id, $service->imcount));
-            });
-        }
-        
         return $this->render('templates/im/inbox.template.php', $data);
     } // outbox
     
@@ -518,92 +508,225 @@ class InstantMessages extends Respond
         if ($app->user->guest)
             return $this->error($app->locale->txt[147]);
         
-        $GET = $request->paramsGet();
         $PARAMS = $request->paramsNamed();
         $COOKIES = $request->cookies();
         
-        $form_subject = $GET->form_subject;
-        
         $db_prefix = $app->db->prefix;
         
-        if (!empty($PARAMS->imsg))
+        if($request->method('GET'))
         {
-            $dbst = $app->db->prepare("SELECT * FROM {$db_prefix}instant_messages WHERE (ID_IM=? AND (ID_MEMBER_TO=? || ID_MEMBER_FROM=?))");
-            $dbst->execute(array($PARAMS->imsg, $app->user->id, $app->user->id));
-            $imsg = $dbst->fetch();
-            $dbst = null; // closing this statement
-            if (empty($imsg))
-                return $this->error('Hacker?');
+            $GET = $request->paramsGet();
+            $form_subject = $GET->form_subject;
             
-            $imsg['msgtime'] = $app->subs->timeformat($imsg['msgtime']);
-            $form_subject = $imsg['subject'];
-            if (!stristr(substr($form_subject,0,3), 're:'))
-                $form_subject = "Re: $form_subject";
-            
-            $service->imto = $imsg['fromName'];
-            $imsg['author'] = $app->user->loadDisplay($imsg['fromName']);
-            
-            if ($service->quote)
+            if (!empty($PARAMS->imsg))
             {
-                $msg['body'] =  preg_replace("|<br( /)?[>]|","\n", $imsg['body']);
-                if ($app->conf->removeNestedQuotes)
+                $dbst = $app->db->prepare("SELECT * FROM {$db_prefix}instant_messages WHERE (ID_IM=? AND (ID_MEMBER_TO=? || ID_MEMBER_FROM=?))");
+                $dbst->execute(array($PARAMS->imsg, $app->user->id, $app->user->id));
+                $imsg = $dbst->fetch();
+                $dbst = null; // closing this statement
+                if (empty($imsg))
+                    return $this->error('Hacker?');
+                
+                $imsg['msgtime'] = $app->subs->timeformat($imsg['msgtime']);
+                $form_subject = $imsg['subject'];
+                if (!stristr(substr($form_subject,0,3), 're:'))
+                    $form_subject = "Re: $form_subject";
+                
+                $service->imto = $imsg['fromName'];
+                $imsg['author'] = $app->user->loadDisplay($imsg['fromName']);
+                
+                if ($service->quote)
                 {
-                    $imsg['body'] = preg_replace("-\n*\[quote([^\\]]*)\]((.|\n)*?)\[/quote\]([\n]*)-", '', $imsg['body']);
-                    $imsg['body'] = preg_replace("/\n*\[\/quote\]\n*/", '', $imsg['body']);
+                    $msg['body'] =  preg_replace("|<br( /)?[>]|","\n", $imsg['body']);
+                    if ($app->conf->removeNestedQuotes)
+                    {
+                        $imsg['body'] = preg_replace("-\n*\[quote([^\\]]*)\]((.|\n)*?)\[/quote\]([\n]*)-", '', $imsg['body']);
+                        $imsg['body'] = preg_replace("/\n*\[\/quote\]\n*/", '', $imsg['body']);
+                    }
+                    $form_message = "[quote] {$imsg['body']} [/quote]\n";
                 }
-                $form_message = "[quote] {$imsg['body']} [/quote]\n";
+                
+                $service->reply_msg = $imsg;
+                $service->is_reply = true;
+            } // if is reply or quote
+            
+            if ($service->report)
+            {
+                $cookieName = "reportedTopicsByUser";
+                $topicSignature = $service->board . "|" . $service->threadid;
+                
+                $service->show_warning = false;
+                
+                $report_cookie = $COOKIES->get($cookieName);
+                if (is_array($report_cookie))
+                    if (in_array($topicSignature, $report_cookie))
+                        $service->show_warning = true;
+                
+                $response->cookie($cookieName."[]", $topicSignature, time()+900);  /* expire in 15 minutes */
+                
+                $service->report_msgid = intval($service->report_msgid);
+                if ($service->report_msgid == 0)
+                    return $this->error('Bad Request.');
+                
+                $dbst = $app->db->query("SELECT * FROM {$db_prefix}messages WHERE ID_MSG={$service->report_msgid}");
+                $report_msg = $dbst->fetch();
+                $dbst = null; // closing this statement
+                if (empty($report_msg))
+                    return $this->error('Hacker?');
+                
+                $report_msg['body'] =  preg_replace("|<br( /)?[>]|","\n", $report_msg['body']);
+                $form_message = "[quote] {$report_msg['body']} [/quote]\n";
+                $form_message .= "[iurl]". SITE_URL . "/{$service->report_msgid}/[/iurl]";
+                $form_subject = $service->form_subject;
+                
+                $service->is_report_field = true;
+            } // if is report
+            
+            $form_subject = !empty($form_subject) ? $form_subject : $app->locale->txt[24];
+            
+            $data = array(
+                'title' => $app->locale->txt[148],
+                'catname' => $app->locale->txt[144],
+                'boardname' => $app->locale->txt[321],
+                'form_subject' => $form_subject,
+                'form_message' => empty($form_message) ? '' : $form_message,
+                'switch_folder' => '',
+                'switch_folder_name' => $app->locale->txt[316],
+            );
+            
+            $this->addJS('ubbc.js');
+            return $this->render('templates/im/impost.template.php', $data);
+        } // if GET
+        elseif ($request->method('POST'))
+        {
+            $app->session->check('post');
+            
+            $POST = $request->paramsPost();
+            
+            $nouser = array();
+            
+            $POST->naztem = trim($POST->naztem);
+            $service->validate($POST->naztem, $app->locale->txt[77])->notEmpty();
+            
+            $service->validate($POST->message, $app->locale->txt[499])->notEmpty()->isLen(1,$app->conf->MaxMessLen);
+            
+            $service->validate($POST->to, $app->locale->txt[747])->notEmpty();
+            
+            $is_report = false;
+            
+            if (!empty($POST->is_report))
+            {
+                $is_report = true;
+                $POST->naztem = "[NOTICE] {$POST->naztem}";
             }
             
-            $service->reply_msg = $imsg;
-            $service->is_reply = true;
-        } // if is reply or quote
-        
-        if ($service->report)
-        {
-            $cookieName = "reportedTopicsByUser";
-            $topicSignature = $service->board . "|" . $service->threadid;
+            $message = $POST->message;
+            $subject = $POST->naztem;
             
-            $service->show_warning = false;
+            $message = $app->subs->preparsecode($message);
             
-            $report_cookie = $COOKIES->get($cookieName);
-            if (is_array($report_cookie))
-                if (in_array($topicSignature, $report_cookie))
-                    $service->show_warning = true;
+            $nouser = array();
+            $multiple = array_unique(explode(',', $POST->to));
+            foreach ($multiple as $dbm)
+            {
+                $dbm = trim($dbm);
+                $ignored = 0;
+                $dbm = preg_replace("/[^0-9A-Za-zÀ-ßà-ÿ#%+\s,-\.:=?@^_ÄÆÈÕÆÝÃÅÖÁÀÞúÉËÌÍÎÏßÐÑÒÓÜÛÇØÙÚ]/", '', $dbm);
+                # Check Ignore-List
+                $dbst = $app->db->prepare("SELECT im_ignore_list,ID_MEMBER,im_email_notify,emailAddress,lngfile FROM {$db_prefix}members WHERE memberName=? LIMIT 1");
+                $dbst->execute(array($dbm));
+                $row = $dbst->fetch();
+                $dbst = null;
+                if (empty($row))
+                {
+                    #adds invalid user's name to array which error list will be built from later
+                    $nouser[] = $dbm;
+                    $ignored = 1;
+                }
+                else
+                {
+                    $ignore = explode(',', $row['im_ignore_list']);
+                    $toID = $row['ID_MEMBER'];
+                    $emailNotify = $row['im_email_notify'];
+                    $notifyAddress = $row['emailAddress'];
+                    $userlng = $row['lngfile'];
+                    
+                    # If User is on Recipient's Ignore-List, show Error Message
+                    foreach ($ignore as $igname)
+                    {
+                        #adds ignored user's name to array which error list will be built from later
+                         if ($igname == $app->user->name || $igname == "*")
+                        {
+                            $nouser[] = $dbm;
+                            $ignored = 1;
+                        }
+                    }
+                    
+                    //$dbst = $app->db->prepare("SELECT ID_MEMBER FROM {$db_prefix}members WHERE memberName=?");
+                    //$dbst->execute(array($app->user->name));
+                    //$fromID = $dbst->fetchColumn();
+                    //$dbst = null;
+                    if($is_report)
+                    {
+                        // It's a report to moderators, don't show in outbox
+                        $app->db->prepare("
+                            INSERT INTO {$db_prefix}instant_messages (ID_MEMBER_FROM,ID_MEMBER_TO,fromName,toName,msgtime,subject,body,deletedBy)
+                            VALUES (?,?,?,?,?,?,?,?)")->
+                            execute(array($app->user->id, $toID, $app->user->name, $dbm, time(), $subject, $message, 0));
+                    }
+                    else 
+                    {
+                        $app->db->prepare("
+                            INSERT INTO {$db_prefix}instant_messages (ID_MEMBER_FROM,ID_MEMBER_TO,fromName,toName,msgtime,subject,body)
+                            VALUES (?,?,?,?,?,?,?)")->
+                            execute(array($app->user->id,$toID,$app->user->name,$dbm,time(),$subject,$message));
+                    }
+                    $imID = $app->db->lastInsertId();
+                    // Log the message
+                    $app->db->prepare("INSERT INTO {$db_prefix}log_latest_actions (type, actorID, addresseeID, subject, value)
+                    VALUES ('NEW_INSTANT_MESSAGE', ?, ?, ?, ?)")->
+                    execute(array($app->user->id, $toID, $subject, $message));
+
+                    # Send notification
+                    if ($emailNotify == 1)
+                    {
+                        $mydate = $app->subs->timeformat(time());
+                        if ($notifyAddress != '')
+                        {
+                            if ($app->conf->userLanguage)
+                            {
+                                $desiredlanguage = (($userlng == Null || $userlng == '') ? $app->conf->language : $userlng);
+                                if ($desiredlanguage != $this->locale->lngfile)
+                                {
+                                    $app->locale->set_locale($desiredlanguage);
+                                }
+                            }
+                            $fromname = $app->user->realname;
+                            $email_subject = str_replace ('SUBJECT', $subject, $app->locale->txt[561]);
+                            $email_subject = str_replace ('SENDER', $fromname, $email_subject);
+                            $email_message = str_replace ('DATE', strip_tags($mydate), $app->locale->txt[562]);
+                            $email_message = str_replace ('MESSAGE', strip_tags($message), $email_message);
+                            $email_message = str_replace ('SENDER', $fromname, $email_message);
+                            $this->sendmail($notifyAddress, $email_subject, $email_message, null, true);
+                        }
+                    }
+                    
+                    # Log congratulation
+                    if ($POST->form_type == "ny")
+                        $app->db->query("INSERT LOW_PRIORITY INTO {$db_prefix}log_congratulations VALUES (?, ?)")->
+                        execute(array($app->user->id, $imID));
+                } // if $row
+            } // foreach 
             
-            $response->cookie($cookieName."[]", $topicSignature, time()+900);  /* expire in 15 minutes */
+            #if there were invalid usernames in the recipient list, these names are listed after all valid users have been IMed
+            if (sizeof($nouser) > 0)
+            {
+                $badusers = implode(', ', $nouser);
+                return $this->error("$badusers {$app->locale->txt[747]}");
+            }
             
-            $service->report_msgid = intval($service->report_msgid);
-            if ($service->report_msgid == 0)
-                return $this->error('Bad Request.');
-            
-            $dbst = $app->db->query("SELECT * FROM {$db_prefix}messages WHERE ID_MSG={$service->report_msgid}");
-            $report_msg = $dbst->fetch();
-            $dbst = null; // closing this statement
-            if (empty($report_msg))
-                return $this->error('Hacker?');
-            
-            $report_msg['body'] =  preg_replace("|<br( /)?[>]|","\n", $report_msg['body']);
-            $form_message = "[quote] {$report_msg['body']} [/quote]\n";
-            $form_message .= "[iurl]". SITE_URL . "/{$service->report_msgid}/[/iurl]";
-            $form_subject = $service->form_subject;
-            
-            $service->is_report_field = true;
-        } // if is report
-        
-        $form_subject = !empty($form_subject) ? $form_subject : $app->locale->txt[24];
-        
-        $data = array(
-            'title' => $app->locale->txt[148],
-            'catname' => $app->locale->txt[144],
-            'boardname' => $app->locale->txt[321],
-            'form_subject' => $form_subject,
-            'form_message' => empty($form_message) ? '' : $form_message,
-            'switch_folder' => '',
-            'switch_folder_name' => $app->locale->txt[316],
-        );
-        
-        $this->addJS('ubbc.js');
-        return $this->render('templates/im/impost.template.php', $data);
+            return $this->redirect('/im/');
+        }// if POST
     } // impost()
 }
 ?>
