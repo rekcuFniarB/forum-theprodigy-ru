@@ -34,11 +34,17 @@ class Service extends \Klein\ServiceProvider
      * @return string
      */
     
-    public function get($key)
+    public function get(string $key='')
     {
+        if (empty($key))
+            return '';
         if ($this->shared_data->exists($key))
+        {
             $val = $this->shared_data->get($key);
-        return $this->esc($val);
+            return $this->esc($val);
+        }
+        else
+            return '';
     }
     
     /**
