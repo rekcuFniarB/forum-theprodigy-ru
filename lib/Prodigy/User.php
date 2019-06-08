@@ -553,46 +553,6 @@ class User {
         
         return in_array($user, $board_moderators) || isset($board_moderators[$user]);
     } // isBoardModerator()
-
-    /**
-     * Load moderators of specified board or prepare array of moderators from supplied list
-     * @param mixed $query   int board number or comma separated list of moderators
-     * @return array
-     */
-    public function LoadBoardModerators($query = null)
-    {
-        $board = (int) $query;
-        /* load the moderators for specified board, if the board is specified */
-        if ($board > 0)
-        {
-            $db = $this->app->db;
-            $dbst = $db->prepare("SELECT b.moderators FROM {$db->prefix}boards AS b WHERE (b.ID_BOARD=?)");
-            $dbst->execute(array($board));
-            /* if there aren't any, skip */
-            $moderators = $dbst->fetchColumn();
-            $dbst = null;
-            if ($moderators)
-                $moderators = explode(',', trim($moderators));
-            else
-                return array();
-        }
-        elseif ($query !== null)
-        {
-            $moderators = explode(',', trim($query));
-        }
-        else
-            $this->error('LoadBoardModerators failed, bad request supplied.', 'u1');
-        
-        $_moderators = array();
-        /* now load the real names of the moderators
-           into the realNames array */
-        for ($i = 0; $i < sizeof($moderators); $i++)
-        {
-            $moderators[$i] = trim($moderators[$i]);
-            $_moderators[$moderators[$i]] = $this->LoadDisplay($moderators[$i]);
-        }
-        return $_moderators;
-    } // LoadBoardModerators()
     
     /**
      * Get user access level
