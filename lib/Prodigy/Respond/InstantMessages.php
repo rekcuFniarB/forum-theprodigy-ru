@@ -764,5 +764,89 @@ class InstantMessages extends Respond
             return $this->back();
         } // if POST
     } // prefs()
+    
+    public function removeFromOutbox($request, $response, $service, $app)
+    {
+         $service->delFromOutbox = true;
+         return $this->remove($request, $response, $service, $app);
+    } // removeFromOutbox
+    
+    public function remove($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->txt[147]);
+        
+        if (!$service->delFromOutbox)
+            // remove from inbox
+            $delBy = 1;
+        else
+            // remove from outbox
+            $delBy = 0;
+        
+        $db_prefix = $app->db->prefix;
+        
+        if ($request->method('GET'))
+        {
+            if (empty($PARAMS->imid))
+                return $this->error('No message specified.');
+            
+            $app->session->check('get');
+            $PARAMS = $request->paramsNamed();
+            $this->delete($delBy, $PARAMS->imid);
+        } // if GET
+        elseif ($request->method('POST'))
+        {
+            $app->session->check('post');
+            
+            $POST = $request->paramsPost();
+            
+            foreach( $POST as $postVar => $postVarValue )
+            {
+                if (strcmp(substr($postVar, 0, 7), 'delete_') == 0)
+                {
+                    $id = substr($postVar, 7);
+                    $this->delete($delBy, $id);
+                }
+            } // foreach()
+        } // if POST
+        
+        return $this->back();
+    } // remove()
+    
+    /**
+     * Delete message.
+     * @param int $delBy delete from inbox (1) or outbox (0).
+    */
+    protected function delete($delBy, $imid)
+    {
+        if ($delBy === 1)
+            // Remove from inbox
+            $tofrom = 'TO';
+        elseif ($delBy === 0)
+            // remove fro outbox
+            $tofrom = 'FROM';
+        else
+            return $this->error('Improper value passed to delete()');
+        
+        $db_prefix = $this->app->db->prefix;
+        $dbst = $this->app->db->prepare("SELECT deletedBy FROM {$db_prefix}instant_messages WHERE ID_IM=? AND ID_MEMBER_$tofrom = ?");
+            $dbst->execute(array($imid, $this->app->user->id));
+            $check = $dbst->fetchColumn();
+            $dbst = null;
+            if ($check === false)
+                return $this->error("Hacker?");
+            
+            $dbst = $this->app->db->prepare("SELECT deletedBy FROM {$db_prefix}instant_messages WHERE ID_IM=? AND deletedBy != -1");
+            $dbst->execute(array($imid));
+            if ($dbst->fetchColumn() !== false)
+                // Already marded as deleted from inbox or outbox, now delete completely
+                $this->app->db->prepare("DELETE FROM {$db_prefix}instant_messages WHERE ID_IM=?")->
+                    execute(array($imid));
+            else
+                // Mark as deleted from inbox or outbox
+                $this->app->db->prepare("UPDATE {$db_prefix}instant_messages SET deletedBy=? WHERE ID_IM=?")->
+                    execute(array($delBy, $imid));
+            $dbst = null;
+    } // delete()
 }
 ?>
