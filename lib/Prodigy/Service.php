@@ -617,6 +617,21 @@ class Service extends \Klein\ServiceProvider
         $trans_tbl['&#039;'] = "'";
         return strtr ($string, $trans_tbl);
     }
+    
+    /**
+     * Convert text to utf-8 if charset is not utf-8
+     */
+    public function utf8($txt)
+    {
+        if(stripos($this->app->conf->charset, 'utf-8') === false && stripos($this->app->conf->charset, 'utf-8'))
+        {
+            // charset is not UTF-8, convert to UTF-8
+            return  mb_convert_encoding($txt, 'utf-8', $this->app->conf->charset);
+        }
+        else
+            // probably already utf-8, just return as is
+            return $txt;
+    } // utf8
 }
 
 ?>

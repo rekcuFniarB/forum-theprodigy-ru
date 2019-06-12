@@ -95,6 +95,8 @@ class Main extends Respond {
 //         error_log("__DEBUG__: PLACEHOLDERS: $placeholders");
 //         $service->msg = "Emulation mode: $emul_mode, Email: $email, Buffered: $buffered, Placeholders: ($placeholders)";
         //$app->im->send_notice(array(182, 1, 2, 3), '__TEST__', 'Привет бля');
+        //$mail_result = $app->im->sendmail(array('retratserif@gmail.com'), 'Subject blah', 'Message blah', null, true);
+        //$app->errors->log('__DEBUG__: MAIL: RESULT: ' . var_export($mail_result, true));
         //return $app->errors->abort('TEST', $msg, 200);
         $this->render('templates/examples/example.php');
     }

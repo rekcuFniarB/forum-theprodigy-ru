@@ -190,10 +190,164 @@ class InstantMessages extends Respond
                 execute(array($notification, $threadid));
     } // Notify2()
     
-    public function sendmail()
+    /**
+     * Send emails
+     * @param array $to array of recepient emails
+     * @param string $subject Message subject.
+     * @param string $message Email body
+     * @param string $fromName Display name mail came from
+     * @param bool $html should we also include html format
+     */
+    public function sendmail($to, $subject, $message, $fromName = null, $html = false)
     {
-        // TODO
-    }
+        // If the recipient list isn't an array, make it one.
+        if (!is_array($to))
+            $to = array($to);
+
+        // Get rid of slashes and entities.
+        $subject = stripslashes($subject);
+        $subject = mb_convert_encoding($subject, 'UTF-8', 'cp1251');
+        $subject = html_entity_decode($subject, ENT_QUOTES, 'utf-8');
+        $subject = '=?UTF-8?B?'.base64_encode($subject).'?=';
+        $boundary = "===EMAIL=BOUNDARY=" . base_convert(time(), 10, 36) . "===";
+
+        if ($html) {
+            $message_html = $this->service->utf8($this->service->doUBBC($message, 'links,inline,blocks'));
+            //$message_html = html_entity_decode($message_html, ENT_QUOTES, 'utf-8');
+            $message_html = str_replace(array("\r", "\n"), array('', "\r\n"), stripslashes($message_html));
+        }
+        
+        // Make the message use \r\n's only.
+        $message = str_replace(array("\r", "\n"), array('', "\r\n"), stripslashes($message));
+        
+        $message = $this->service->utf8($message);
+        $message = html_entity_decode($message, ENT_QUOTES, 'utf-8');
+
+        if ($html) {
+            $multipart_message = "This is a multi-part message in MIME format.\r\n";
+            $multipart_message .= "--$boundary\r\n";
+            $multipart_message .= "Content-Type: text/plain; charset=utf-8\r\n";
+            $multipart_message .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+            $multipart_message .= $message . "\r\n\r\n";
+            
+            $multipart_message .= "--$boundary\r\n";
+            $multipart_message .= "Content-Type: text/html; charset=utf-8\r\n";
+            $multipart_message .= "Content-Transfer-Encoding: 8bit\r\n\r\n";
+            $multipart_message .= "<html>\r\n  <head>\r\n    <meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\">\r\n";
+            $multipart_message .= "    <style>\r\n      table {background-color: #b0b0b0; border: 1px solid #808080;}\r\n";
+            $multipart_message .= "      div.spoiler {display: block !important; background-color: #a0a0a0;}\r\n    </style>\r\n";
+            $multipart_message .= "  </head>\r\n<body>\r\n";
+            $multipart_message .= "$message_html\r\n</body>\r\n\r\n";
+            $multipart_message .= "--$boundary--";
+            $message = &$multipart_message;
+        }
+        
+        $umbname = $this->service->utf8($this->app->conf->mbname);
+        if (!empty($fromName))
+            $fromName = base64_encode($this->service->utf8($fromName));
+        else
+            $fromName = base64_encode($umbname);
+        
+        // Construct the mail headers...
+        $headers = "From: \"=?UTF-8?B?$fromName?=\" <webmaster@{$this->service->host}>\r\n";
+        $headers .= "Reply-To: \"=?UTF-8?B?$fromName?=\" <{$this->app->conf->webmaster_email}>\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        
+        if ($html)
+            $headers .= "Content-Type: multipart/alternative; boundary=\"$boundary\"\r\n";
+        else
+        {
+            $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
+            $headers .= "Content-Transfer-Encoding: 8bit\r\n";
+        }
+        
+        $headers .= "Return-Path: {$this->app->conf->webmaster_email}\r\n";
+        $headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' +0000';
+        
+        // SMTP or sendmail?
+        if ($this->app->conf->mail_type == 'sendmail')
+            foreach ($to as $email)
+                $mail_result = mail(str_replace(array("\r", "\n"), array('', ' '), $email), str_replace(array("\r", "\n"), array('', ' '), $subject), $message, $headers);
+        else
+            $mail_result = $this->smtp_mail($to, $subject, $message, $headers);
+        
+        // Everything go smoothly?
+        return $mail_result;
+    } // sendmail()
+    
+    protected function smtp_mail($mail_to_array, $subject, $message, $headers)
+    {
+        if (!$socket = fsockopen($this->app->conf->smtp_host, 25, $errno, $errstr, 20))
+            return $this->error("Could not connect to smtp host : $errno : $errstr");
+
+        if (!$this->server_parse($socket, '220'))
+            return false;
+        if ($this->app->conf->smtp_username && $this->app->conf->smtp_password)
+        {
+            fputs($socket, 'EHLO ' . $this->app->conf->smtp_host . "\r\n");
+            if (!$this->server_parse($socket, '250'))
+                return false;
+            fputs($socket, "AUTH LOGIN\r\n");
+            if (!$this->server_parse($socket, '334'))
+                return false;
+            fputs($socket, base64_encode($this->app->conf->smtp_username) . "\r\n");
+            if (!$this->server_parse($socket, '334'))
+                return false;
+            fputs($socket, base64_encode($this->app->conf->smtp_password) . "\r\n");
+            if (!$this->server_parse($socket, '235'))
+                return false;
+        }
+        else
+        {
+            fputs($socket, 'HELO ' . $this->app->conf->smtp_host . "\r\n");
+            if (!$this->server_parse($socket, '250'))
+                return false;
+        }
+        
+        foreach ($mail_to_array as $mail_to)
+        {
+            fputs($socket, 'MAIL FROM: <' . $this->app->conf->webmaster_email . ">\r\n");
+            if (!$this->server_parse($socket, '250'))
+                return false;
+            fputs($socket, 'RCPT TO: <' . $mail_to . ">\r\n");
+            if (!$this->server_parse($socket, '250'))
+                return false;
+            fputs($socket, "DATA\r\n");
+            if (!$this->server_parse($socket, '354'))
+                return false;
+            fputs($socket, 'Subject: ' . $subject . "\r\n");
+            if (strlen($mail_to))
+                fputs($socket, 'To: <' . $mail_to . ">\r\n");
+            fputs($socket, $headers . "\r\n\r\n");
+            fputs($socket, $message . "\r\n");
+            fputs($socket, ".\r\n");
+            if (!$this->server_parse($socket, '250'))
+                return false;
+            fputs($socket, "RSET\r\n");
+            if (!$this->server_parse($socket, '250'))
+                return false;
+        }
+        fputs($socket, "QUIT\r\n");
+        fclose($socket);
+        
+        return true;
+    } // smtp_mail()
+    
+    // Parse a message to the SMTP server.
+    protected function server_parse($socket, $response)
+    {
+        // No response yet.
+        $server_response = '';
+        
+        while (substr($server_response, 3, 1) != ' ')
+            if (!($server_response = fgets($socket, 256)))
+                return $this->error('Couldn\'t get mail server response codes');
+        
+        if (substr($server_response, 0, 3) != $response)
+            return $this->error("Ran into problems sending Mail. Error: $server_response");
+
+        return true;
+    } // server_parse()
     
     /**
      * Sends notifications to users.
