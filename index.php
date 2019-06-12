@@ -228,6 +228,7 @@ $router->respond(array('GET', 'POST'), '/im/new/', 'im->impost');
 $router->respond('GET', '/im/reply/[i:imsg]/', 'im->impost');
 $router->respond('GET', '/im/quote/[i:imsg]/', 'im->quote');
 $router->respond('GET', '/report/[i:msgid]/', 'thread->report');
+$router->respond(array('GET', 'POST'), '/im/prefs/', 'im->prefs');
 
 $router->respond('GET', '/example/', 'main->example');
 //$router->respond('GET', '/example/', 'main->example2');

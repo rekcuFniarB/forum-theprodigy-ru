@@ -728,5 +728,41 @@ class InstantMessages extends Respond
             return $this->redirect('/im/');
         }// if POST
     } // impost()
+    
+    public function prefs($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->txt[147]);
+        
+        $db_prefix = $app->db->prefix;
+        
+        if ($request->method('GET'))
+        {
+            $dbst = $app->db->prepare("SELECT im_ignore_list,im_email_notify FROM {$db_prefix}members WHERE ID_MEMBER=?");
+            $dbst->execute(array($app->user->id));
+            $imconfig = $dbst->fetch();
+            $dbst = null;
+            $data = array(
+                'title' => "{$app->locale->txt[144]}: {$app->locale->txt[323]}",
+                'sel0' => $imconfig['im_email_notify'] ? '' : 'selected="selected"',
+                'sel1' => $imconfig['im_email_notify'] ? 'selected="selected"' : '',
+                'ignores' => str_replace(',', "\n", $imconfig['im_ignore_list']),
+                'catname' => $app->locale->txt[144],
+                'boardname' => $app->locale->txt[323]
+            );
+            $this->render('templates/im/prefs.template.php', $data);
+        } // if GET
+        elseif ($request->method('POST'))
+        {
+            $app->session->check('post');
+            $POST = $request->paramsPost();
+            $ignorelist = str_replace(array("\r\n", "\n\r", "\n"), ',', trim($POST->ignore));
+            
+            $app->db->prepare("UPDATE {$db_prefix}members SET im_ignore_list=?,im_email_notify=? WHERE ID_MEMBER=?")->
+                execute(array($ignorelist, $POST->notify, $app->user->id));
+            
+            return $this->back();
+        } // if POST
+    } // prefs()
 }
 ?>
