@@ -231,6 +231,8 @@ $router->respond('GET', '/report/[i:msgid]/', 'thread->report');
 $router->respond(array('GET', 'POST'), '/im/prefs/', 'im->prefs');
 $router->respond(array('GET', 'POST'), '/im/[i:start]?/remove/[i:imid]?/', 'im->remove');
 $router->respond(array('GET', 'POST'), '/im/outbox/[i:start]?/remove/[i:imid]?/', 'im->removeFromOutbox');
+$router->respond('GET', '/im/[i:start]?/removeall/', 'im->removeall');
+$router->respond('GET', '/im/outbox/[i:start]?/removeall/', 'im->removeallFromOutbox');
 
 $router->respond('GET', '/example/', 'main->example');
 //$router->respond('GET', '/example/', 'main->example2');

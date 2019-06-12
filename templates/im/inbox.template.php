@@ -43,7 +43,7 @@
               <font size="-1">
                 <a href="<?= SITE_ROOT ?>/im/<?= $this->switch_folder ?>"><?= $this->switch_folder_name ?></a><?= $this->menusep ?><a href="<?= SITE_ROOT ?>/im/new/"><?= $this->locale->img['im_new'] ?></a><?= $this->menusep ?><a href="<?= SITE_ROOT ?>/im/"><?= $this->locale->img['im_reload'] ?></a><?= $this->menusep ?>
                 <?php if(!$this->nomessages): ?>
-                    <a href="javascript:DoConfirm('<?= $this->locale->txt[413]?>', './removeall/?sesc=<?= $this->sessionid ?>');"><?= $this->locale->img['im_delete'] ?></a><?= $this->menusep ?>
+                    <a href="./removeall/"><?= $this->locale->img['im_delete'] ?></a><?= $this->menusep ?>
                 <?php endif; ?>
                 <a href="<?= SITE_ROOT ?>/im/prefs/"><?= $this->locale->img['im_config'] ?></a>
               </font>
@@ -107,7 +107,7 @@
           <tr>
             <td bgcolor="<?= $this->windowbg ?>" class="windowbg2" style="padding: 2px;" align="right" colspan="5">
               <input type="submit" value="<?= $this->locale->yse138 ?>" />
-              <a href="javascript:DoConfirm('<?= $this->locale->txt[413]?>', './removeall/?sesc=<?= $this->sessionid ?>');"><?= $this->locale->img['im_delete'] ?></a>
+              <a href="./removeall/"><?= $this->locale->img['im_delete'] ?></a>
             </td>
           </tr>
         </table>

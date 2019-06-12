@@ -839,7 +839,7 @@ class InstantMessages extends Respond
             $dbst = $this->app->db->prepare("SELECT deletedBy FROM {$db_prefix}instant_messages WHERE ID_IM=? AND deletedBy != -1");
             $dbst->execute(array($imid));
             if ($dbst->fetchColumn() !== false)
-                // Already marded as deleted from inbox or outbox, now delete completely
+                // Already marked as deleted from inbox or outbox, now delete completely
                 $this->app->db->prepare("DELETE FROM {$db_prefix}instant_messages WHERE ID_IM=?")->
                     execute(array($imid));
             else
@@ -848,5 +848,58 @@ class InstantMessages extends Respond
                     execute(array($delBy, $imid));
             $dbst = null;
     } // delete()
+    
+    public function removeallFromOutbox($request, $response, $service, $app)
+    {
+        $service->delFromOutbox = true;
+        return $this->removeall($request, $response, $service, $app);
+    }
+    
+    public function removeall($request, $response, $service, $app)
+    {
+        if ($app->user->guest)
+            return $this->error($app->locale->txt[147]);
+        
+        $data = array();
+        
+        if (!$service->delFromOutbox)
+        {
+            // remove from inbox
+            $delBy1 = 0;
+            $delBy2 = 1;
+            $tofrom = 'ID_MEMBER_TO';
+            $data['title'] = $app->locale->txt[316];
+        }
+        else
+        {
+            // remove from outbox
+            $delBy1 = 1;
+            $delBy2 = 0;
+            $tofrom = 'ID_MEMBER_FROM';
+            $data['title'] = $app->locale->txt[320];
+        }
+        
+        $data['question'] = str_replace('IMBOX', $data['title'], $app->locale->txt[412]);
+        
+        if ($request->paramsGet()->get('sesc') === null)
+        {
+            // Show prompt
+            return $this->render('templates/im/removeall.template.php', $data);
+        }
+        else
+        {
+            $app->session->check('get');
+            $db_prefix = $app->db->prefix;
+            
+            // Delete messages already marked as deleted
+            $app->db->prepare("DELETE FROM {$db_prefix}instant_messages WHERE $tofrom = ? && deletedBy = ?")->
+                execute(array($app->user->id, $delBy1));
+            // Mark messages as deleted
+            $app->db->prepare("UPDATE {$db_prefix}instant_messages SET deletedBy=? WHERE $tofrom = ?")->
+                execute(array($delBy2, $app->user->id));
+            
+            return $this->redirect('/im/');
+        } // if sesc
+    } // removeall()
 }
 ?>
