@@ -195,10 +195,57 @@ class InstantMessages extends Respond
         // TODO
     }
     
-    public function send_notice()
+    /**
+     * Sends notifications to users.
+     * @param array $receivers - list of ID's of users notice send to
+     * @param string $subject - subject
+     * @param string $message - notification message
+     * @param int $fromID - sender ID.
+     * @param string $fromName - user name (login).
+     */
+    public function send_notice($receivers, $subject, $message='', $fromID=null, $fromName=null)
     {
-        // TODO
-    }
+        if (! is_array($receivers))
+            $receivers = array($receivers);
+        
+        $subject = "[NOTICE] $subject";
+        
+        $db_prefix = $this->app->db->prefix;
+        
+        $placeholders = $this->app->db->build_placeholders($receivers);
+        
+        $dbst = $this->app->db->prepare("SELECT memberName, ID_MEMBER, emailAddress, im_email_notify FROM {$db_prefix}members WHERE ID_MEMBER IN ($placeholders)");
+        $dbst->execute($receivers);
+        $receivers = $dbst->fetchAll();
+        $dbst = null; // closing this statement
+        
+        $insert_values = array();
+        $sent_time = time();
+        $mail_to = array();
+        
+        if (empty($fromID) || empty($fromName))
+        {
+            $fromID = 0;
+            $fromName = '';
+        }
+        
+        if (count($receivers) > 0) {
+            $dbst = $this->app->db->prepare("INSERT INTO {$db_prefix}instant_messages (ID_MEMBER_FROM, fromName, ID_MEMBER_TO, toName, msgtime, subject, body, deletedBy) VALUES (?,?,?,?,?,?,?,?)");
+            foreach($receivers as $receiver)
+            {
+                $dbst->execute(array($fromID, $fromName, $receiver['ID_MEMBER'], $receiver['memberName'], $sent_time, $subject, $message, 0));
+    
+                if ($receiver['im_email_notify'])
+                    // Preparing email receivers
+                    $mail_to[] = $receiver['emailAddress'];
+                
+            } // foreach $receivers
+            $dbst = null;
+        } // if $receivers
+        
+        if (!empty($mail_to))
+            $this->sendmail($mail_to, $subject, $message, null, true);
+    } // send_notice()
     
     public function inbox($request, $response, $service, $app)
     {

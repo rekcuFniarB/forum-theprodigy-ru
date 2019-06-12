@@ -75,26 +75,26 @@ class Main extends Respond {
         //return $this->ajax_response('["dick"]');
         //return $this->error('testing', 400);
         
-        // testing prepared statements
-        $dbst = $app->db->prepare("SELECT memberName FROM members WHERE ID_MEMBER > 100 AND ID_MEMBER < 110
-            AND ? LIKE 'dick'");
-        $dbst->execute(array('dicka'));
-        $found = $dbst->fetchColumn();
-        //var_dump($found);
-        $service->found = $found['memberName'];
-        $emul_mode = $app->db->getAttribute(\PDO::ATTR_EMULATE_PREPARES);
-        $dbst2 = $app->db->prepare("SELECT emailAddress FROM members WHERE ID_MEMBER = 182");
-        $dbst2->execute();
-        $email = $dbst2->fetchColumn();
-        $dbst = null;
-        $dbst2 = null;
-        
-        $buffered = $app->db->getAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY);
-        
-        $placeholders = $app->db->build_placeholders(array('dick' => 'DICK', 'ass' => 'ASS', 'cunt' => 'CUNT'), true, false);
-        error_log("__DEBUG__: PLACEHOLDERS: $placeholders");
-        $service->msg = "Emulation mode: $emul_mode, Email: $email, Buffered: $buffered, Placeholders: ($placeholders)";
-        
+//         // testing prepared statements
+//         $dbst = $app->db->prepare("SELECT memberName FROM members WHERE ID_MEMBER > 100 AND ID_MEMBER < 110
+//             AND ? LIKE 'dick'");
+//         $dbst->execute(array('dicka'));
+//         $found = $dbst->fetchColumn();
+//         //var_dump($found);
+//         $service->found = $found['memberName'];
+//         $emul_mode = $app->db->getAttribute(\PDO::ATTR_EMULATE_PREPARES);
+//         $dbst2 = $app->db->prepare("SELECT emailAddress FROM members WHERE ID_MEMBER = 182");
+//         $dbst2->execute();
+//         $email = $dbst2->fetchColumn();
+//         $dbst = null;
+//         $dbst2 = null;
+//         
+//         $buffered = $app->db->getAttribute(\PDO::MYSQL_ATTR_USE_BUFFERED_QUERY);
+//         
+//         $placeholders = $app->db->build_placeholders(array('dick' => 'DICK', 'ass' => 'ASS', 'cunt' => 'CUNT'), true, false);
+//         error_log("__DEBUG__: PLACEHOLDERS: $placeholders");
+//         $service->msg = "Emulation mode: $emul_mode, Email: $email, Buffered: $buffered, Placeholders: ($placeholders)";
+        //$app->im->send_notice(array(182, 1, 2, 3), '__TEST__', 'Привет бля');
         //return $app->errors->abort('TEST', $msg, 200);
         $this->render('templates/examples/example.php');
     }
