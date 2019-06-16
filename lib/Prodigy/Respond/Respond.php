@@ -537,6 +537,19 @@ abstract class Respond {
         return $this->app->errors->abort($this->app->locale->txt[106], $error_message, $code);
     }
     
+    /**
+     * Simple message page
+     * @param string $title Message title
+     * @param string $message Message text
+     */
+    public function message($title, $message, $escape=true)
+    {
+        $this->service->title = $title;
+        $this->service->message = $message;
+        $this->service->escape = $escape;
+        return $this->render('templates/message.template.php');
+    }
+    
     public function ajax_response($data, $format = 'json', $charset = null)
     {
         $this->service->layout(null);
