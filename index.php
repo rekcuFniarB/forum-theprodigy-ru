@@ -216,7 +216,10 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/vote/[i:poll]/',
 $router->respond('GET', '/people/[:user]/', 'profile->show');
 $router->respond('GET', '/people/[:user]/messages/[i:start]?/', 'profile->messages');
 $router->respond(array('GET', 'POST'), '/people/[:user]/modify/', 'profile->edit');
+
+// Karma
 $router->respond('GET', '/people/[:user]/karma/', 'karma->view');
+$router->respond('GET', '/people/[:user]/karma/remove/[i:msgid]/', 'karma->remove');
 
 // Comments
 $router->respond(array('GET', 'POST'), '/comments/subscribed/', 'comments->subscribed');

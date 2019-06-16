@@ -73,7 +73,7 @@ class Karma extends Respond
                 $data['actions'][$karma['ID_MSG']]['karmas'][$karma_key]['dupes'] ++;
             else
             {
-                $karma['dellnk'] = http_build_query(array('t'=>$karma['time'],'u1'=>$karma['user1'],'u2'=>$karma['user2']), '', '&amp;');
+                $karma['dellnk'] = http_build_query(array('t'=>$karma['time'],'u1'=>$karma['user1']), '', '&amp;');
                 preg_match("/(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)/", $karma['time'], $m);
                 $karma['time'] = $m;
                 $karma['action'] = $karma['action'] == "покарал" ? "покарал" : "поощрил";
@@ -96,4 +96,68 @@ class Karma extends Respond
         
         $this->render('templates/profile/karma.template.php', $data);
     } // view()
+    
+    public function remove($request, $response, $service, $app)
+    {
+        if (!$app->user->isAdmin())
+            // For admins only
+            return $this->error($app->locale->txt[1]);
+        
+        $GET = $request->paramsGet();
+        $PARAMS = $request->paramsNamed();
+        
+        if (empty($GET->t) || empty($GET->u1))
+            return $this->error('Bad request.', 400);
+        
+        $db_prefix = $app->db->prefix;
+        
+        // Get action direction
+        $dbst = $app->db->prepare("SELECT action from {$db_prefix}karmawatch
+            WHERE ID_MSG = ? AND time = ? AND user1 = ? AND user2 = ? LIMIT 1");
+        $dbst->execute(array($PARAMS->msgid, $GET->t, $GET->u1, $PARAMS->user));
+        $action = $dbst->fetchColumn();
+        $dbst = null; // closing this statement
+        
+        if (empty($action))
+            return $this->error('Karma action not found.');
+        
+        // Setting board to none. We have to do it before using function loadDisplay()
+        $app->board->load(-1);
+        
+        // Get info of actor
+        $actor = $app->user->loadDisplay($GET->u1);
+        if (!$actor['found'])
+            return $this->error("Actor {$GET->u1} not found.");
+        
+        // Get info of member
+        $member = $app->user->loadDisplay($PARAMS->user);
+        if (!$member['found'])
+            return $this->error("Member {$PARAMS->usere} not found.");
+        
+        $dbst = $app->db->prepare("DELETE FROM {$db_prefix}karmawatch 
+            WHERE ID_MSG = ? AND time = ? AND user1 = ? AND user2 = ? and action = ?");
+        $dbst->execute(array($PARAMS->msgid, $GET->t, $GET->u1, $PARAMS->user, $action));
+        $num = $dbst->rowCount();
+        $dbst = null;
+        
+        if ($num > 0)
+        {
+            if ($action == 'поощрил')
+            {
+                $app->db->prepare("UPDATE messages SET karmaGood = karmaGood - ?, karmaGoodExecutors = REPLACE(karmaGoodExecutors, ?,'') WHERE ID_MSG = ?")->
+                    execute(array($num, ",{$actor['ID_MEMBER']}", $PARAMS->msgid));
+                $app->db->prepare("UPDATE members SET karmaGood = karmaGood-? WHERE ID_MEMBER = ?")->
+                    execute(array($num, $member['ID_MEMBER']));
+            } // if karma+
+            elseif ($action == 'покарал')
+            {
+                $app->db->prepare("UPDATE messages SET karmaBad = karmaBad - ?, karmaBadExecutors = REPLACE(karmaBadExecutors, ?,'') WHERE ID_MSG = ?")->
+                    execute(array($num, ",{$actor['ID_MEMBER']}", $PARAMS->msgid));
+                $app->db->prepare("UPDATE members SET karmaBad = karmaBad-? WHERE ID_MEMBER = ?")->
+                    execute(array($num, $member['ID_MEMBER']));
+            }
+        }
+        
+        return $this->message('Удаление заценок', "Удалено $num заценок пользователя {$actor['realName']} в отношении {$member['realName']}.");
+    } // remove()
 }
