@@ -106,7 +106,8 @@ $router->respond(function($request, $response, $service, $app, $router) {
             array('locale',   '\Prodigy\Localization'),
             array('im',       '\Prodigy\Respond\InstantMessages'),
             array('calendar', '\Prodigy\Respond\Calendar'),
-            array('profile',  '\Prodigy\Respond\Profile')
+            array('profile',  '\Prodigy\Respond\Profile'),
+            array('karma',    '\Prodigy\Respond\Karma')
         )
     );
     
@@ -215,6 +216,7 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/vote/[i:poll]/',
 $router->respond('GET', '/people/[:user]/', 'profile->show');
 $router->respond('GET', '/people/[:user]/messages/[i:start]?/', 'profile->messages');
 $router->respond(array('GET', 'POST'), '/people/[:user]/modify/', 'profile->edit');
+$router->respond('GET', '/people/[:user]/karma/', 'karma->view');
 
 // Comments
 $router->respond(array('GET', 'POST'), '/comments/subscribed/', 'comments->subscribed');
