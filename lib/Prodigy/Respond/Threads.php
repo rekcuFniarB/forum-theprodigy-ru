@@ -574,7 +574,11 @@ class Threads extends Respond
                     $karma['actions'] = true;
                 
                 $karma['css'] = ($karma['karmaGood'] > 0 or $karma['karmaBad'] > 0) ? 'table-row' : 'none';
-
+                
+                $karma['smite_not_allowed'] = false;
+                $smite_not_allowed = $app->conf->get('smite_not_allowed', array());
+                if (in_array($app->user->name, $smite_not_allowed) || in_array($app->user->id, $smite_not_allowed))
+                    $karma['smite_not_allowed'] = true;
                 $message['karma'] = $karma;
             }
             $karmaQuery = null; // closing this statement

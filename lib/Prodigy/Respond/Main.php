@@ -43,15 +43,17 @@ class Main extends Respond {
         
         //error_log("__TEST__: ". $service->getval('sample2'));
         
-        $testval = $service->get('sample.k2.k21.usr.name');
+        $testval = 'UUUU';
         
         //var_dump($testval); exit();
         
-        $msg = "$msg\n<br>TEST: $testval";
+        $msg = "$msg\n<br>TEST: $testval XXX";
         
         //$app->errors->log($msg);
         
         $service->title = 'Bad BB Code test';
+        
+        $service->msg = $request->paramsGet()->get('test');
         
         // Original bad message
         //$service->badmsg = '[size=3]Дорогие друзья!!![/size]<br /><br />Счастлив Вам сообщить, что по многочисленным просьбам трудящихся [b]СДЕЛАНЫ 3 НОВЫЕ КНОПКИ[/b] в форме ответа а именно:<br />[code][video][/video][/code]<br />[code][audio][/audio][/code]<br />[code][hidden][/hidden][/code]<br /><br />Обратите внимание - у кнопок пока что нет &quot;Лиц&quot;... (если у вас в браузере не работает подсветка ссылок, то расположены они именно в таком порядке - В,А,Х, а находятся во втором ряду формы после кнопки &quot;картинка&quot;).<br />[img]http://img2.pict.com/92/3d/af/3412380/0/1272140362.jpg[/img]<br /><br />А это значит, что от Вас зависит, как они будут выглядеть.<br /><br />Скины на форуме разные, кнопки в них отичаются, посему поступим так:<br />Выкладывайте свои наборы из 3-х новых кнопок сюда с указанием СКИНА и с миниголосованием.<br /><br />Удачи!';
@@ -66,11 +68,11 @@ class Main extends Respond {
         $service->badmsg = '[code]dick[/code]
         "';
         
-        $file = $line = '';
-        if (headers_sent($file, $line))
-            error_log("__HEADERS_SENT__: $file, $line");
-        else
-            error_log('__HEADERS_SENT__: NO');
+//         $file = $line = '';
+//         if (headers_sent($file, $line))
+//             error_log("__HEADERS_SENT__: $file, $line");
+//         else
+//             error_log('__HEADERS_SENT__: NO');
         
         //return $this->ajax_response('["dick"]');
         //return $this->error('testing', 400);
@@ -98,7 +100,8 @@ class Main extends Respond {
         //$mail_result = $app->im->sendmail(array('retratserif@gmail.com'), 'Subject blah', 'Message blah', null, true);
         //$app->errors->log('__DEBUG__: MAIL: RESULT: ' . var_export($mail_result, true));
         //return $app->errors->abort('TEST', $msg, 200);
-        $this->render('templates/examples/example.php');
+        // return $this->render('templates/examples/example.php');
+        return $this->message('Message Title', 'Message text');
     }
     
     public function example($request, $response, $service, $app) {

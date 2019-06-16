@@ -104,7 +104,7 @@
                 <i><?= $karma['time'][4] ?>:<?= $karma['time'][5] ?>:<?= $karma['time'][6] ?> <?= $karma['time'][3] ?>/<?= $karma['time'][2] ?>/<?= $karma['time'][1] ?></i>
               </font>
               <?php if($this->delbtn): ?>
-                [<a href="./remove/?<?= $karma['dellnk'] ?>">Удалить</a>]
+                [<a href="./remove/<?= $id ?>/?<?= $karma['dellnk'] ?>">Удалить</a>]
               <?php endif; ?>
             </li>
           <?php endforeach; ?>

@@ -220,6 +220,7 @@ $router->respond(array('GET', 'POST'), '/people/[:user]/modify/', 'profile->edit
 // Karma
 $router->respond('GET', '/people/[:user]/karma/', 'karma->view');
 $router->respond('GET', '/people/[:user]/karma/remove/[i:msgid]/', 'karma->remove');
+$router->respond('GET', '/karma/[applaud|smite:action]/[i:msgid]/', 'karma->action');
 
 // Comments
 $router->respond(array('GET', 'POST'), '/comments/subscribed/', 'comments->subscribed');

@@ -494,7 +494,7 @@
                                     <td align="right">
                                       <a href="<?= SITE_ROOT ?>/karma/applaud/<?= $msgid ?>/" onclick="Forum.Data.rateTheMessage(<?= $msgid ?>, 'applaud');return false;" class="button"><?= $this->locale->applause ?></a>
                                     </td>
-                                    <?php if(in_array($this->user->name, $this->conf->get('smite_not_allowed', array()))): ?>
+                                    <?php if($msg['karma']['smite_not_allowed']): ?>
                                       <td></td><td></td></tr>
                                     <?php else: ?>
                                       <td align="center"><?= $this->menusep ?></td>
