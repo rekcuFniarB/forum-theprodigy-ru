@@ -28,7 +28,7 @@ class Threads extends Respond
             $start = "msg$startmsg";
         }
         
-        if ($currentboard == 0 || empty($currentboard))
+        if (empty($currentboard))
             return $this->findBoard($currentboard, $threadid);
         
         $board_moderators = $app->board->moderators($currentboard);
@@ -675,7 +675,7 @@ class Threads extends Respond
             "SELECT ID_BOARD FROM {$this->app->db->prefix}topics WHERE ID_TOPIC = ?");
         $dbrq->execute(array($threadid));
         $board = $dbrq->fetchColumn();
-        if (!$board)
+        if (empty($board))
             $this->error($this->app->locale->txt[472]);
         
         return intval($board);

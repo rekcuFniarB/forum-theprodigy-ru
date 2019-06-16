@@ -55,9 +55,8 @@ class Localization {
     } // set_locale()
     
     public function txt($name, $default = '') {
-        if (is_null($this->lngfile)) {
+        if (null === $this->lngfile)
             $this->set_locale($this->app->conf->language);
-        }
         
         if (isset($this->txt[$name]))
             return $this->txt[$name];

@@ -530,11 +530,9 @@ abstract class Respond {
      */
     public function error($msg, $code = 404)
     {
-        if (isset($this->app->locale->txt[$msg]))
-            $error_message = $this->app->locale->txt[$msg];
-        else
-            $error_message= $msg;
-        return $this->app->errors->abort($this->app->locale->txt[106], $error_message, $code);
+        // look for stored message or return self
+        $error_message = $this->app->locale->txt($msg, $msg);
+        return $this->app->errors->abort($this->app->locale->txt(106), $error_message, $code);
     }
     
     /**

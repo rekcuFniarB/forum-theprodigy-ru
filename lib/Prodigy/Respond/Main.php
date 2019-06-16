@@ -101,7 +101,8 @@ class Main extends Respond {
         //$app->errors->log('__DEBUG__: MAIL: RESULT: ' . var_export($mail_result, true));
         //return $app->errors->abort('TEST', $msg, 200);
         // return $this->render('templates/examples/example.php');
-        return $this->message('Message Title', 'Message text');
+        //return $this->message('Message Title', 'Message text');
+        return $this->error($app->locale->txt[1]);
     }
     
     public function example($request, $response, $service, $app) {

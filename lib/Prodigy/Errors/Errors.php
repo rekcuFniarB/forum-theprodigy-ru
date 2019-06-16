@@ -26,10 +26,9 @@ class Errors {
     
     //// Custom error page
     public function abort($title='Error', $msg='', $code=404) {
-        if(empty($title)) $title = $this->app->locale->txt[106];
+        if(empty($title)) $title = $this->app->locale->txt(106);
         //$this->app->respond->prepare_layout();
         $this->log("__ERROR__: [$title] $msg");
-        $this->response->code($code);
         $this->service->title = $title;
         $this->service->message = $msg;
         
@@ -38,14 +37,25 @@ class Errors {
         else
             $respond = $this->app->main;
         
-        if($respond->layout_ready()) {
-            // Page already rendered, just print error
-            echo "<script>alert('    $title\\n[$code] $msg');</script>";
-            //echo "<script>alert('Error');</script>";
-        } else {
-            // Otherwise generate error page.
-            $respond->render('templates/error.php');
+        if (!$this->service->ajax)
+        {
+            $this->response->code($code);
+            
+            if($respond->layout_ready())
+            {
+                // FIXME this is temporary behavior. We should reset buffers and render new template.
+                // Page already rendered, just print error
+                echo "<script>alert('    $title\\n[$code] $msg');</script>";
+                //echo "<script>alert('Error');</script>";
+            }
+            else
+            {
+                // Otherwise generate error page.
+                $respond->render('templates/error.php');
+            }
         }
+        else
+            $respond->ajax_response("    $title\n[$code] $msg", 'text');
         
         if(!$this->response->isSent())
             $this->response->send();

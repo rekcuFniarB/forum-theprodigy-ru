@@ -188,7 +188,7 @@ class Profile extends Respond
         
         $meminf = $dbst->fetch();
         if (!$meminf)
-            return $this->error(sprintf($app->locale->txt[453], $user));
+            return $this->error(sprintf($app->locale->txt(453), $user));
         
         $tmpl = array();
         
