@@ -623,7 +623,7 @@ class Service extends \Klein\ServiceProvider
      */
     public function utf8($txt)
     {
-        if(stripos($this->app->conf->charset, 'utf-8') === false && stripos($this->app->conf->charset, 'utf-8'))
+        if(stripos($this->app->conf->charset, 'utf-8') === false && stripos($this->app->conf->charset, 'utf8') === false)
         {
             // charset is not UTF-8, convert to UTF-8
             return  mb_convert_encoding($txt, 'utf-8', $this->app->conf->charset);
