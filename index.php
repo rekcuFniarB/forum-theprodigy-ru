@@ -96,6 +96,7 @@ $router->respond(function($request, $response, $service, $app, $router) {
             array('session',  '\Prodigy\Session'),
             array('user',     '\Prodigy\User'),
             //array('respond',  '\Prodigy\Respond\Respond'),
+            array('dumb',     '\Prodigy\Respond\Dumb'),
             array('main',     '\Prodigy\Respond\Main'),
             array('board',    '\Prodigy\Respond\Board'),
             array('thread',   '\Prodigy\Respond\Threads'),

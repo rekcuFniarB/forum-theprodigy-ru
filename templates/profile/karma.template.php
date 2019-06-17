@@ -105,7 +105,7 @@
               </font>
               <?php if($this->delbtn): ?>
                 [<a href="./remove/<?= $id ?>/?<?= $karma['dellnk'] ?>">Удалить</a>]
-              <?php endif; ?>
+              <?php endif;?>
             </li>
           <?php endforeach; ?>
         </ul>

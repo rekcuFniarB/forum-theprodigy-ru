@@ -35,7 +35,7 @@ class Errors {
         if(isset($this->app->respond))
             $respond = $this->app->respond;
         else
-            $respond = $this->app->main;
+            $respond = $this->app->dumb;
         
         if (!$this->service->ajax)
         {
@@ -43,16 +43,15 @@ class Errors {
             
             if($respond->layout_ready())
             {
-                // FIXME this is temporary behavior. We should reset buffers and render new template.
-                // Page already rendered, just print error
-                echo "<script>alert('    $title\\n[$code] $msg');</script>";
-                //echo "<script>alert('Error');</script>";
+                if (!empty(ob_get_length()))
+                {
+                    ob_clean();
+                    // reset layout
+                    $respond->prepare_layout();
+                }
             }
-            else
-            {
-                // Otherwise generate error page.
-                $respond->render('templates/error.php');
-            }
+            
+            $respond->render('templates/error.php');
         }
         else
             $respond->ajax_response("    $title\n[$code] $msg", 'text');
