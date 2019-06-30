@@ -101,6 +101,7 @@ $router->respond(function($request, $response, $service, $app, $router) {
             array('board',    '\Prodigy\Respond\Board'),
             array('thread',   '\Prodigy\Respond\Threads'),
             array('comments', '\Prodigy\Respond\Comments'),
+            array('stats', '\Prodigy\Respond\Stats'),
             array('errors',   '\Prodigy\Errors\Errors'),
             array('subs',     '\Prodigy\Subs'),
             array('security', '\Prodigy\Security'),
@@ -240,6 +241,8 @@ $router->respond(array('GET', 'POST'), '/im/[i:start]?/remove/[i:imid]?/', 'im->
 $router->respond(array('GET', 'POST'), '/im/outbox/[i:start]?/remove/[i:imid]?/', 'im->removeFromOutbox');
 $router->respond('GET', '/im/[i:start]?/removeall/', 'im->removeall');
 $router->respond('GET', '/im/outbox/[i:start]?/removeall/', 'im->removeallFromOutbox');
+
+$router->respond('GET', '/stats/', 'stats->main');
 
 $router->respond('GET', '/example/', 'main->example');
 //$router->respond('GET', '/example/', 'main->example2');
