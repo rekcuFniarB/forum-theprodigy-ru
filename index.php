@@ -101,7 +101,7 @@ $router->respond(function($request, $response, $service, $app, $router) {
             array('board',    '\Prodigy\Respond\Board'),
             array('thread',   '\Prodigy\Respond\Threads'),
             array('comments', '\Prodigy\Respond\Comments'),
-            array('stats', '\Prodigy\Respond\Stats'),
+            array('stats',    '\Prodigy\Respond\Stats'),
             array('errors',   '\Prodigy\Errors\Errors'),
             array('subs',     '\Prodigy\Subs'),
             array('security', '\Prodigy\Security'),
