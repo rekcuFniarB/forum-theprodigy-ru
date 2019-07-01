@@ -184,14 +184,18 @@ div.avatar
 <footer>
 <table width="<?= $this->mobileMode?'100%':'92%' ?>" align="center" border="0" role="presentation">
   <tr>
-    <td align="center"><font class="copyright"><?= $this->yycopyright ?></font></td>
+    <td align="center">
+      <font class="copyright">
+        <?php $this->partial("templates/copyright.block.php") ?>
+      </font>
+    </td>
   </tr>
 
   <tr>
-    <td align="center"><?php $this->partial(PROJECT_ROOT . "/templates/counters.php"); ?></td>
+    <td align="center"><?php $this->partial("templates/counters.php"); ?></td>
   </tr>
 </table>
-<?php $this->partial(PROJECT_ROOT.'/templates/footer.php'); ?>
+<?php $this->partial('templates/footer.php'); ?>
 </footer>
 </body>
 </html>

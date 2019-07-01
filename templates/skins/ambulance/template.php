@@ -265,7 +265,7 @@ body,td,th {
                     <TR>
                       <TD vAlign=center align=right width="25%" bgColor=#333333>&nbsp;</TD>
                       <TD vAlign=center align=middle width="50%" bgColor=#333333>
-                        <?= $this->yycopyright ?>
+                        <?php $this->partial("templates/copyright.block.php") ?>
                       </TD>
                       <TD vAlign=center align=left width="25%" bgColor=#333333>&nbsp;</TD>
                     </TR>

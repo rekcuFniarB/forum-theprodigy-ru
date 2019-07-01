@@ -286,13 +286,13 @@ body,td,th {
                     <tr>
                       <td vAlign=center align=right width="25%" bgColor=#333333>&nbsp;</td>
                       <td vAlign=center align=middle width="50%" bgColor=#333333>
-                        <?= $this->yycopyright ?>
+                        <?php $this->partial("templates/copyright.block.php"); ?>
                       </td>
                       <td vAlign=center align=left width="25%" bgColor=#333333>&nbsp;</td>
                     </tr>
                     <tr>
                       <td align="center" colspan="3">
-                        <?php $this->partial(PROJECT_ROOT . "/templates/counters.php"); ?>
+                        <?php $this->partial("templates/counters.php"); ?>
                       </td>
                     </tr>
                   </tbody>
