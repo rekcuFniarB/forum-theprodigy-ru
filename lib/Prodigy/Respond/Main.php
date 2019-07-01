@@ -536,7 +536,6 @@ class Main extends Respond {
         } else {
             $service->calendar_index = null;
         }
-        
 
         if ($app->conf->enableSP1Info == 1) {
             // include_once("$sourcedir/Recent.php");

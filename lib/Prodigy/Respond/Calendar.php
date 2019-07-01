@@ -45,7 +45,8 @@ class Calendar extends Respond
                     $holidays[$row['day']] .= ", {$row['title']}";
             }
         }
-        return($holidays);
+        $dbst = null;
+        return $holidays;
     }
     
     // $day has been added as an optional parameter to restrict the results to a particular day.
@@ -64,6 +65,7 @@ class Calendar extends Respond
         }
         
         $dbst = $this->app->db->prepare($strSql);
+        $dbst->execute($qparams);
         while ($row = $dbst->fetch())
         {
             $euser=urlencode($row['membername']);
@@ -79,7 +81,8 @@ class Calendar extends Respond
             else
                 $bday[$row['dom']] .= ', <a href="' . SITE_ROOT . '/people/' . $euser . '/">' . $this->service->esc($row['realname']) . '' . $age . '</a>';
         }
-        return($bday);
+        $dbst = null;
+        return $bday;
     }
 
     function createEventArray($bPowerUser, $cats, $month, $year, $day = NULL)
@@ -117,13 +120,12 @@ class Calendar extends Respond
             }
         }
         $dbst = null;
-        return($events);
+        return $events;
     }
     
     // Called from BoardIndex.php to display the current day's events on the board index.
     public function getEvents()
     {
-        //global $modSettings, $db, $db_prefix, $txt, $imagesdir, $settings, $scripturl;
         if (!$this->app->conf->cal_enabled)
             return null;
 
@@ -152,7 +154,7 @@ class Calendar extends Respond
 
         if ($this->app->conf->cal_showeventsonindex)
         {
-            $bPowerUser = ($this->app->user->accessLevel() > 2);
+            $bPowerUser = ($this->app->user->isStaff() > 2);
             $cats = array();
             $db_prefix = $this->app->db->prefix;
             $rs = $this->app->db->query("SELECT ID_CAT,membergroups FROM {$db_prefix}categories");
