@@ -109,7 +109,8 @@ $router->respond(function($request, $response, $service, $app, $router) {
             array('im',       '\Prodigy\Respond\InstantMessages'),
             array('calendar', '\Prodigy\Respond\Calendar'),
             array('profile',  '\Prodigy\Respond\Profile'),
-            array('karma',    '\Prodigy\Respond\Karma')
+            array('karma',    '\Prodigy\Respond\Karma'),
+            array('register', '\Prodigy\Respond\Register')
         )
     );
     
@@ -248,6 +249,8 @@ $router->respond('GET', '/allmypeople/[grp|staff:sort]/', 'stats->membersByGroup
 $router->respond('GET', '/allmypeople/[top:sort]/', 'stats->topmembers');
 $router->respond('GET', '/allmypeople/[alph:sort]/', 'stats->membersByLetter');
 $router->respond('GET', '/people/', 'stats->allmypeople');
+
+$router->respond('GET', '/agreement/', 'register->agreement');
 
 $router->respond('GET', '/example/', 'main->example');
 //$router->respond('GET', '/example/', 'main->example2');
