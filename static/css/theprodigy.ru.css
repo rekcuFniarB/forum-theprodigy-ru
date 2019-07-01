@@ -651,3 +651,11 @@ div.audio-player {
     max-width: 100%;
 }
 /* END mediaelementjs */
+
+
+nav.linktree {
+    display: inline-block;
+}
+nav.linktree > font {
+    display: inline-block;
+}

@@ -196,22 +196,7 @@ class Board extends Respond
             $pageindex .= "<a class=\"navPages\" href=\"$site_root/b{$this->board}/all/\">{$app->locale->txt[190]}</a>";
         
         // Build a list of the board's moderators.
-        if (sizeof($service->board_moderators) > 0)
-        {
-            if (sizeof($service->board_moderators) == 1)    // if only one mod - use a different string
-                $showmods = "({$app->locale->txt[298]}: ";
-            else
-                $showmods = "({$app->locale->txt[299]}: ";
-            
-            foreach ($service->board_moderators as $modername => $moderinfo)
-            {
-                $euser = urlencode($modername);
-                $tmp[] = '<a href="' . SITE_ROOT . '/people/' . $euser . '/"><acronym title="' . $app->locale->txt[62] . '">' . $service->esc($moderinfo['realName']) . '</acronym></a>';
-            }
-
-            $showmods .= implode(", ", $tmp) . ')';	// stitch the list together
-        }
-        $service->showmods = $showmods;        
+        $service->showmods = $service->board_moderators;       
         
         $canPostPoll = ($app->conf->pollMode == '1' && (($app->conf->pollPostingRestrictions == '2' && ($user->accessLevel() > 1)) || ($app->conf->pollPostingRestrictions == '1' && $user->group == 'Administrator') || $app->conf->pollPostingRestrictions == '0'));
         
@@ -397,6 +382,11 @@ class Board extends Respond
         $service->boardviewers = $this->getBoardViewersList($this->board);
         
         $service->topics = $topics;
+        
+        $service->linktree = array(
+            array('url' => "/#{$service->currcat}", 'name' => $service->catname),
+            array('url' => "/b{$service->board}/", 'name' => $service->title)
+        );
         
         $this->render('templates/board/index.php');
         

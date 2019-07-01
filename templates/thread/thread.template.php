@@ -31,39 +31,22 @@
           
           <!-- # the link tree -->
           <?php $this->start_cache('linktree'); ?>
-          <?php if($this->conf->enableInlineLinks): ?>
-            <font size="1">
-              <b><a href="<?= SITE_ROOT ?>/" class="nav"><?= $this->conf->mbname ?></a> </b>&nbsp;|&nbsp; 
-              <b><a href="<?= SITE_ROOT ?>/#<?= $this->curcat ?>" class="nav"><?= $this->get('catname') ?></a> </b>&nbsp;|&nbsp; 
-              <b><a href="<?= SITE_ROOT ?>/b<?= $this->board ?>/" class="nav"><?= $this->get('boardname') ?></a></b> <?= $this->showmods ?>
-              <br class="brs">
-              <br class="brs">
-              <table class="curthread">
-                <tr valign="top" width="100%" align="right">
-                  <td valign="top" width="100%" align="left">
-                    <font color="#FFFFFF"><?= $this->locale->txt[118] ?>:&nbsp;</font><b><?php $this->get_cache('curthreadurl') ?></b>
-                  </td>
-                </tr>
-              </table>
-            </font>
-          <?php else: ?>
-            <font size="2">
-              <b>
-                <img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>" class="nav"><?= $this->conf->mbname ?></a>
-                <br>
-                <img src="<?= $this->conf->imagesdir ?>/tline.gif" border="0" alt=""><img src="<?= $this->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>#<?= $this->curcat ?>" class="nav"><?= $this->catname ?></a>
-                <br>
-                <img src="<?= $this->conf->imagesdir ?>/tline2.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<a href="<?= SITE_ROOT ?>/b<?= $this->board ?>" class="nav"><?= $this->boardname ?></a>
-              </b>
-              <?= $this->showmods ?>
-              <b>
+              <?php $this->partial('templates/parts/linktree.template.php') ?>
+              <?php $this->_partial('templates/thread/showmods.template.php', array('showmods' => $this->showmods)) ?>
+              <?php if($this->conf->enableInlineLinks): ?>
+                <br><br>
+                <table class="curthread">
+                  <tr valign="top" width="100%" align="right">
+                    <td valign="top" width="100%" align="left">
+                      <font color="#FFFFFF"><?= $this->locale->txt[118] ?>:&nbsp;</font><b><?php $this->get_cache('curthreadurl') ?></b>
+                    </td>
+                  </tr>
+                </table>
+              <?php else: ?>
                 <br>
                 <img src="<?= $this->conf->imagesdir ?>/tline3.gif" border="0" alt=""><img src="<?= $this->conf->imagesdir ?>/open.gif" border="0" alt="">&nbsp;&nbsp;<?= $this->get_cache('curthreadurl') ?>
-              </b>
-            </font>
-          <?php endif; /* enableInlineLinks */ ?>
+              <?php endif; ?>
           <?php $this->get_cache('linktree'); ?>
-
         </td>
         
         <?php /* Create a previous next string if the selected theme has it as a selected option */ ?>

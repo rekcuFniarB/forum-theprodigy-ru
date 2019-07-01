@@ -318,6 +318,12 @@ abstract class Respond {
         $this->service->color = $this->app->conf->color;
         $this->service->imagesdir = $this->app->conf->imagesdir;
         
+        // Inline linktree separator
+        if (isset($this->app->conf->linktreesep))
+            $this->service->linktreesep = $this->app->conf->linktreesep;
+        else
+            $this->service->linktreesep = '»';
+        
         self::$layout_ready = true;
 
     } // prepare_layout()

@@ -87,13 +87,17 @@ class Service extends \Klein\ServiceProvider
      * @param string $view  template names
      * @param array $data   data
      */
-    public function cpartial($view, array $data = array()) {
+    public function cpartial($view, array $data = array(), $extract = false) {
         if(isset($this->output_cache[$view])) {
             echo $this->output_cache[$view];
         } else {
             ob_start();
-            //parent::partial($view, $data);
-            $this->partial($view, $data);
+            
+            if ($extract)
+                $this->_partial($view, $data);
+            else
+                $this->partial($view, $data);
+            
             $this->output_cache[$view] = ob_get_contents();
             ob_end_clean();
             echo $this->output_cache[$view];

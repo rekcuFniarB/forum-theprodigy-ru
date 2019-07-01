@@ -3,7 +3,8 @@
   <tr>
     <td class="board_tree">
       <a name="top"></a>
-      <?php $this->cpartial('templates/board/link_tree.php'); ?>
+      <?php $this->cpartial('templates/parts/linktree.template.php'); ?>
+      <?php $this->cpartial('templates/thread/showmods.template.php', array('showmods' => $this->showmods), true) ?>
       <span class="link_tree_br"><br></span><br>
     </td> <!-- .board_tree -->
   </tr>
@@ -292,7 +293,8 @@
     <tr>
       <td class="board_tree" colspan="3">
         <br>
-        <?php $this->cpartial('templates/board/link_tree.php'); ?>
+        <?php $this->cpartial('templates/parts/linktree.template.php') ?>
+        <?php $this->cpartial('templates/thread/showmods.template.php') ?>
         <br>
         <br>
       </td>

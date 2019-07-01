@@ -476,12 +476,14 @@ class InstantMessages extends Respond
         
         $data = array(
             'title' => $app->locale->txt[143],
-            'catname' => $app->locale->txt[144],
-            'boardname' => $app->locale->txt[316],
             'windowbg' => $bgcolors[(++ $counter % $bgcolornum)],
             'switch_folder' => 'outbox/',
             'switch_folder_name' => $app->locale->txt[320],
-            'messages' => $messages
+            'messages' => $messages,
+            'linktree' => array(
+                array('url' => '/im/', 'name' => $app->locale->txt[144]),
+                array('name' => $app->locale->txt[316])
+            )
         );
         
         //// BEGIN prepare pagination data
@@ -627,12 +629,14 @@ class InstantMessages extends Respond
         
         $data = array(
             'title' => "{$app->locale->txt[143]} ({$app->locale->txt[320]})",
-            'catname' => $app->locale->txt[144],
-            'boardname' => $app->locale->txt[320],
             'windowbg' => $bgcolors[(++ $counter % $bgcolornum)],
             'switch_folder' => '',
             'switch_folder_name' => $app->locale->txt[316],
-            'messages' => $messages
+            'messages' => $messages,
+            'linktree' => array(
+                 array('url' => '/im/', 'name' => $app->locale->txt[144]),
+                 array('name' => $app->locale->txt[320])
+            )
         );
         
         //// BEGIN prepare pagination data
@@ -787,12 +791,14 @@ class InstantMessages extends Respond
             
             $data = array(
                 'title' => $app->locale->txt[148],
-                'catname' => $app->locale->txt[144],
-                'boardname' => $app->locale->txt[321],
                 'form_subject' => $form_subject,
                 'form_message' => empty($form_message) ? '' : $form_message,
                 'switch_folder' => '',
                 'switch_folder_name' => $app->locale->txt[316],
+                'linktree' => array(
+                    array('url' => '/im/', 'name' => $app->locale->txt[144]),
+                    array('name' => $app->locale->txt[321])
+                )
             );
             
             $this->addJS('ubbc.js');
@@ -948,8 +954,10 @@ class InstantMessages extends Respond
                 'sel0' => $imconfig['im_email_notify'] ? '' : 'selected="selected"',
                 'sel1' => $imconfig['im_email_notify'] ? 'selected="selected"' : '',
                 'ignores' => str_replace(',', "\n", $imconfig['im_ignore_list']),
-                'catname' => $app->locale->txt[144],
-                'boardname' => $app->locale->txt[323]
+                'linktree' => array(
+                    array('url' => '/im/', 'name' => $app->locale->txt[144]),
+                    array('name' => $app->locale->txt[323])
+                )
             );
             $this->render('templates/im/prefs.template.php', $data);
         } // if GET

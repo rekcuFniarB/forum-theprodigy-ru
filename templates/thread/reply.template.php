@@ -3,7 +3,7 @@
             <tr>
               <td valign="bottom" colspan="2">
                 <!-- LinkTree -->
-                <?php $this->partial('templates/thread/replyform_linktree.template.php') ?>
+                <?php $this->partial('templates/parts/linktree.template.php') ?>
               </td>
             </tr>
           </table>

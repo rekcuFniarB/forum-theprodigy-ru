@@ -248,28 +248,7 @@ class Threads extends Respond
         $service->title = $app->subs->CensorTxt($yytitle);
         $service->mstate = $mstate;
         $service->threadclass = $threadclass;
-        
-        // Build a list of this board's moderators.
-        $showmods = '';		// create an empty string
-        $tmp = array();		// used to temporarily store the list
-        
-        if (sizeof($board_moderators) > 0)
-        {
-            if (sizeof($board_moderators) == 1)    // if only one mod - use a different string
-                $showmods = "({$app->locale->txt[298]}: ";
-            else
-                $showmods = "({$app->locale->txt[299]}: ";
-            
-            foreach ($board_moderators as $modername => $moderinfo)
-            {
-                $euser = urlencode($modername);
-                $tmp[] = '<a href="' . SITE_ROOT . '/people/' . $euser . '/"><acronym title="' . $app->locale->txt[62] . '">' . $service->esc($moderinfo['realName']) . '</acronym></a>';
-            }
-
-            $showmods .= implode(", ", $tmp) . ')';	// stitch the list together
-        }
-        
-        $service->showmods = $showmods;
+        $service->showmods = $board_moderators;
         
         $service->jumptoform = $this->prepareJumptoForm($currentboard);
         
@@ -663,7 +642,12 @@ class Threads extends Respond
             $service->quickReplyExtendedForm = false;
         
         $service->boardviewers = $this->getBoardViewersList($currentboard);
-            
+        
+        $service->linktree = array(
+            array('url' => "/#{$service->curcat}", 'name' => $service->catname),
+            array('url' => "/b{$service->board}/", 'name' => $service->boardname)
+        );
+                
         $this->render('templates/thread/thread.template.php');
         
     } // Display()
@@ -969,6 +953,12 @@ class Threads extends Respond
         $service->notify = $app->conf->enable_notification && !$app->user->guest;
         $service->lock = $app->user->accessLevel() > 2 && !$threadinfo['locked'];
         $service->locked = $threadinfo['locked'];
+        
+        $service->linktree = array(
+            array('url' => "/#{$service->cat}", 'name' => $service->catname),
+            array('url' => "/b{$service->board}/", 'name' => $service->boardname),
+            array('name' => $service->title . (isset($service->sub) ? " ( {$service->sub} )" : ''))
+        );
         
         $this->render('templates/thread/reply.template.php');
     } // reply()
@@ -1859,9 +1849,10 @@ class Threads extends Respond
                 if (!(in_array($app->user->group, explode(',', trim($app->conf->attachmentMemberGroups))) || $app->user->accessLevel > 2))
                     $service->attachment_fields = 0;
             
-            $dbrq = $app->db->prepare("SELECT b.ID_BOARD AS bid, b.name AS bname, c.ID_CAT AS cid, c.name AS cname, t.ID_MEMBER_STARTED FROM {$db_prefix}boards AS b, {$db_prefix}categories AS c, {$db_prefix}topics AS t WHERE (b.ID_BOARD=t.ID_BOARD AND b.ID_CAT=c.ID_CAT AND t.ID_TOPIC = $threadid)");
-            $bcinfo = $dbrq->fetch();
-            $dbrq = null;
+            $dbst = $app->db->prepare("SELECT b.ID_BOARD AS bid, b.name AS bname, c.ID_CAT AS cid, c.name AS cname, t.ID_MEMBER_STARTED FROM {$db_prefix}boards AS b, {$db_prefix}categories AS c, {$db_prefix}topics AS t WHERE (b.ID_BOARD=t.ID_BOARD AND b.ID_CAT=c.ID_CAT AND t.ID_TOPIC = ?)");
+            $dbst->execute(array($threadid));
+            $bcinfo = $dbst->fetch();
+            $dbst = null;
             
             $board = intval($bcinfo['bid']);
             $service->boardname = $bcinfo['bname'];
@@ -1883,6 +1874,12 @@ class Threads extends Respond
             
             if ($app->user->accessLevel($board) > 1 )
                 $service->editfeed = true;
+            
+            $service->linktree = array(
+                array('url' => "/#{$curcat}", 'name' => $service->catname),
+                array('url' => "/b{$board}/", 'name' => $service->boardname),
+                array('name' => $service->title . (isset($service->sub) ? " ( {$service->sub} )" : ''))
+            );
             
             return $this->render('templates/thread/reply.template.php');
         }
@@ -2422,7 +2419,12 @@ class Threads extends Respond
             'boardname' => $bcinfo['bname'],
             'catname' => $bcinfo['cname'],
             'threadid' => $PARAMS->thread,
-            'poll' => $pollinfo
+            'poll' => $pollinfo,
+            'linktree' => array(
+                array('url' => "/#{$bcinfo['cid']}", 'name' => $bcinfo['cname']),
+                array('url' => "/b{$bcinfo['bid']}/", 'name' => $bcinfo['bname']),
+                array('name' => "{$app->locale->yse39} ({$bcinfo['subject']})")
+            )
         );
         
         if (!empty($pollinfo['locked']))

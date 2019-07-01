@@ -7,7 +7,7 @@
           Достаточно одной жалобы, чтобы модераторы обратили внимание на все сообщения темы!
         </div>
       <?php endif; ?>
-      <?php $this->partial('templates/im/linktree.part.php') ?>
+      <?php $this->partial('templates/parts/linktree.template.php') ?>
     </td>
   </tr>
 </table>
