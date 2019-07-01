@@ -513,10 +513,8 @@ class User {
                 FROM {$this->app->db->prefix}membergroups
                 ORDER BY ID_GROUP"
             );
-
-            $this->_membergroups = array();
-            while ($row = $dbst->fetch())
-                $this->_membergroups[] = $row['membergroup'];
+            $this->_membergroups = $dbst->fetchAll(\PDO::FETCH_COLUMN);
+            $dbst = null;
             return $this->_membergroups;
         } else {
             // already cached

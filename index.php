@@ -243,6 +243,11 @@ $router->respond('GET', '/im/[i:start]?/removeall/', 'im->removeall');
 $router->respond('GET', '/im/outbox/[i:start]?/removeall/', 'im->removeallFromOutbox');
 
 $router->respond('GET', '/stats/', 'stats->main');
+$router->respond('GET', '/allmypeople/', 'stats->membersall');
+$router->respond('GET', '/allmypeople/[grp|staff:sort]/', 'stats->membersByGroup');
+$router->respond('GET', '/allmypeople/[top:sort]/', 'stats->topmembers');
+$router->respond('GET', '/allmypeople/[alph:sort]/', 'stats->membersByLetter');
+$router->respond('GET', '/people/', 'stats->allmypeople');
 
 $router->respond('GET', '/example/', 'main->example');
 //$router->respond('GET', '/example/', 'main->example2');
