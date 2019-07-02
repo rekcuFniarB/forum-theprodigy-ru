@@ -2645,5 +2645,3 @@ class Threads extends Respond
         return $app->im->impost($request, $response, $service, $app);
     }
 }
-
-?>

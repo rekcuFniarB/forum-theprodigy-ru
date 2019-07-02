@@ -190,6 +190,7 @@ $txt[113] = 'Current Status:';
 $txt[114] = 'Administration Login';
 $days = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
 $months = array('January','February','March','April','May','June','July','August','September','October','November','December');
+$monthy = array('january','february','march','april','may','june','jule','august','september','october','november','december');
 $days_short = array('Sun','Mon','Tue','Wed','Thu','Fri','Sat');
 $months_short = array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 $txt[116] = 'Post+reply'; # + instead of spaces. Do not translate this line!!!
@@ -1958,4 +1959,3 @@ $img['new_some'] = '<img src="' . $imagesdir . $langimages . '/new_some.gif" bor
 $img['new_none'] = '<img src="' . $imagesdir . $langimages . '/new_none.gif" border="0" alt="' . $txt[334] . '" title="' . $txt[334] . '"/>';
 $img['new_off'] = '<img src="' . $imagesdir . '/off.gif" alt="' . $txt[334] . '" title="' . $txt[334] . '" border="0" />';
 $img['new_on'] = '<img src="' . $imagesdir . '/on.gif" alt="' . $txt[333] . '" title="' . $txt[333] . '" border="0" />';
-?>

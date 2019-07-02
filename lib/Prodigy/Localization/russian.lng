@@ -1941,5 +1941,3 @@ $img['new_none'] = '<img src="' . $imagesdir . $langimages . '/new_none.gif" bor
 $img['new_off'] = '<img src="' . $imagesdir . '/off.gif" alt="' . $txt[334] . '" title="' . $txt[334] . '" border="0" />';
 
 $img['new_on'] = '<img src="' . $imagesdir . '/on.gif" alt="' . $txt[333] . '" title="' . $txt[333] . '" border="0" />';
-
-?>
