@@ -26,7 +26,8 @@ class Board extends Respond
         
         $board = (int) $board;
         if ($board == 0)
-            return $this->error("Board info requested but no board ID specified.");
+            //return $this->error("Board info requested but no board ID specified.");
+            throw new \Exception('Board info requested but no board ID specified.');
         elseif ($board == -1)
         {
             $this->service->board_moderators = $this->moderators = array();
