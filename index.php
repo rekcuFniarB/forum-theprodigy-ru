@@ -110,7 +110,8 @@ $router->respond(function($request, $response, $service, $app, $router) {
             array('calendar', '\Prodigy\Respond\Calendar'),
             array('profile',  '\Prodigy\Respond\Profile'),
             array('karma',    '\Prodigy\Respond\Karma'),
-            array('register', '\Prodigy\Respond\Register')
+            array('register', '\Prodigy\Respond\Register'),
+            array('example',    '\Prodigy\Respond\Example'),
         )
     );
     
@@ -250,12 +251,15 @@ $router->respond('GET', '/allmypeople/[top:sort]/', 'stats->topmembers');
 $router->respond('GET', '/allmypeople/[alph:sort]/', 'stats->membersByLetter');
 $router->respond('GET', '/people/', 'stats->allmypeople');
 
+// Calendar
+$router->respond('GET', '/calendar/', 'calendar->show');
+
 $router->respond('GET', '/agreement/', 'register->agreement');
 
-$router->respond('GET', '/example/', 'main->example');
-//$router->respond('GET', '/example/', 'main->example2');
-$router->respond('GET', '/test/', 'main->testResponse');
-$router->respond('GET', '/simple/', 'main->simple_example');
+$router->respond('GET', '/example/', 'example->example');
+//$router->respond('GET', '/example/', 'example->example2');
+$router->respond('GET', '/test/', 'example->testResponse');
+$router->respond('GET', '/simple/', 'example->simple_example');
 
 $router->with('/feed', 'lib/Prodigy/Feed/index.php');
 $router->with('/files', 'lib/Prodigy/Cloud/index.php');
@@ -263,5 +267,3 @@ $router->with('/files', 'lib/Prodigy/Cloud/index.php');
 $router->dispatch();
 
 //var_dump($router->app()->conf);
-
-?>
