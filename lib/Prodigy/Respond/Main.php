@@ -52,7 +52,7 @@ class Main extends Respond {
             {
                 $placeholders = $app->db->build_placeholders($mark_topics);
                 $dbst = $app->db->prepare("DELETE FROM {$db_prefix}log_topics WHERE ID_MEMBER=? AND ID_TOPIC IN ($placeholders)");
-                $dbst->execute(array_merge(array($app->usr->id), $mark_topics));
+                $dbst->execute(array_merge(array($app->user->id), $mark_topics));
                 $dbst = null;
             }
             //return $service->redirect('/');

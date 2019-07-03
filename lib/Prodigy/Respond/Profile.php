@@ -952,7 +952,7 @@ class Profile extends Respond
             } // moda != -1
             else
             {    // if we did say "delete user"
-                if (($app->user->isAdmin() || $POST->user == $app->usr->name))
+                if (($app->user->isAdmin() || $POST->user == $app->user->name))
                 {
                     $app->db->prepare("UPDATE {$db_prefix}messages SET ID_MEMBER='-1' WHERE ID_MEMBER=?")->
                         execute(array($POST->userID));
