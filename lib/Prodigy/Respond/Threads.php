@@ -698,7 +698,7 @@ class Threads extends Respond
         $service->cValue=(((date('YmdH')%113)*107)%113)+113;
         
         if ($app->user->guest)
-        {
+        { // TODO test guest posting
             if ($app->conf->enable_guestposting)
             {
                 // show confirm dialog if not confirmed before
@@ -720,11 +720,6 @@ class Threads extends Respond
         if ($POST->get('naztem') != null) {
             // A post was submitted
             return $this->postReply($request, $response, $service, $app);
-        }
-        
-        if ($GET->get('linkcalendar') != null)
-        {
-            $app->calendar->ValidatePost();
         }
         
         $threadinfo = array('locked' => 0, 'ID_MEMBER_STARTED'=>'-1');
@@ -1019,7 +1014,7 @@ class Threads extends Respond
         
         $mreplies = 0;
 
-        $app->board->load($PARAMS->get('board'));
+        $app->board->load($PARAMS->board);
         
         if ($app->user->posts < 100 && $app->security->isTOR()){
             $app->im->notifyAdmins("предотвращён постинг через TOR", "Пользователь: {$service->siteurl}/people/" . urlencode($username) . '/');
@@ -1046,9 +1041,9 @@ class Threads extends Respond
             return $this->error("Неверный серийный ключ! Обратитесь к администратору за разъяснением!");
         }
         
-        if ($POST->get('linkcalendar') != null)
+        if ($POST->linkcalendar != null)
         { 
-            $app->calendar->ValidatePost();
+            $app->calendar->ValidatePost($request);
         }
         
         if ($app->user->name == 'Guest' && $app->conf->enable_guestposting == 0)
@@ -1468,8 +1463,8 @@ class Threads extends Respond
                         $statsquery = null;
                     }
                     
-                    if ($POST->get('linkcalendar') !== null)
-                        $app->calendarInsertEvent($service->board, $threadid, $POST->get('evtitle'), $app->user->id, $POST->get('month'), $POST->get('day'), $POST->get('year'), $POST->get('span'));
+                    if ($POST->linkcalendar !== null)
+                        $app->calendar->InsertEvent($service->board, $threadid, $POST->evtitle, $app->user->id, $POST->month, $POST->day, $POST->year, $POST->span);
                     
                     if ($app->board->isAnnouncement())
                     {

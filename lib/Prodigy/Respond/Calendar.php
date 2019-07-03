@@ -106,7 +106,7 @@ class Calendar extends Respond
         while ($row = $dbst->fetch())
         {
             if ($bPowerUser || $row['id_member'] == $this->app->user->id)
-                $strOwner = '<a href="' . SITE_ROOT . '/calendar/ee/' . $row[id] . '/"><font color="#FF0000">*</font></a>';
+                $strOwner = '<a href="' . SITE_ROOT . '/calendar/editevent/' . $row['id'] . '/"><font color="#FF0000">*</font></a>';
             else
                 $strOwner = '';
             
@@ -114,7 +114,7 @@ class Calendar extends Respond
             if ($cats[$row['ID_CAT']][0] == '' || $bPowerUser || in_array($this->app->user->group, $cats[$row['ID_CAT']]))
             {
                 if (!isset($events[$row['day']]))
-                    $events[$row['day']] = '<font color="#' . $this->app->conf->cal_eventcolor . '">' . $this->locale->calendar4 . '</font> ' . $strOwner . '<a href="' . SITE_ROOT . '/b' . $row['id_board'] . '/t' . $row['id_topic'] . '/">' . $this->service->esc($row['title']) . '</a>';
+                    $events[$row['day']] = '<font color="#' . $this->app->conf->cal_eventcolor . '">' . $this->app->locale->calendar4 . '</font> ' . $strOwner . '<a href="' . SITE_ROOT . '/b' . $row['id_board'] . '/t' . $row['id_topic'] . '/">' . $this->service->esc($row['title']) . '</a>';
                 else
                     $events[$row['day']] .= ', ' . $strOwner . '<a href="' . SITE_ROOT . '/b' . $row['id_board'] . '/t' . $row['id_topic'] . '/">' . $this->service->esc($row['title']) . '</a>';
             }
@@ -183,10 +183,10 @@ class Calendar extends Respond
         if (empty($POST->year))
             return $this->error($this->app->locale->calendar8);
         
-        if ($POST->month < 0 || $POST0->month > 11)
+        if ($POST->month < 0 || $POST->month > 11)
             return $this->error($this->app->locale->calendar1);
         
-        if ($POST->year < $this->app->conf-cal_minyear || $POST->year > $this->app->conf->cal_maxyear)
+        if ($POST->year < $this->app->conf->cal_minyear || $POST->year > $this->app->conf->cal_maxyear)
             return $this->error($this->app->locale->calendar2);
         
         if (!empty($POST->span))
@@ -203,7 +203,7 @@ class Calendar extends Respond
         if (empty($POST->deleteevent))
         {
             if (empty($POST->day))
-                return $this->error($this->locale->calendar14);
+                return $this->error($this->app->locale->calendar14);
             if (empty($POST->evtitle))
                 return $this->error($this->app->locale->calendar15);
             
@@ -488,4 +488,359 @@ class Calendar extends Respond
         
         return $this->render('templates/calendar/show.template.php', $data);
     } // show()
+    
+    public function postEvent($request, $response, $service, $app)
+    {
+        if($app->user->guest)
+            return $this->error($app->locale->txt[1]);
+        
+        $db_prefix = $app->db->prefix;
+        
+        // No point in doing this if over and over for access checks.
+        if ($app->user->isStaff())
+            $bPowerUser = true;
+        else
+            $bPowerUser = false;
+        
+        if($request->method('get'))
+        {
+            $GET = $request->paramsGet();
+            
+            $calPostGroups = explode(',', $app->conf->cal_postgroups);
+            if (!$this->CanPost())
+                return $this->error($app->locale->calendar6);
+            
+            if (!isset($GET->month))
+                return $this->error($app->locale->calendar7s);
+            if (!isset($GET->year))
+                return $this->error($app->locale->calendar8);
+            
+            if ($GET->month < 0 || $GET->month > 11)
+                return $this->error($app->locale->calendar1);
+            
+            if ($GET->year < $app->conf->cal_minyear || $GET->year > $app->conf->cal_maxyear)
+                return $this->error($app->locale->calendar2);
+            
+            // Find the last day of the month.
+            $nLastDay = 31;
+            while (!checkdate($GET->month + 1, $nLastDay, $GET->year) && $nLastDay > 0)
+                $nLastDay--;
+            
+            $data = array(
+                'title' => "{$app->conf->mbname} : {$app->locale->calendar23}",
+                'month' => $GET->month,
+                'year' => $GET->year,
+                'monthy' => $app->locale->monthy[$GET->month]
+            );
+            
+            $data['days'] = array();
+            for ($i = 1; $i <= $nLastDay; $i++)
+            {
+                $selected = '';
+                if (isset($GET->day) && $i == $GET->day)
+                    $selected = 'selected="selected"';
+                $data['days'][] = array($i, $selected);
+            }
+            
+            // Show the number of days to span only if enabled and set for more than one day.
+            if ($app->conf->cal_allowspan == 1 && $app->conf->cal_maxspan > 1)
+            {
+                $data['spans'] = array();
+                for ($i = 1; $i <= $app->conf->cal_maxspan; $i++)
+                {
+                    $selected = '';
+                    if ($i == 1)
+                        $selected = 'selected="selected"';
+                    $data['spans'][] = array($i, $selected);
+                }
+            }
+            
+            $data['boards'] = array();
+            $dbst = $app->db->query("SELECT b.ID_BOARD, b.name AS boardname, c.memberGroups, c.name AS catname FROM {$db_prefix}boards as b, {$db_prefix}categories as c WHERE b.ID_CAT = c.ID_CAT");
+            while ($row = $dbst->fetch())
+            {
+                $groups = explode(',', $row['memberGroups']);
+                
+                if ($row['memberGroups'] == '' || $bPowerUser || in_array($app->user->group, $groups))
+                {
+                    $board = "{$row['catname']} - {$row['boardname']}";
+                    $selected = '';
+                    if ($board == $app->conf->cal_defaultboard)
+                        $selected = 'selected="selected"';
+                    $data['boards'][] = array($row['ID_BOARD'], $board, $selected);
+                }
+            }
+            $dbst = null;
+                    
+            return $this->render('templates/calendar/postevent.template.php', $data);
+        } // if GET
+        elseif ($request->method('post'))
+        {
+            $this->validatePost($request);
+            $service->linkcalendar = true;
+            $POST = $request->paramsPost();
+            $PARAMS = $request->paramsNamed();
+            // patching request
+            $PARAMS->board = (int) $POST->board;
+            $service->calendar_year = $POST->year;
+            $service->calendar_month = $POST->month;
+            $service->calendar_day = $POST->day;
+            $service->calendar_evtitle = $POST->evtitle;
+            $service->calendar_span = $POST->span;
+            $service->calendar_board = $POST->board;
+            // now open create new thread form
+            return $app->thread->newThread($request, $response, $service, $app);
+        } // if POST
+    } // postEvent()
+    
+    // Consolidating the various insert statements into this function.
+    public function InsertEvent($id_board, $id_topic, $title, $id_member, $month, $day, $year, $span)
+    {
+        $db_prefix = $this->app->db->prefix;
+        if ($span == NULL || trim($span) == "")
+            $this->app->db->prepare("
+                INSERT INTO {$db_prefix}calendar(id_board,id_topic,title,id_member,month,day,year)
+                VALUES(?,?,?,?,?,?,?)")->
+                execute(array($id_board, $id_topic, $title, $id_member, $month, $day, $year));
+        else
+        {
+            // I went for the simplest way I could think of for making the events span multiple days. For each day
+            // a row is added to the calendar table.
+            $tVal = mktime(0, 0, 0, $month + 1, $day, $year);
+            
+            $dbst = $this->app->db->prepare("
+                    INSERT INTO {$db_prefix}calendar(id_board,id_topic,title,id_member,month,day,year)
+                    VALUES(?,?,?,?,?,?,?)");
+            for ($i = 0; $i < $span; $i++)
+            {
+                $eventTime = localtime($tVal);
+                $year = $eventTime[5] + 1900;
+                $dbst->execute(array($id_board,$id_topic,$title,$id_member,$eventTime[4],$eventTime[3],$year));
+                $tVal = strtotime("tomorrow",$tVal);
+            }
+            $dbst = null; // closing this statement;
+        }
+    } // InsertEvent();
+    
+    // Returns TRUE if this user is allowed to link the topic in question.
+    protected function canLink($board, $thread)
+    {
+        if (!$this->canPost())
+            return $this->error($this->app->locale->calendar6);
+        
+        if (empty($board))
+            return $this->error($this->app->locale->calendar38);
+        if (empty($thread))
+            return $this->error($this->app->locale->calendar39);
+        
+        $db_prefix = $this->app->db->prefix;
+        
+        // If not an admin or global mod make sure they are either the owner of the topic they are trying to
+        // link or a moderator of that board.
+        if (!$this->app->user->isStaff())
+        {
+            $dbst = $this->app->db->prepare("SELECT moderators FROM {$db_prefix}boards WHERE ID_BOARD=?");
+            $dbst->execute(array($board));
+            if ($mods = $dbst->fetchColumn())
+            {
+                $dbst = null;
+                $mods = explode(',', $mods);
+                if (in_array($this->app->user->name,$mods))
+                    return true;
+                
+                // Not admin, global mod, or a moderator of this board. Only thing left is to see if they are the
+                // owner of the topic.
+                $dbst = $this->app->db->prepare("SELECT ID_MEMBER_STARTED FROM {$db_prefix}topics WHERE ID_TOPIC='$e_threadid'");
+                $dbst->execute(array($thread));
+                if ($row = $dbst->fetchColumn())
+                {
+                    $dbst = null;
+                    if ($row != $this->app->user->id)
+                        return $this->error($this->app->locale->calendar41); // Not the owner of the topic.
+                }
+                else
+                    return $this->error($this->app->locale->calendar40);  // Topic doesn't exist.
+            }
+            else
+                return $this->error($this->app->locale->calendar42); // Board doesn't exist.
+        }
+        return true;
+    } // canLink()
+    
+    public function linkEvent($request, $response, $service, $app)
+    {
+        $PARAMS = $request->paramsNamed();
+        $this->canLink($PARAMS->board, $PARAMS->thread);
+        
+        $db_prefix = $app->db->prefix;
+        
+        if($request->method('get'))
+        {
+            $dbst = $app->db->prepare("SELECT id FROM {$db_prefix}calendar WHERE id_topic = ?");
+            $dbst->execute(array($PARAMS->thread));
+            $id = $dbst->fetchColumn();
+            $dbst = null;
+            if ($id)
+                // event already exists, redirect to edit event page
+                return $this->redirect("/calendar/editevent/$id/");
+            
+            $today = localtime($this->GetCurrentTime());
+            $day = $today[3];
+            $month = $today[4];
+            $year = $today[5] + 1900;
+            
+            $data = array(
+                'title' => "{$app->conf->mbname} : {$app->locale->calendar43}"
+            );
+            
+            $nMonth = 0;
+            $data['months'] = array();
+            foreach ($app->locale->monthy as $m)
+            {
+                $selected = '';
+                if ($nMonth == $month)
+                    $selected = 'selected="selected"';
+                $data['months'][] = array($nMonth, $m, $selected);
+                $nMonth++;
+            }
+            
+            $data['years'] = array();
+            for ($i = $app->conf->cal_minyear; $i <= $app->conf->cal_maxyear; $i++)
+            { 
+                $selected = '';
+                if ($year == $i)
+                    $selected = 'selected="selected"';
+                $data['years'][] = array($i, $selected);
+            }
+            
+            $data['days'] = array();
+            // Since we don't know which month the user will choose, providing the max 31 days. The date will be
+            // validated when they try to post the event.
+            for ($i=1;$i<=31;$i++)
+            {
+                $selected = '';
+                if ($day == $i)
+                    $selected = 'selected="selected"';
+                $data['days'][] = array($i, $selected);
+            }
+            
+            // Show the number of days to span only if enabled and set for more than one day.
+            if ($app->conf->cal_allowspan == 1 && $app->conf->cal_maxspan)
+            {
+                $data['spans'] = array();
+                for ($i = 1; $i <= $app->conf->cal_maxspan; $i++)
+                {
+                    $selected = '';
+                    if ($i == 1)
+                        $selected = 'selected="selected"';
+                    $data['spans'][] = array($i, $selected);
+                }
+            }
+    
+            return $this->render('templates/calendar/linkevent.template.php', $data);
+        } // if GET
+        elseif ($request->method('post'))
+        {
+            $POST = $request->paramsPost();
+            $app->session->check('post');
+            $this->CanLink($PARAMS->board, $PARAMS->thread);
+            $this->ValidatePost($request);
+
+            $this->InsertEvent($PARAMS->board,$PARAMS->thread,$POST->evtitle,$app->user->id,$POST->month,$POST->day,$POST->year,$POST->span);
+
+            return $this->redirect("/calendar/?ayear={$POST->year}&month={$POST->month}");
+        } // if POST
+    } // linkEvent()
+    
+    public function editEvent($request, $response, $service, $app)
+    {
+        if($app->user->guest)
+            return $this->error($app->locale->txt[1]);
+        
+        $PARAMS = $request->paramsNamed();
+        
+        if ($app->user->isStaff())
+            $bPowerUser = true;
+        else
+            $bPowerUser = false;
+        
+        $db_prefix = $app->db->prefix;
+        
+        $dbst = $app->db->prepare("SELECT title,month,day,year,id_member FROM {$db_prefix}calendar WHERE id=?");
+        $dbst->execute(array($PARAMS->eventid));
+        $row = $dbst->fetch();
+        $dbst = null;
+
+        if(!$row)
+            return $this->error('Event not found.');
+        
+        if (!$bPowerUser)
+            if ($row['id_member'] != $app->user->id)
+                return $this->error($app->locale->calendar19);
+        
+        
+        
+        if ($request->method('get'))
+        {
+            $data = array(
+                'title' => "{$app->conf->mbname} : {$app->locale->calendar20}",
+                'eventid' => $PARAMS->eventid,
+                'eventTitle' => $row['title']
+            );
+            
+            $nMonth = 0;
+            $data['months'] = array();
+            foreach ($app->locale->monthy as $m)
+            {
+                $selected = '';
+                if ($nMonth == $row['month'])
+                    $selected = 'selected="selected"';
+                $data['months'][] = array($nMonth, $m, $selected);
+                $nMonth++;
+            }
+            
+            $data['years'] = array();
+            for ($i = $app->conf->cal_minyear; $i <= $app->conf->cal_maxyear; $i++)
+            {
+                $selected = '';
+                if ($i == $row['year'])
+                    $selected = 'selected="selected"';
+                $data['years'][] = array($i, $selected);
+            }
+            
+            // Since we don't know which month the user will choose, providing the max 31 days. The date will be
+            // validated when they try to post the event.
+            $data['days'] = array();
+            for ($i = 1; $i <= 31; $i++)
+            {
+                $selected = '';
+                if ($i == $row['day'])
+                    $selected = 'selected="selected"';
+                $data['days'][] = array($i, $selected);
+            }
+            
+            return $this->render('templates/calendar/editevent.template.php', $data);
+        } // if method GET
+        elseif ($request->method('post'))
+        {
+            $app->session->check('post');
+            
+            $POST = $request->paramsPost();
+            
+            if ($POST->deleteevent)
+            {
+                $app->db->prepare("DELETE FROM {$db_prefix}calendar WHERE id=?")->
+                    execute(array($PARAMS->eventid));
+            }
+            else
+            {
+                $this->validatePost($request);
+                
+                $app->db->prepare("Update {$db_prefix}calendar Set month=?,day=?,year=?,title=? WHERE id=?")->
+                    execute(array($POST->month, $POST->day, $POST->year, $POST->evtitle, $PARAMS->eventid));
+            }
+            
+            return $this->redirect("/calendar/?year={$POST->year}&month={$POST->month}");
+        }
+    } // editEvent();
 }

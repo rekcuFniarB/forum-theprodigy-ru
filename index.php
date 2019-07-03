@@ -253,6 +253,9 @@ $router->respond('GET', '/people/', 'stats->allmypeople');
 
 // Calendar
 $router->respond('GET', '/calendar/', 'calendar->show');
+$router->respond(array('GET', 'POST'), '/calendar/newevent/', 'calendar->postEvent');
+$router->respond(array('GET', 'POST'), '/calendar/linkevent/b[i:board]/t[i:thread]/', 'calendar->linkevent');
+$router->respond(array('GET', 'POST'), '/calendar/editevent/[i:eventid]/', 'calendar->editEvent');
 
 $router->respond('GET', '/agreement/', 'register->agreement');
 

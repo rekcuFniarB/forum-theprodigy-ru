@@ -723,7 +723,7 @@
             
             <?php if($this->calendar_enabled): ?>
               <?= $this->menusep() ?>
-              <a href="<?= SITE_ROOT ?>/calendarle/b<?= $this->board ?>/t<?= $this->thread ?>/"><font size="1" class="imgwindowbg"><?= $this->locale->linkToCalendar ?></font></a>
+              <a href="<?= SITE_ROOT ?>/calendar/linkevent/b<?= $this->board ?>/t<?= $this->thread ?>/"><font size="1" class="imgwindowbg"><?= $this->locale->linkToCalendar ?></font></a>
             <?php endif; ?>
           </font>
         </td>

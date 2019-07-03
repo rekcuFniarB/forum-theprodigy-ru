@@ -317,6 +317,9 @@
               </tr>
             </table>
             <input type="hidden" name="sc" value="<?= $this->ses_id ?>">
+            <?php if($this->linkcalendar): ?>
+              <?php $this->partial('templates/calendar/hiddenfields.part.php') ?>
+            <?php endif; ?>
           </form>
           
           <?php if(isset($this->thread_summary)): ?>
