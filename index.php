@@ -133,18 +133,18 @@ $router->respond(function($request, $response, $service, $app, $router) {
     //set_error_handler(array($app->errors, 'handler'), E_STRICT);
 });
 
-//// Defaults for POST requests
-$router->respond('POST', null, function($request, $response, $service, $app) {
+//// Defaults for POST requests TODO
+//$router->respond('POST', null, function($request, $response, $service, $app) {
     //$app->srvc->sessionRequire();
     //// Check for CSRF
     //$service->validateParam('csrf', 'CSRF token missing.')->isAlnum();
     //if ($request->param('csrf') != $service->sessid) $app->srvc->abort('Error', 'Session error.');
-});
+//});
 
 //// Defaults for GET requests
 $router->respond('GET', null, function($request, $response, $service, $app) {
-    if ($response->isSent()) return;
-    //$app->srvc->build_menu();
+    if ($response->isSent())
+        return;
     
     $service->before = intval($request->param('before', null));
     $service->pageNext = 0;
@@ -152,39 +152,6 @@ $router->respond('GET', null, function($request, $response, $service, $app) {
     $service->paginateBy = 25;
     $service->next_page_available = false;
     $service->post_view = false;
-});
-
-//// Root view
-$router->respond('GET', '/anon-function-respond/', function($request, $response, $service, $app) {
-    //// Goto default category
-    //$app->render->root();
-    $app->errors->log('__DEBUG__: GET /');
-    //var_dump($app->db);
-    //var_dump($app->db->db_prefix);
-
-});
-
-$router->respond('GET', '/main/', function($request, $response, $service, $app) {
-    //$app->respond->qwerty();
-    //$app->respond('QWERTY');
-    
-    $respond = new \Prodigy\Respond\Main ($app);
-    //var_dump($respond);
-    $respond('QWERTY'); // run __invoke()
-    $respond->aaaaa();  // run __call()
-    //$respond->display();
-});
-
-$router->respond('GET', '/errortest/', function($request, $response, $service, $app) {
-    //$app->errors->abort('Error Title', 'Error Message');
-    //$app->errors->backtrace('Manual Error');
-    //throw new Prodigy\Errors\MySQLException('Fuck!', 666);
-    //$app->db->query('selectttt');
-    //return call_user_func(array($app->errors, 'handler'));
-    //set_error_handler(array($app->errors, 'handlerr'));
-    $x = $AAA;
-    error_log("__DEBUG__: afer error handler");
-    //$app->errors->handler();
 });
 
 // Registering routes
@@ -212,9 +179,6 @@ $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/delete/', 'threa
 
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/editpoll/', 'thread->editpoll');
 $router->respond(array('GET', 'POST'), '/b[i:board]/t[i:thread]/vote/[i:poll]/', 'thread->pollVote');
-
-//$router->respond('GET', '/main-static-call/', '\Prodigy\Router::Main');
-
 
 // User Profile
 $router->respond('GET', '/people/[:user]/', 'profile->show');
@@ -262,11 +226,9 @@ $router->respond('GET', '/agreement/', 'register->agreement');
 $router->respond('GET', '/example/', 'example->example');
 //$router->respond('GET', '/example/', 'example->example2');
 $router->respond('GET', '/test/', 'example->testResponse');
-$router->respond('GET', '/simple/', 'example->simple_example');
+//$router->respond('GET', '/simple/', 'example->simple_example');
 
-$router->with('/feed', 'lib/Prodigy/Feed/index.php');
+$router->with('/feed', 'lib/Prodigy/Feed/index.php'); // TBD (to be done)
 $router->with('/files', 'lib/Prodigy/Cloud/index.php');
 
 $router->dispatch();
-
-//var_dump($router->app()->conf);
