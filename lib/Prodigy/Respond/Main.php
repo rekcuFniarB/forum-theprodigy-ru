@@ -536,14 +536,14 @@ class Main extends Respond {
                         AND (FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups='' OR ? LIKE 'Administrator' OR ? LIKE 'Global Moderator')
                     ORDER BY m.last_comment_time DESC
                     LIMIT 0, ?");
-            $request->excute(
+            $request->execute(
                 array_merge(
                     $messages, array($usergroup, $usergroup, $usergroup, $showlatestcount)
                 )
             );
             
             $post = '';
-            while ($row = $request->fetch_array()) {
+            while ($row = $request->fetch()) {
                 $csvlines = explode("\r\n", $row['COMMENTS']);
                 end($csvlines);
                 $lastcsvline = explode("#;#", prev($csvlines));
