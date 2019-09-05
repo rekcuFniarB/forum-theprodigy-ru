@@ -37,7 +37,7 @@ Class Service {
         $response->code($code);
         $this->service->title = $title;
         $this->service->message = $msg;
-        $this->service->render('templates/error.php');
+        $this->service->render('error.php');
         $response->send();
         return $response;
     }

@@ -3,7 +3,7 @@
             <tr>
               <td valign="bottom" colspan="2">
                 <!-- LinkTree -->
-                <?php $this->partial('templates/parts/linktree.template.php') ?>
+                <?php $this->partial('parts/linktree.template.php') ?>
               </td>
             </tr>
           </table>
@@ -147,7 +147,7 @@
                 <!-- end poll form -->
                 <?php endif; ?>
                 
-                    <?php $this->partial('templates/thread/postbox.template.php'); ?>
+                    <?php $this->partial('thread/postbox.template.php'); ?>
                     
                   <?php if($this->conf->nowlistening_enabled): ?>
                     <tr>
@@ -318,12 +318,12 @@
             </table>
             <input type="hidden" name="sc" value="<?= $this->ses_id ?>">
             <?php if($this->linkcalendar): ?>
-              <?php $this->partial('templates/calendar/hiddenfields.part.php') ?>
+              <?php $this->partial('calendar/hiddenfields.part.php') ?>
             <?php endif; ?>
           </form>
           
           <?php if(isset($this->thread_summary)): ?>
-              <?php $this->partial('templates/thread/summary.template.php'); ?>
+              <?php $this->partial('thread/summary.template.php'); ?>
           <?php else: ?>
             <!--no summary-->
           <?php endif; ?>

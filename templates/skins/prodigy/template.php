@@ -19,7 +19,7 @@
 <meta name="Other.Language" content="Russian">
 
 <?php /* <yabb head> */ ?>
-<?php $this->partial(PROJECT_ROOT.'/templates/head.php'); ?>
+<?php $this->partial('head.php'); ?>
 
 <style type="text/css">
 <!--
@@ -104,7 +104,7 @@ div.avatar
 
 </head>
 <body>
-<?php $this->partial('templates/body.inc.php'); // <yabb body> ?>
+<?php $this->partial('body.inc.php'); // <yabb body> ?>
 <br>
 <header>
 <table width="<?= ($this->user->mobileMode?'100%':'92%') ?>" cellspacing="1" cellpadding="0" border="0" align="CENTER" class="bordercolor" role="presentation">
@@ -118,7 +118,7 @@ div.avatar
                 <td class="logo-block" bgcolor="#CCCCCC" height="50" style="line-height: 0px;"><a href="<?= SITE_ROOT ?>/" target="_blank"><img src="<?= STATIC_ROOT ?>/skins/prodigy/YaBBImages/prodlogo.gif" alt="TheProdigy.ru" border="0"></a></td>
                 <td bgcolor="#CCCCCC">
                 <font size="2">
-                <?= $this->yyuname ?> <?php $this->partial('templates/im_head.php') ?><BR>
+                <?= $this->yyuname ?> <?php $this->partial('im_head.php') ?><BR>
                 <?= $this->yytime ?><?php /* <yabb time> */ ?>
                 </font><BR>
                 </td>
@@ -135,7 +135,7 @@ div.avatar
           <td width="100%" align="center">
             <table border="0" width="100%" cellpadding="3" cellspacing="0" bgcolor="#A0A0A0" align="center" role="presentation">
               <tr>
-                <td valign="middle" bgcolor="#A0A0A0" align="center" class="menubar"><font size="1"><nav><?php $this->partial('templates/yymenu.php') ?></nav></font></td>
+                <td valign="middle" bgcolor="#A0A0A0" align="center" class="menubar"><font size="1"><nav><?php $this->partial('yymenu.php') ?></nav></font></td>
               </tr>
             </table>
           </td>
@@ -186,16 +186,16 @@ div.avatar
   <tr>
     <td align="center">
       <font class="copyright">
-        <?php $this->partial("templates/copyright.block.php") ?>
+        <?php $this->partial("copyright.block.php") ?>
       </font>
     </td>
   </tr>
 
   <tr>
-    <td align="center"><?php $this->partial("templates/counters.php"); ?></td>
+    <td align="center"><?php $this->partial("counters.php"); ?></td>
   </tr>
 </table>
-<?php $this->partial('templates/footer.php'); ?>
+<?php $this->partial('footer.php'); ?>
 </footer>
 </body>
 </html>

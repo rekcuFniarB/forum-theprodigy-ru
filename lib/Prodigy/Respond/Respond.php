@@ -76,7 +76,7 @@ abstract class Respond {
             //$this->prepare_layout();
         if ($this->service->layout() === null)
             $this->prepare_layout();
-        $this->service->render($view, $data);
+        $this->service->render(PROJECT_ROOT . '/templates/' . $view, $data);
         //return $this->response->send();
         //$this->router->skipRemaining();
         return $this->response;
@@ -551,7 +551,7 @@ abstract class Respond {
         $this->service->title = $title;
         $this->service->message = $message;
         $this->service->escape = $escape;
-        return $this->render('templates/message.template.php');
+        return $this->render('message.template.php');
     }
     
     public function ajax_response($data, $format = 'json', $charset = null)

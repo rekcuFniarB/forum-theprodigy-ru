@@ -9,7 +9,7 @@
 <meta name="Other.Language" content="Russian">
 
 <?php /* <yabb head> */ ?>
-<?php $this->partial(PROJECT_ROOT.'/templates/head.php'); ?>
+<?php $this->partial('head.php'); ?>
 
 <STYLE type=text/css>
 A:link {
@@ -189,7 +189,7 @@ body,td,th {
 <?php endif; ?>
 </HEAD>
 <BODY>
-<?php $this->partial('templates/body.inc.php'); // <yabb body> ?>
+<?php $this->partial('body.inc.php'); // <yabb body> ?>
 <TABLE class=bordercolor cellSpacing=0 cellPadding=0 width="90%" align=center bgColor=#333333 border=0>
   <TBODY>
   <TR>
@@ -203,10 +203,10 @@ body,td,th {
               <TBODY>
               <TR>
                 <TD class="logo-block" vAlign=center align=left bgColor=#000000 style="line-height: 0px;"><a href="/"><img src="<?= STATIC_ROOT ?>/skins/<?= $this->skinname ?>/YaBBImages/header.jpg" width="600" height="100" border="0"></a></TD>
-                <TD vAlign=center bgColor=#000000><FONT size=2><?= $this->yyuname?><?php $this->partial('templates/im_head.php') ?><BR><?= $this->yytime ?>
+                <TD vAlign=center bgColor=#000000><FONT size=2><?= $this->yyuname?><?php $this->partial('im_head.php') ?><BR><?= $this->yytime ?>
 				</FONT></TD></TR></TBODY></TABLE></TD></TR>
         <TR vAlign=center align=middle bgColor=#b7bbda>
-          <TD bgColor=#DAE0E8 class="windowbg menubar"><FONT size=1><?php $this->partial('templates/yymenu.php') ?></FONT></TD>
+          <TD bgColor=#DAE0E8 class="windowbg menubar"><FONT size=1><?php $this->partial('yymenu.php') ?></FONT></TD>
          </TR>
 		 <tr><td width="100%" bgcolor="#333333" height="24"><?php /* <yabb news> */ ?></td></tr>
         </TBODY>
@@ -265,13 +265,13 @@ body,td,th {
                     <TR>
                       <TD vAlign=center align=right width="25%" bgColor=#333333>&nbsp;</TD>
                       <TD vAlign=center align=middle width="50%" bgColor=#333333>
-                        <?php $this->partial("templates/copyright.block.php") ?>
+                        <?php $this->partial("copyright.block.php") ?>
                       </TD>
                       <TD vAlign=center align=left width="25%" bgColor=#333333>&nbsp;</TD>
                     </TR>
                     <tr>
                       <td align="center" colspan="3">
-                        <?php $this->partial(PROJECT_ROOT . "/templates/counters.php"); ?>
+                        <?php $this->partial("counters.php"); ?>
                       </td>
                     </tr>
                   </TBODY>
@@ -285,7 +285,7 @@ body,td,th {
   </TBODY>
 </TABLE>
 
-<?php $this->partial(PROJECT_ROOT.'/templates/footer.php'); ?>
+<?php $this->partial('footer.php'); ?>
 
 </body>
 </HTML>

@@ -51,7 +51,7 @@ class Errors {
                 }
             }
             
-            $respond->render('templates/error.php');
+            $respond->render('error.php');
         }
         else
             $respond->ajax_response("    $title\n[$code] $msg", 'text');

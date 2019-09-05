@@ -648,7 +648,7 @@ class Threads extends Respond
             array('url' => "/b{$service->board}/", 'name' => $service->boardname)
         );
                 
-        $this->render('templates/thread/thread.template.php');
+        $this->render('thread/thread.template.php');
         
     } // Display()
     
@@ -703,7 +703,7 @@ class Threads extends Respond
             {
                 // show confirm dialog if not confirmed before
                 if (!$app->session->get('guestRulesConfirmed', false) && intval($POST->get('cconfirm')) != $service->cValue)
-                    return $this->render('templates/thread/confirm.template.php');
+                    return $this->render('thread/confirm.template.php');
                 // remember confirmation
                 if ($POST->get('cconfirm') == $service->cValue) {
                     $app->session->check('post');
@@ -955,7 +955,7 @@ class Threads extends Respond
             array('name' => $service->title . (isset($service->sub) ? " ( {$service->sub} )" : ''))
         );
         
-        $this->render('templates/thread/reply.template.php');
+        $this->render('thread/reply.template.php');
     } // reply()
     
     public function thread_summary($thread) {
@@ -1876,7 +1876,7 @@ class Threads extends Respond
                 array('name' => $service->title . (isset($service->sub) ? " ( {$service->sub} )" : ''))
             );
             
-            return $this->render('templates/thread/reply.template.php');
+            return $this->render('thread/reply.template.php');
         }
         elseif ($request->method() == 'POST')
         {
@@ -2119,7 +2119,7 @@ class Threads extends Respond
             $service->sessid = $app->session->id;
             $service->msgid = $msg;
             $service->title = $app->locale->txt(154);
-            return $this->render('templates/thread/deletemsg.template.php');
+            return $this->render('thread/deletemsg.template.php');
         }
         elseif ($request->method('POST'))
         {
@@ -2265,7 +2265,7 @@ class Threads extends Respond
             $service->sessid = $app->session->id;
             $service->msgid = $row['ID_FIRST_MSG'];
             $service->title = 'Delete thread';
-            return $this->render('templates/thread/deletemsg.template.php');
+            return $this->render('thread/deletemsg.template.php');
         }
         elseif ($request->method('POST'))
         {
@@ -2429,7 +2429,7 @@ class Threads extends Respond
         
         if ($request->method('GET'))
         {
-            return $this->render('templates/thread/editpoll.template.php', $data);
+            return $this->render('thread/editpoll.template.php', $data);
             
         } // if GET
         elseif ($request->method('POST'))

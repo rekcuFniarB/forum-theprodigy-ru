@@ -486,7 +486,7 @@ class Calendar extends Respond
         $data['year'] = $GET->year;
         $data['canpost'] = $bCanPost;
         
-        return $this->render('templates/calendar/show.template.php', $data);
+        return $this->render('calendar/show.template.php', $data);
     } // show()
     
     public function postEvent($request, $response, $service, $app)
@@ -572,7 +572,7 @@ class Calendar extends Respond
             }
             $dbst = null;
                     
-            return $this->render('templates/calendar/postevent.template.php', $data);
+            return $this->render('calendar/postevent.template.php', $data);
         } // if GET
         elseif ($request->method('post'))
         {
@@ -737,7 +737,7 @@ class Calendar extends Respond
                 }
             }
     
-            return $this->render('templates/calendar/linkevent.template.php', $data);
+            return $this->render('calendar/linkevent.template.php', $data);
         } // if GET
         elseif ($request->method('post'))
         {
@@ -819,7 +819,7 @@ class Calendar extends Respond
                 $data['days'][] = array($i, $selected);
             }
             
-            return $this->render('templates/calendar/editevent.template.php', $data);
+            return $this->render('calendar/editevent.template.php', $data);
         } // if method GET
         elseif ($request->method('post'))
         {

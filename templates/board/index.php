@@ -3,8 +3,8 @@
   <tr>
     <td class="board_tree">
       <a name="top"></a>
-      <?php $this->cpartial('templates/parts/linktree.template.php'); ?>
-      <?php $this->cpartial('templates/thread/showmods.template.php', array('showmods' => $this->showmods), true) ?>
+      <?php $this->cpartial('parts/linktree.template.php'); ?>
+      <?php $this->cpartial('thread/showmods.template.php', array('showmods' => $this->showmods), true) ?>
       <span class="link_tree_br"><br></span><br>
     </td> <!-- .board_tree -->
   </tr>
@@ -62,7 +62,7 @@
                 <tr>
                   <td id="viewers" width="100%">
                     <?php if(isset($this->boardviewers)): ?>
-                        <?php $this->partial('templates/parts/boardviewers.template.php'); ?>
+                        <?php $this->partial('parts/boardviewers.template.php'); ?>
                     <?php endif; ?>
                   </td>
                   
@@ -293,8 +293,8 @@
     <tr>
       <td class="board_tree" colspan="3">
         <br>
-        <?php $this->cpartial('templates/parts/linktree.template.php') ?>
-        <?php $this->cpartial('templates/thread/showmods.template.php') ?>
+        <?php $this->cpartial('parts/linktree.template.php') ?>
+        <?php $this->cpartial('thread/showmods.template.php') ?>
         <br>
         <br>
       </td>
@@ -340,7 +340,7 @@
     </td>
     <td align="right" valign="middle">
       <?php if(isset($this->jumptoform)): ?>
-        <?php $this->partial('templates/board/jumpto.template.php') ?>
+        <?php $this->partial('board/jumpto.template.php') ?>
       <?php endif; ?>
     </td>
   </tr>

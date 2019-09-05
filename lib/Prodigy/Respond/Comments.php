@@ -129,7 +129,7 @@ class Comments extends Respond
         $dbst = null; // closing this statement
         
         $this->addJS('ubbc.js');
-        return $this->render('templates/comments/subscribed.template.php', $data);
+        return $this->render('comments/subscribed.template.php', $data);
     } // subscribed()
     
     public function commentsTo($request, $response, $service, $app)
@@ -204,7 +204,7 @@ class Comments extends Respond
         $dbst = null; // closing this statement
         
         $this->addJS('ubbc.js');
-        return $this->render('templates/comments/subscribed.template.php', $data);
+        return $this->render('comments/subscribed.template.php', $data);
     } // commentsTo()
     
     public function commentsBy($request, $response, $service, $app)
@@ -275,7 +275,7 @@ class Comments extends Respond
         $dbst = null; // closing this statement
         
         $this->addJS('ubbc.js');
-        return $this->render('templates/comments/subscribed.template.php', $data);
+        return $this->render('comments/subscribed.template.php', $data);
     } // commentsBy
     
     /**

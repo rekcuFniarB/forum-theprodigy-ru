@@ -551,7 +551,7 @@ class InstantMessages extends Respond
             }
         });
         
-        return $this->render('templates/im/inbox.template.php', $data);
+        return $this->render('im/inbox.template.php', $data);
     } // inbox()
     
     public function outbox($request, $response, $service, $app)
@@ -692,7 +692,7 @@ class InstantMessages extends Respond
         if ($app->conf->profilebutton && !$app->user->guest)
             $data['profilebutton'] = true;
         
-        return $this->render('templates/im/inbox.template.php', $data);
+        return $this->render('im/inbox.template.php', $data);
     } // outbox
     
     public function quote($request, $response, $service, $app)
@@ -802,7 +802,7 @@ class InstantMessages extends Respond
             );
             
             $this->addJS('ubbc.js');
-            return $this->render('templates/im/impost.template.php', $data);
+            return $this->render('im/impost.template.php', $data);
         } // if GET
         elseif ($request->method('POST'))
         {
@@ -959,7 +959,7 @@ class InstantMessages extends Respond
                     array('name' => $app->locale->txt[323])
                 )
             );
-            $this->render('templates/im/prefs.template.php', $data);
+            $this->render('im/prefs.template.php', $data);
         } // if GET
         elseif ($request->method('POST'))
         {
@@ -1093,7 +1093,7 @@ class InstantMessages extends Respond
         if ($request->paramsGet()->get('sesc') === null)
         {
             // Show prompt
-            return $this->render('templates/im/removeall.template.php', $data);
+            return $this->render('im/removeall.template.php', $data);
         }
         else
         {

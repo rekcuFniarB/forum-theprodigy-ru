@@ -389,7 +389,7 @@ class Board extends Respond
             array('url' => "/b{$service->board}/", 'name' => $service->title)
         );
         
-        $this->render('templates/board/index.php');
+        $this->render('board/index.php');
         
     } // index()
     

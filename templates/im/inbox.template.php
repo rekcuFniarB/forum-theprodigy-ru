@@ -28,7 +28,7 @@
 <table role="presentation" border="0" width="100%" cellspacing="0" cellpadding="0">
   <tr>
     <td valign="bottom">
-        <?php $this->partial('templates/parts/linktree.template.php') ?>
+        <?php $this->partial('parts/linktree.template.php') ?>
     </td>
   </tr>
 </table>
@@ -118,7 +118,7 @@
 </form>
 <br />
 
-<?php $this->partial('templates/parts/simple_pagination.template.php'); ?>
+<?php $this->partial('parts/simple_pagination.template.php'); ?>
 
 <?php if(!$this->nomessages): ?>
   <table role="presentation" border="0" width="100%" cellspacing="1" cellpadding="4" bgcolor="<?= $this->color['bordercolor'] ?>" class="bordercolor instant-messages-page">

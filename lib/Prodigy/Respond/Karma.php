@@ -94,7 +94,7 @@ class Karma extends Respond
         $dbst = null;
         
         
-        $this->render('templates/profile/karma.template.php', $data);
+        $this->render('profile/karma.template.php', $data);
     } // view()
     
     public function remove($request, $response, $service, $app)

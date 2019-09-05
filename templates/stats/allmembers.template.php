@@ -12,7 +12,7 @@
 <?php endif; ?>
 
 <table border="0" width="100%" cellspacing="1" cellpadding="4" bgcolor="<?= $this->color['bordercolor'] ?>" class="bordercolor" align="center" role="presentatioin">
-  <?php $this->partial('templates/stats/header.part.php') ?>
+  <?php $this->partial('stats/header.part.php') ?>
   
   <?php if($this->notfound): ?>
     <tr>
@@ -21,7 +21,7 @@
       </td>
     </tr>
   <?php else: ?>
-    <?php $this->partial('templates/stats/listmembers.part.php') ?>
+    <?php $this->partial('stats/listmembers.part.php') ?>
   <?php endif; ?>
 </table>
 

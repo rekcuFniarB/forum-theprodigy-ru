@@ -11,6 +11,6 @@ class Register extends Respond
         $service->agreement = $dbst->fetchColumn();
         $dbst = null;
         
-        return $this->render('templates/register/agreement.template.php');
+        return $this->render('register/agreement.template.php');
     }
 }

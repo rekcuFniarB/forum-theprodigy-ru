@@ -31,8 +31,8 @@
           
           <!-- # the link tree -->
           <?php $this->start_cache('linktree'); ?>
-              <?php $this->partial('templates/parts/linktree.template.php') ?>
-              <?php $this->_partial('templates/thread/showmods.template.php', array('showmods' => $this->showmods)) ?>
+              <?php $this->partial('parts/linktree.template.php') ?>
+              <?php $this->_partial('thread/showmods.template.php', array('showmods' => $this->showmods)) ?>
               <?php if($this->conf->enableInlineLinks): ?>
                 <br><br>
                 <table class="curthread">
@@ -101,7 +101,7 @@
                     <tr>
                       <td id="viewers" width="100%">
                         <?php if(isset($this->boardviewers)): ?>
-                            <?php $this->partial('templates/parts/boardviewers.template.php'); ?>
+                            <?php $this->partial('parts/boardviewers.template.php'); ?>
                         <?php endif; ?>
                       </td>
                       
@@ -176,7 +176,7 @@
     </table>
     
     <?php if(isset($this->pollinfo)): ?>
-      <?php $this->partial('templates/thread/poll.template.php'); ?>
+      <?php $this->partial('thread/poll.template.php'); ?>
     <?php endif; /* if poll */ ?>
     
     <table cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="<?= $this->conf->color['bordercolor'] ?>" class="bordercolor" align="center">
@@ -609,7 +609,7 @@
                   <?php endif; ?>
                   
                   <hr width="100%" size="1" />
-                  <?php  $this->_partial('templates/comments/comments.template.php', array('msgid' => $msgid, 'msg' => $msg));  ?>
+                  <?php  $this->_partial('comments/comments.template.php', array('msgid' => $msgid, 'msg' => $msg));  ?>
                 </td>
               </tr>
             </table>
@@ -669,7 +669,7 @@
     <div id="recentcommentstable"></div>
     
     <?php if($this->quickReplyForm): ?>
-        <?php $this->partial('templates/thread/quick_reply_form.template.php'); ?>
+        <?php $this->partial('thread/quick_reply_form.template.php'); ?>
     <?php endif; ?>
     
     <table border="0" width="100%" cellpadding="0" cellspacing="0">
@@ -687,7 +687,7 @@
             <?php $this->get_cache('linktree'); ?>
             <div class="go-form">
               <?php if(isset($this->jumptoform)): ?>
-                <?php $this->partial('templates/board/jumpto.template.php') ?>
+                <?php $this->partial('board/jumpto.template.php') ?>
               <?php endif; ?>
             </div>
             

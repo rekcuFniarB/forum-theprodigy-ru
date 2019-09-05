@@ -384,7 +384,7 @@ class Main extends Respond {
         $service->cats = $cats;
         
         //$this->template_header();
-        $this->render('templates/board_index.php');
+        $this->render('board_index.php');
         //obExit();
     } // boardIndex()
     

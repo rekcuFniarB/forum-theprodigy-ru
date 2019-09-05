@@ -80,7 +80,16 @@ class Service extends \Klein\ServiceProvider
         $string = preg_replace('/\s/', '', trim($string));
         return $this->esc($string, $charset);
     }
-        
+    
+    /**
+     * Custom templates path
+     */
+    public function partial($view, array $data = array())
+    {
+        return parent::partial(PROJECT_ROOT . '/templates/' . $view, $data);
+    }
+    
+    
     /**
      * This is $this->partial() wrapper allowing to cache first call output
      * and then just print already rendered part from cache.
@@ -102,7 +111,7 @@ class Service extends \Klein\ServiceProvider
             ob_end_clean();
             echo $this->output_cache[$view];
         }
-    } // partial()
+    } // cpartial()
     
     /**
      * Simplified version of $this->partial()
@@ -112,7 +121,7 @@ class Service extends \Klein\ServiceProvider
         if(is_array($data))
             extract($data, EXTR_SKIP);
         
-        require $view;
+        require PROJECT_ROOT . '/templates/' . $view;
         
         if (false !== $this->response->chunked) {
             $this->response->chunk();

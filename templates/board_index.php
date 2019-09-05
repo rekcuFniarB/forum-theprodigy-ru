@@ -23,7 +23,7 @@
     </table>
     
     <?php if ($this->conf->shownewsfader == 1): ?>
-        <?php $this->partial('templates/newsfader.php'); ?>
+        <?php $this->partial('newsfader.php'); ?>
     <?php endif; ?>
     
     <table border="0" width="100%" cellspacing="0" cellpadding="0" class="bordercolor"><tr><td>
@@ -212,7 +212,7 @@
             <?php endif; /* if Show_RecentBar */ ?>
             
             <?php if (isset($this->calendar) && is_array($this->calendar)): ?>
-              <?php $this->partial('templates/calendar/board_index.template.php') ?>
+              <?php $this->partial('calendar/board_index.template.php') ?>
             <?php endif; ?>
             
             <?php if ($this->conf->Show_MemberBar == 1): ?>

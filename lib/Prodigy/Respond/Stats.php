@@ -125,7 +125,7 @@ class Stats extends Respond
         
         $data['linktree'] = array(array('url' => '/stats/', 'name' => $app->locale->yse_stats_1));
         
-        return $this->render('templates/stats/main.template.php', $data);
+        return $this->render('stats/main.template.php', $data);
     } // main()
     
     protected function memberCount()
@@ -250,7 +250,7 @@ class Stats extends Respond
             )
         );
         
-        return $this->render('templates/stats/allmembers.template.php', $data);
+        return $this->render('stats/allmembers.template.php', $data);
     } // members()
     
     public function membersByGroup($request, $response, $service, $app)
@@ -328,7 +328,7 @@ class Stats extends Respond
         if (!$staff)
             $data['pages'] = $this->preparePagination($start, $memcount);
         
-        return $this->render('templates/stats/allmembers.template.php', $data);
+        return $this->render('stats/allmembers.template.php', $data);
     } // membersByGroup()
     
     public function topmembers($request, $response, $service, $app)
@@ -342,7 +342,7 @@ class Stats extends Respond
         $db_prefix = $app->db->prefix;
         $query = "SELECT * FROM {$db_prefix}members WHERE 1 ORDER BY posts DESC LIMIT ?";
         $service->members = $this->getMemberList($query, array($app->conf->TopAmmount));
-        return $this->render('templates/stats/allmembers.template.php');
+        return $this->render('stats/allmembers.template.php');
     } // topmembers()
     
     public function membersByLetter($request, $response, $service, $app)
@@ -375,7 +375,7 @@ class Stats extends Respond
         if(!$service->members)
             $service->notfound = true;
         
-        return $this->render('templates/stats/allmembers.template.php');
+        return $this->render('stats/allmembers.template.php');
     } // membersByLetter()
     
     public function allmypeople($request, $response, $service, $app)

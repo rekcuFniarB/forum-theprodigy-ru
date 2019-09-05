@@ -14,7 +14,7 @@ class Profile extends Respond
         if ($request->paramsGet()->get('newpass'))
             $service->comment = $app->locale->txt[638];
         
-        return $app->main->render('templates/login.php');
+        return $app->main->render('login.php');
     } // loginform()
 
     public function login($request, $response, $service, $app) {
@@ -172,7 +172,7 @@ class Profile extends Respond
     
     public function kickguest($request, $response, $service, $app) {
         $service->title = $app->locale->txt[34];
-        $app->main->render('templates/kickguest.template.php');
+        $app->main->render('kickguest.template.php');
     }
 
     public function show($request, $response, $service, $app)
@@ -397,7 +397,7 @@ class Profile extends Respond
 
         $tmpl['meminf'] = $meminf;
        
-       return $this->render('templates/profile/show.template.php', $tmpl);        
+       return $this->render('profile/show.template.php', $tmpl);        
     } // show()
     
     public function edit($request, $response, $service, $app)
@@ -615,7 +615,7 @@ class Profile extends Respond
             
             $tdat['mem'] = $meminf;
             
-            $this->render('templates/profile/modify.template.php', $tdat);
+            $this->render('profile/modify.template.php', $tdat);
 
         } // if GET
         elseif ($request->method('POST'))
@@ -1156,6 +1156,6 @@ class Profile extends Respond
         
         // END prepare pagination data
         
-        return $this->render('templates/profile/messages.template.php', $data);
+        return $this->render('profile/messages.template.php', $data);
     } // messages()
 }

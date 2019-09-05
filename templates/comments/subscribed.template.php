@@ -42,7 +42,7 @@
       </tr>
       <tr>
         <td colspan="3" bgcolor="<?= $this->color['windowbg2'] ?>" valign="top" class="windowbg2">
-          <?php $this->_partial('templates/comments/comments.template.php', array('msgid' => $msg['ID_MSG'], 'msg' => $msg)); ?>
+          <?php $this->_partial('comments/comments.template.php', array('msgid' => $msg['ID_MSG'], 'msg' => $msg)); ?>
         </td>
       </tr>
       <tr>

@@ -7,7 +7,7 @@
           Достаточно одной жалобы, чтобы модераторы обратили внимание на все сообщения темы!
         </div>
       <?php endif; ?>
-      <?php $this->partial('templates/parts/linktree.template.php') ?>
+      <?php $this->partial('parts/linktree.template.php') ?>
     </td>
   </tr>
 </table>
@@ -65,7 +65,7 @@
             </td>
           </tr>
           
-          <?php $this->partial('templates/thread/postbox.template.php') ?>
+          <?php $this->partial('thread/postbox.template.php') ?>
           
           <tr>
             <td align="center" colspan="2">

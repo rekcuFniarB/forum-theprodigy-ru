@@ -1,7 +1,7 @@
 <table width="100%" align="center">
   <tr>
     <td valign="bottom">
-      <?php $this->partial('templates/parts/linktree.template.php') ?>
+      <?php $this->partial('parts/linktree.template.php') ?>
     </td>
   </tr>
 </table>

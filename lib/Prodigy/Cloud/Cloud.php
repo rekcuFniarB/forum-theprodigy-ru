@@ -367,7 +367,7 @@ class Cloud extends Respond
             $service->title = "Upload files";
             $service->sessid = $app->session->id;
             $this->addCSS('cloud.css');
-            $this->render('templates/cloud/upload.template.php');
+            $this->render('cloud/upload.template.php');
         } // if method GET
         
     } // main()
@@ -470,7 +470,7 @@ class Cloud extends Respond
             }
             
             $this->addCss('cloud.css');
-            return $this->render('templates/cloud/show.template.php');
+            return $this->render('cloud/show.template.php');
         }
     }
     
@@ -495,7 +495,7 @@ class Cloud extends Respond
         
         error_log('__RENDER__: iteminfo');
         
-        $this->render('templates/cloud/main.template.php');
+        $this->render('cloud/main.template.php');
     } // example()
     
     public function example($request, $response, $service, $app)
@@ -504,6 +504,6 @@ class Cloud extends Respond
         $service->title = 'Cloud examples';
         $img = imagecreatefromstring('qwerty');
         var_dump($img);
-        $this->render('templates/cloud/example.template.php');
+        $this->render('cloud/example.template.php');
     }
 }

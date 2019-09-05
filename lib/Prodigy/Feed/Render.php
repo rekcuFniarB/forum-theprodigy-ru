@@ -89,7 +89,7 @@ Class Render extends \Prodigy\Respond\Respond {
         
         $service->rss_link = true;
         
-        $this->render('templates/feed/articles.php');
+        $this->render('feed/articles.php');
     } // category()
     
     /*
@@ -147,7 +147,7 @@ Class Render extends \Prodigy\Respond\Respond {
         
         $this->service->rss_link = true;
         
-        $this->service->render('templates/articles.php');
+        $this->service->render('articles.php');
      
     } // board()
     
@@ -243,7 +243,7 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->service->post = $post;
         $this->service->title = $this->service->menuCatNames[$this->request->cat] . ' &#12299; ' . $post['boardname'];
         
-        $this->service->render('templates/edit.php');
+        $this->service->render('edit.php');
     } // article_edit()
     
     /*
@@ -330,7 +330,7 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->service->posts = $posts;
         $this->service->post_view = true;
         
-        $this->service->render('templates/articles.php');
+        $this->service->render('articles.php');
         return $this->response;
     } // article()
     
@@ -388,8 +388,8 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->service->posts = $posts;
         
         $this->response->header('Content-Type', 'application/rss+xml; charset=UTF-8');
-        $this->service->layout('templates/rss.php');
-        $this->service->render('templates/rss.php');
+        $this->service->layout('rss.php');
+        $this->service->render('rss.php');
         return $this->response;
     } // rss()
 }

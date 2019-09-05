@@ -1,9 +1,9 @@
 <?php
-define('PROJECT_ROOT', __DIR__);
+define('PROJECT_ROOT', dirname(__DIR__));
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once PROJECT_ROOT . '/vendor/autoload.php';
 
-define('SITE_ROOT', dirname($_SERVER['PHP_SELF']));
+define('SITE_ROOT', dirname(dirname($_SERVER['PHP_SELF'])));
 
 define('TIME_START', microtime(true));
 
@@ -44,7 +44,7 @@ $router->onHttpError(function ($code, $router) {
         default:
             $app->errors->abort('Error', "Oh no, a bad error happened that caused a $code.");
     }
-    //$service->render('templates/error.php');
+    //$service->render('error.php');
 });
 
 $router->respond(function($request, $response, $service, $app, $router) {
@@ -111,7 +111,7 @@ $router->respond(function($request, $response, $service, $app, $router) {
             array('profile',  '\Prodigy\Respond\Profile'),
             array('karma',    '\Prodigy\Respond\Karma'),
             array('register', '\Prodigy\Respond\Register'),
-            array('example',    '\Prodigy\Respond\Example'),
+            array('example',  '\Prodigy\Respond\Example'),
         )
     );
     
@@ -228,7 +228,7 @@ $router->respond('GET', '/example/', 'example->example');
 $router->respond('GET', '/test/', 'example->testResponse');
 //$router->respond('GET', '/simple/', 'example->simple_example');
 
-$router->with('/feed', 'lib/Prodigy/Feed/index.php'); // TBD (to be done)
-$router->with('/files', 'lib/Prodigy/Cloud/index.php');
+$router->with('/feed', '../lib/Prodigy/Feed/index.php'); // TBD (to be done)
+$router->with('/files', '../lib/Prodigy/Cloud/index.php');
 
 $router->dispatch();

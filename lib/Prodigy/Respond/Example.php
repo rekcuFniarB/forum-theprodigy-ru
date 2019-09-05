@@ -109,7 +109,7 @@ class Example extends Respond
         //$mail_result = $app->im->sendmail(array('retratserif@gmail.com'), 'Subject blah', 'Message blah', null, true);
         //$app->errors->log('__DEBUG__: MAIL: RESULT: ' . var_export($mail_result, true));
         //return $app->errors->abort('TEST', $msg, 200);
-        return $this->render('templates/examples/example.php');
+        return $this->render('examples/example.php');
         //return $this->message('Message Title', 'Message text');
         //return $this->error($app->locale->txt[1]);
     }
@@ -139,7 +139,7 @@ class Example extends Respond
         
         //throw new \Prodigy\Errors\TemplateException('Example Template Exception', 1);
         
-        $this->render('templates/examples/example.php');
+        $this->render('examples/example.php');
         
         //$app->router->skipRemaining();
         
@@ -152,7 +152,7 @@ class Example extends Respond
         
         $service->hello = 'Hello';
         
-        //$this->render('templates/example.php');
+        //$this->render('example.php');
     }
     
     public function simple_example($request, $response, $service, $app)
@@ -162,11 +162,11 @@ class Example extends Respond
         $service->msg = 'This is simple example msg';
         $response->cookie('x-test-cookie', 'simple-example');
         $response->header('x-test', 'simple-example');
-        $service->layout('templates/examples/simple.layout.php');
+        $service->layout('examples/simple.layout.php');
         error_log("__DEBUG__: Chunked: {$response->chunked}, ob_level: " . ob_get_level() . ", ob_length: " . ob_get_length());
         return $this->ajax_response('["qwerty"]');
         //var_dump(ini_get('output_buffering'));
-        return $this->render('templates/examples/simple.template.php');
+        return $this->render('examples/simple.template.php');
         error_log("__DEBUG__: Chunked: {$response->chunked}, ob_level: " . ob_get_level() . ", ob_length: " . ob_get_length());
         
         //var_dump(ob_get_status(true));
