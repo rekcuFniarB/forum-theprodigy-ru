@@ -1,0 +1,22 @@
+{
+  "media":
+    {
+      "title": "Radio",
+      "ogg": "live.ogg",
+      "mp3": "stream.mp3",
+      "opus": "56k.opus",
+      "m4a": "live.aac"
+    },
+  "mainStreams": ["m4a", "ogg", "mp3"],
+  "additionalStreams": ["ogg", "m4a", "opus"],
+  "descr":
+    {
+      "opus": "opus 56kbps",
+      "m4a": "aac 64kbps",
+      "ogg": "ogg ~128kbps",
+      "mp3": "Stream for iOS and IE",
+      "live.ogg": "live",
+      "autodj.ogg": "autodj"
+    },
+  "icecast": "http://theprodigy.ru:8000/"
+}

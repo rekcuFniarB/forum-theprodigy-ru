@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<playlist version="1" xmlns="http://xspf.org/ns/0/">
+  <title>Radio Arena</title>
+  <info>http://forum.theprodigy.ru/radio/</info>
+  <image>http://forum.theprodigy.ru/radio/incl/Arena-Radio-Logo.png</image>
+  <trackList>
+    <track>
+      <title>Radio Arena (AAC+, Dial-Up)</title>
+      <location>http://theprodigy.ru:8000/live.aac</location>
+      <info>http://forum.theprodigy.ru/radio/</info>
+      <image>http://forum.theprodigy.ru/radio/incl/Arena-Radio-Logo.png</image>
+      <annotation>Radio Arena
+          http://forum.theprodigy.ru/radio/
+          http://forum.theprodigy.ru/?board=39
+	  http://www.lastfm.ru/group/Arena+Radio</annotation>
+    </track>
+      
+    <track>
+      <title>Radio Arena (main stream, OGG)</title>
+      <location>http://theprodigy.ru:8000/live.ogg</location>
+      <info>http://forum.theprodigy.ru/radio/</info>
+      <image>http://forum.theprodigy.ru/radio/incl/Arena-Radio-Logo.png</image>
+      <annotation>Radio Arena
+          http://forum.theprodigy.ru/radio/
+	  http://forum.theprodigy.ru/?board=39
+          http://www.lastfm.ru/group/Arena+Radio</annotation>
+    </track>
+
+    <track>
+      <title>Radio Arena (Opus 56kbps, Dial-Up)</title>
+      <location>http://theprodigy.ru:8000/56k.opus</location>
+      <info>http://forum.theprodigy.ru/radio/</info>
+      <image>http://forum.theprodigy.ru/radio/incl/Arena-Radio-Logo.png</image>
+      <annotation>Radio Arena
+          http://forum.theprodigy.ru/radio/
+          http://forum.theprodigy.ru/?board=39
+	  http://www.lastfm.ru/group/Arena+Radio</annotation>
+    </track>
+  
+    <track>
+      <title>Radio Arena (MP3)</title>
+      <location>http://theprodigy.ru:8000/stream.mp3</location>
+      <info>http://forum.theprodigy.ru/radio/</info>
+      <image>http://forum.theprodigy.ru/radio/incl/Arena-Radio-Logo.png</image>
+      <annotation>Radio Arena
+          http://forum.theprodigy.ru/radio/
+	  http://forum.theprodigy.ru/?board=39
+          http://www.lastfm.ru/group/Arena+Radio</annotation>
+    </track>
+
+  </trackList>
+  
+  <annotation>Radio Arena
+          http://forum.theprodigy.ru/radio/
+	  http://forum.theprodigy.ru/?board=39
+          http://www.lastfm.ru/group/Arena+Radio</annotation>
+  <creator>BrainFucker</creator>
+</playlist>

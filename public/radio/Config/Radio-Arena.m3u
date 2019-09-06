@@ -1,0 +1,13 @@
+#EXTM3U
+
+#EXTINF:-1,Radio Arena (AAC 64kbps)
+http://theprodigy.ru:8000/live.aac
+
+#EXTINF:-1,Radio Arena (OGG)
+http://theprodigy.ru:8000/live.ogg
+
+#EXTINF:-1,Radio Arena (OPUS 56kbps)
+http://theprodigy.ru:8000/56k.opus
+
+#EXTINF:-1,Radio Arena (MP3)
+http://theprodigy.ru:8000/stream.mp3

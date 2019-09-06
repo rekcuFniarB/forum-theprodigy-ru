@@ -1,0 +1,295 @@
+body {
+      padding: 0 2%;
+      font-family: Tahoma, Geneva, Ubuntu, "DejaVu Sans", sans-serif;
+      }
+
+/* #playlist_links, #play-radio-button {float: right;} */
+#playlist_links img {width: 1em; height: 1em;}
+/* #radio-player {top: 40%;} */
+#column-1 {
+/*           width: 45%; */
+          float: right;
+          }
+#radio-skip {height: 2em; background-color: #404040; color: #fff; top: -0.6em; position: relative;}
+
+li>a {display: block; width: 90%;}
+li>a:hover {background-color: #e0e0e0; color: #000000; text-decoration: none;}
+a.dl {display: none; font-size: 0.95em; width: 5%;}
+li {clear: both; cursor: pointer;}
+
+/* li:hover {background-color: #e0e0e0;} */
+
+#Playlist, #chat {
+    background-color: #eeeeee;
+    color: #000;
+    width: 100%;
+    }
+
+#Playlist > ul {
+    margin: 0;
+    padding: 0;
+    }
+
+ul {list-style-type: none;}
+
+ul, li  {display: block;}
+
+#Playlist  > ul  > li  {
+      border: solid #ccc;
+      border-width: 1px 0 0 0;
+      display: block;
+}
+
+#Playlist  > ul > li  div {padding: 0 1em;}
+
+#Playlist  > ul > li  div:hover {
+      background-color: #cccccc;
+}
+
+.track > a:link {color: #000000; text-decoration: none;}
+.track > a:active {color: #000000; text-decoration: none;}
+.track > a:visited {color: #000000; text-decoration: none;}
+.track > a:hover {color: #000000; text-decoration: none;}
+
+a.dl:link {text-decoration: none;}
+a.dl:hover {background-color: #808080; color: #ffffff;}
+
+/* .playing {background-color: #019BE3} */
+
+div.track {position: relative;}
+
+.play-icon {visibility: hidden; display: inline-block; left: -2em; position: absolute;}
+.playing .play-icon {visibility: visible;}
+
+h1 {
+    text-align: center;
+    margin: 0px;
+    font-size: 6.8vw;
+    font-family: Impact;
+    font-weight: 400;
+    color: #cccccc;
+    text-shadow: #019BE3 1px 0, #019BE3 0 1px, #019BE3 -1px 0, #019BE3 0 -1px;
+}
+
+
+/* Quality Selector */
+div.radio-qual {
+    display: inline-block;
+    float: right;
+    /*position: relative;
+    top: 0.4em;*/
+}
+div.radio-qual > select {
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #808080;
+}
+div.player-control::after {
+    content: " ";
+    display: block;
+    clear: both;
+    height: 0;
+}
+
+
+/* Chat */
+#chat {min-height: 1.6em; border-top: 1px solid #ccc;}
+
+.chat-notify {color: red;}
+/* button.chat-switchers {float: right;} */
+div#chat > div.chat-switchers-block {text-align: right;}
+button#chat-switch-off {display: none;}
+button.chat-btn-shrink {display: none;}
+button.chat-btn-detach {display: none;}
+#chat-window {clear: both; display: none;}
+#chatmessages {
+    height: 15em;
+    overflow: auto;
+    padding: 2px;
+}
+#chatmessages img {
+    min-width: 15px;
+    min-height: 15px;
+}
+
+#chatmessages > span.chat-timestamp {display: none;}
+
+#chatform {display: table; width: 100%;}
+#chatform > div {display: table-cell; padding: 0.6em;}
+#chatform > div:first-child {width: 100%;}
+input[name="message"] {width: 100%;}
+
+div.skype-info {
+    font-size: 0.8em;
+    margin: 0 0.6em;
+}
+
+/* Detached window */
+
+#chat.chat-detach {
+    position: fixed;
+/*     bottom: 0px; */
+    height: 70%;
+    width: 90%;
+    left: 5%;
+    box-sizing: border-box;
+    margin: auto;
+    top: 25%;
+}
+
+#chat.chat-detach > div.chat-switchers-block {height: 1.5em;}
+#chat.chat-detach > div#chat-window {
+    height: 100%;
+    padding-top: 1.5em;
+    box-sizing: border-box;
+    margin-top: -1.5em;
+    padding-bottom: 2em;
+}
+
+#chat.chat-detach > div#chat-window > div#chatmessages {height: 100%;}
+
+#chat.chat-detach > div#chat-window > div.chat-input-form {margin-top: -0.5em;}
+
+#chat.chat-detach > div#chat-window > div.chat-input-form > div.skype-info {display: none;}
+
+#chat.chat-detach > div#chat-window > div#chatmessages > span.chat-timestamp {display: initial;}
+
+/*
+ * New black theme
+ */
+
+html, body {background-color: #000; padding: 0; margin: 0; color: #fff;}
+
+#main-container {
+    margin:auto;
+    width: 700px;
+    min-width: 700px;
+}
+
+#logo {
+    background-image: url(./img/Arena-Radio-Logo.png);
+    width: 700px;
+    height: 163px;
+    margin: auto;
+    background-color: #000;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#player>.title {clear: both;}
+
+/* Progressbar */
+#player > div.player-control > div.progress {
+    background-color: transparent;
+    cursor: pointer;
+    float: right;
+    width: calc(100% - 3em);
+    position: relative;
+    top: 0.22em;
+    height: 1.2em;
+    background: -moz-linear-gradient(top, black, #444, black);
+    background: -webkit-linear-gradient(top, black, #444, black);
+    background: -o-linear-gradient(top, black, #444, black);
+    background: linear-gradient(top, black, #444, black);
+}
+#player > div.player-control > div.progress > div {
+    position: absolute;
+    margin: 0;
+    box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+}
+#player > div.player-control > div.progress > .progress-indicator {
+    background-color: #808080;
+    color: #fff;
+    width: 1px;
+    overflow: visible;
+    padding: 0;
+    height: 1.4em;
+    font-size: 0.8em;
+    background: -moz-linear-gradient(top, #000, #ccc, #000);
+    background: -webkit-linear-gradient(top, #000, #ccc, #000);
+    background: -o-linear-gradient(top, #000, #ccc, #000);
+    background: linear-gradient(top, #000, #ccc, #000);
+}
+
+#player > div.player-control > div.progress > .progress-time {
+    text-align: center;
+    width: 100%;
+    font-size: 0.8em;
+    font-family: "Lucida Console", Monaco, "Ubuntu Mono", monospace;
+    line-height: 1.7em;
+    /*color: #e0e0e0;*/
+}
+
+#player > div.player-control > button {min-width: 3em;}
+#player > div.player-control > button.button-pause { display: none;}
+#player>.title {text-align: center;}
+
+/* Stick player on scroll */
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 700px;
+    z-index: 1000;
+    background-color: black;
+    display: block;
+}
+
+#Description {
+    background: -moz-linear-gradient(top, #eee, #000);
+    background: -webkit-linear-gradient(top, #eee, #000);
+    background: -o-linear-gradient(top, #eee, #000);
+    background: linear-gradient(top, #eee, #000);
+    padding: 0.5em;
+}
+
+#radio-switch {
+    color: #fff;
+    height: 5em;
+    margin: 0;
+    padding: 0.5em;
+    background: -moz-linear-gradient(top, #000, #eee);
+    background: -webkit-linear-gradient(top, #000, #eee);
+    background: -o-linear-gradient(top, #000, #eee);
+    background: linear-gradient(top, #000, #eee);
+}
+
+#radio-switch a:link, #Description a:link {color: #fff; text-decoration: underline;}
+#radio-switch a:visited, #Description a:visited {color: #fff; text-decoration: underline;}
+#radio-switch a:hover, #Description a:hover {color: #f0f0f0; text-decoration: none;}
+
+#play-radio-button > a {
+    border: solid 1px #fff;
+    background-color: #cccccc;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-top: 2em;
+    padding: 0 0.5em;
+    color: black;
+}
+
+#play-radio-button > a:link {color: black; text-decoration: none;}
+#play-radio-button > a:visited {color: black; text-decoration: none;}
+#play-radio-button > a:hover {background-color: #eeeeee; text-decoration: none;}
+
+#chatmessages a:link {color: #000; text-decoration: underline;}
+#chatmessages a:visited {color: #000; text-decoration: underline;}
+#chatmessages a:hover {color: #404040; text-decoration: none;}
+
+
+#player button {
+    background: -moz-linear-gradient(top, black, #ccc, black);
+    background: -webkit-linear-gradient(top, black, #ccc, black);
+    background: -o-linear-gradient(top, black, #ccc, black);
+    background: linear-gradient(top, black, #ccc, black);
+    border: 0;
+    cursor: pointer;
+    color: white;
+}
+#player button:hover {
+    background: -moz-linear-gradient(top, black, #aaa, black);
+    background: -webkit-linear-gradient(top, black, #aaa, black);
+    background: -o-linear-gradient(top, black, #aaa, black);
+    background: linear-gradient(top, black, #aaa, black);
+}

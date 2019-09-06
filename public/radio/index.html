@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8'>
+<title>Arena Radio</title>
+  <link rel="icon" type="image/png" href="incl/img/Favicon.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link type="text/css" href="incl/style.css?v=1546349411" rel="stylesheet" />
+  <meta name="twitter:card" content="summary"/>
+  <meta name="twitter:site" content="@theprodigy_ru"/>
+  <meta property="og:title" content="Радио Арена"/>
+  <meta property="og:description" content="Радио «Арена» это интернет радиостанция сообщества музыкантов форума theprodigy.ru."/>
+  <meta property="og:url" content="https://forum.theprodigy.ru/radio/"/>
+  <meta property="og:image" content="https://forum.theprodigy.ru/radio/incl/img/opengraph_bg.png"/>
+</head>
+<body>
+<div id="main-container">
+<!-- <div id="Title"><h1>Arena Radio</h1></div> -->
+<div id="logo"></div>
+
+<div id="player">
+  <div class="player-control">
+    <button class="button-play">▶</button>
+    <button class="button-pause">▮▮</button>
+    <div class="radio-qual"></div>
+    <div class="progress">
+      <div class="progress-indicator"></div>
+      <div class="progress-time"></div>
+      <div class="progress-touch"></div>
+    </div>
+  </div> <!-- .player-control -->
+  <div class="title"></div>
+</div>
+
+<div id="Playlist">
+
+<div id="radio-switch">
+  <span id="play-radio-button"><a href="#">Слушать радио</a></span>
+  <span id="playlist_links" class="radio-elements"><b>Слушать в плеере:</b> <a href="Config/Radio-Arena.xspf" target="_blank"><img src="http://images.videolan.org/images/VLC-IconSmall.png"></a> <a href="Config/Radio-Arena.xspf" target="_blank">VLC</a> (xspf), <a href="Config/Radio-Arena.m3u" target="_blank"><img src="http://upload.wikimedia.org/wikipedia/ru/thumb/c/cf/Windows_Media_Player_12_Logo_on_Windows_7.png/64px-Windows_Media_Player_12_Logo_on_Windows_7.png"></a> <a href="Config/Radio-Arena.m3u" target="_blank">прочие</a> (m3u)</span>
+  <h3>Слушать записи:</h3>
+</div> <!-- #radio-switch -->
+
+<ul>
+  <li></li>
+</ul> <!-- Main Playlist -->
+
+</div> <!-- #Playlist -->
+
+<div id="chat">
+  <div class="chat-switchers-block">
+    <button id="chat-switch-on" class="chat-switchers chat-on-off">Чат</button>
+    <button id="detach-chat" class="chat-switchers chat-btn-detach" title="Развернуть">⇱⇲</button>
+    <button id="shrink-chat" class="chat-switchers chat-btn-shrink" title="Свернуть">↧</button>
+    <button id="chat-switch-off" class="chat-switchers chat-on-off" title="Закрыть чат">X</button>
+  </div>
+  <div id="chat-window">
+    <div id="chatmessages"></div>
+    <div class='chat-input-form'>
+      <form action="/" method="POST" id="chatform">
+        <div>
+          <input type="text" name="message" autocomplete="off" placeholder="Введите текст сообщения" required>
+        </div>
+        <div>
+          <input type="submit" value="↵" name="send">
+        </div>
+        <input type="hidden" name="room" value="radio">
+        <input type="hidden" name="action" value="chatroomsend">
+        <input type="hidden" name="requesttype" value="ajax">
+      </form>
+      <div class="skype-info">Также у нас есть <a href="https://join.skype.com/mqt0481InYpf" target="_blank">чат в Skype</a>.</div>
+    </div>
+  </div> <!-- #chat-window -->
+</div> <!-- #chat -->
+
+<div id="Description">Радио «Арена» это интернет радиостанция сообщества музыкантов с <a href="/" target="_blank">форума theprodigy.ru</a>.<br>Анонсы будущих передач и прочую информацию можно найти на <a href="/?board=39#viewers" target="_blank">официальном форуме радио «Арена»</a>.</div><!-- #Description -->
+
+</div> <!-- #main-container -->
+
+<!-- jQuery -->
+  <!--[if lt IE 9]>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.6.2/html5shiv.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <![endif]-->
+<!--[if gte IE 9]><!-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<!--<![endif]-->
+
+<script>
+if (typeof jQuery == 'undefined') {
+      document.write(unescape("%3Cscript src='/includes/jquery-latest.js' type='text/javascript'%3E%3C/script%3E"));
+  }
+</script>
+
+<script src="incl/radio.js?v=1546349411"></script>
+<script src="incl/chat.js?v=1483229042"></script>
+
+<script>
+var radio;
+
+$(function(){ // Running below when document is ready
+  // Check if user is 18+
+  var notify18 = 'В данный раздел сайта допускаются только лица, достигшие 18 лет.\nЕсли вам меньше 18, нажмите «отмена».';
+  var is18 = true;
+//   if (typeof localStorage !== 'undefined'){
+//     if (!localStorage.getItem('is18')){
+//       if (confirm(notify18)){
+//         localStorage.setItem('is18', 'yes');
+//         is18 = true;
+//       }
+//       else document.location.href = '/';
+//     }
+//     else{
+//       if (localStorage.getItem('is18') == 'yes'){
+//         is18 = true;
+//       }
+//     }
+//   }
+//   else {
+//     // No localStorage support
+//     if (confirm(notify18)){
+//       is18 = true;
+//     }
+//     else document.location.href = '/';
+//   }
+  
+  if (is18){
+      // Chat
+      var chatroom = new Chat('radio', $('#chatmessages'));
+      // Radio init
+      radio = new Radio('#player');
+      radio.init();
+  } // if(is18)
+
+}); // End of document ready
+
+</script>
+
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+(function (d, w, c) {
+    (w[c] = w[c] || []).push(function() {
+        try {
+            w.yaCounter28339961 = new Ya.Metrika({id:28339961,
+                    clickmap:true,
+                    trackLinks:true,
+                    accurateTrackBounce:true});
+        } catch(e) { }
+    });
+
+    var n = d.getElementsByTagName("script")[0],
+        s = d.createElement("script"),
+        f = function () { n.parentNode.insertBefore(s, n); };
+    s.type = "text/javascript";
+    s.async = true;
+    s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
+
+    if (w.opera == "[object Opera]") {
+        d.addEventListener("DOMContentLoaded", f, false);
+    } else { f(); }
+})(document, window, "yandex_metrika_callbacks");
+</script>
+<noscript><div><img src="//mc.yandex.ru/watch/28339961" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</body>
+</html>
