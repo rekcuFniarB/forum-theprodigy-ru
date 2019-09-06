@@ -1,0 +1,6 @@
+{
+    "name": "weekly",
+    "title": "Треки Недели",
+    "jingles": "/var/lib/liquidsoap/jingles.json",
+    "jingle_period": 20000000
+}

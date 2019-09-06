@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Музыка прошедшей недели",
+        "src" : "/attachments/podcasts/weekly.playlist.json",
+        "type": 2
+    },
+    {
+        "name": "Музыка позапрошлой недели",
+        "src" : "/attachments/podcasts/weekly.playlist.prev.json",
+        "type": 2
+    },
+    {
+        "name": "Музыка прошедшего месяца",
+        "src" : "/attachments/podcasts/monthly.playlist.json",
+        "type": 2
+    },
+    {
+        "name": "Музыка позапрошлого месяца",
+        "src" : "/attachments/podcasts/monthly.playlist.prev.json",
+        "type": 2
+    }
+]

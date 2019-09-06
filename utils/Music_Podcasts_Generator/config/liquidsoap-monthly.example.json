@@ -1,0 +1,6 @@
+{
+    "name": "monthly",
+    "title": "Треки Месяца",
+    "jingles": "/var/lib/liquidsoap/jingles.json",
+    "jingle_period": 20000000
+}

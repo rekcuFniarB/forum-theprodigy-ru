@@ -1,0 +1,4 @@
+#!/bin/sh
+
+DIR="$(dirname "$0")"
+exec python2.7 "$DIR/__init__.pyo" "$@"

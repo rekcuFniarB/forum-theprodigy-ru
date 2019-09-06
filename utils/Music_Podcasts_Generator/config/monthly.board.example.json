@@ -1,0 +1,16 @@
+{
+  "mysqlhost": "127.0.0.1",
+  "mysqlport": 3301,
+  "mysqldb": "dbname",
+  "mysqluser": "dbuser",
+  "mysqlpasswd": "dbpassword",
+  "mysqlcharset": "cp1251",
+  
+  "mode": "board",
+  "id": 12,
+  "name": "weekly",
+  "period": 7,
+  "cache": "/var/www/public/audio_cache",
+  "max_size": 30000000,
+  "sitedir": "http://example.com/audio_cache"
+}

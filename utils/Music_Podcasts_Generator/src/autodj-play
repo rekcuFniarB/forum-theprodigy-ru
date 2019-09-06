@@ -1,0 +1,36 @@
+#!/bin/sh
+
+S='UNIX-CONNECT:/tmp/liquidsoap.sock'
+
+USAGE='Usage:
+    autodj-play file  file.ogg
+    autodj-play list file.lst
+List format example:
+    request.push /tmp/file1.ogg
+    request.push annotate:artist="Anal Cunt",title="You are gay":/tmp/file2.ogg'
+
+if [ -z "$2" ]
+  then
+    echo "$USAGE"
+    exit 1
+fi
+
+if [ _"$1" = _"file" ]
+  then
+    echo "Adding file to queue: $2"
+    echo "request.push $2" | socat - $S
+    echo "Done."
+elif [ _"$1" = _"list" ]
+  then
+    echo "Adding playlist to queue: $2"
+    grep 'request\.push' "$2" | while read Item; do echo "$Item"; sleep 0.3; done | socat -d -d - $S
+    echo "Done."
+elif [ _"$1" = _"test" ]
+  then
+    echo "Testing..."
+    echo "$2" | socat -d -d - $S
+    echo "Done."
+else
+    echo "$USAGE"
+    exit 1
+fi

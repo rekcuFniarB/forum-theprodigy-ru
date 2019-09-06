@@ -1,0 +1,45 @@
+#!/bin/sh
+set -e
+export LANG=en_US.UTF-8
+
+CONF="$(dirname "$1")/liquidsoap-queue.conf"
+
+if [ ! -f "$CONF" ]; then
+    echo "Rsync config file '$CONF' not found."
+    exit 1
+fi
+
+. "$CONF"
+
+WAIT='wait'
+
+if [ -n "$REMOTE" ]; then
+    while [ _$WAIT = _'wait' ]; do
+        wget -U 'Radio Arena AutoDJ Queue https://forum.theprodigy.ru/radio/' --spider -q -t 1 -T 3 "$SITEDIR.running"
+        if [ $? -eq 0 ]; then
+            echo "$(date)  Still waiting..."
+            sleep 10m
+        else
+            WAIT='none'
+        fi
+    done
+else
+    while [ _$WAIT = _'wait' ]; do
+        if [ -f "$DESTINATION.running" ]; then
+            echo "$(date)  Still waiting..."
+            sleep 10m
+        else
+            WAIT='none'
+        fi
+    done
+fi
+
+echo "$(date)  OK, started."
+
+if [ -n "$REMOTE" ]; then
+    rsync -avv --delete "$SOURCE" "$DESTINATION"
+fi
+
+DIR="$(dirname "$0")"
+
+exec python2.7 "$DIR/liquidsoap-queue.pyo" "$@"
