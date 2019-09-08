@@ -1,4 +1,31 @@
 #!/bin/sh
 
+if [ -z "$1" ]; then
+    echo "No config given."
+    exit 1
+fi
+
 DIR="$(dirname "$0")"
-exec python2.7 "$DIR/__init__.pyo" "$@"
+
+EXEC="$DIR/__init__.pyo"
+
+## Use Python from virtualenv if exists.
+LOCALPYTHON="$(dirname "$DIR")/virtualenv/bin/python"
+if [ -f "$LOCALPYTHON" ]; then
+    PYTHON="$LOCALPYTHON"
+else
+    PYTHON='python2.7'
+fi
+
+echo "Python is $PYTHON"
+
+if [ ! -f "$EXEC" ]; then
+    if [ -f "$DIR/__init__.py" ]; then
+        "$PYTHON" -OO -m compileall "$DIR/__init__.py"
+    else 
+        echo "Executable $DIR/__init__.py not found."
+        exit 1
+    fi
+fi
+
+exec "$PYTHON" "$EXEC" "$@"

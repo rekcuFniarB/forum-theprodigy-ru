@@ -1,0 +1,4 @@
+{
+    "thread": "SELECT body, mem.ID_MEMBER as idmem, IFNULL(mem.realName, msg.posterName) as member FROM messages msg LEFT JOIN members mem ON msg.ID_MEMBER = mem.ID_MEMBER WHERE ID_TOPIC IN (%s) AND posterTime > UNIX_TIMESTAMP() - %s",
+    "board": "SELECT body, mem.ID_MEMBER as idmem, IFNULL(mem.realName, msg.posterName) as member FROM messages msg LEFT JOIN members mem ON msg.ID_MEMBER = mem.ID_MEMBER LEFT JOIN topics top ON msg.ID_TOPIC = top.ID_TOPIC LEFT JOIN boards brd ON brd.ID_BOARD = top.ID_BOARD WHERE brd.ID_BOARD IN (%s) AND posterTime > UNIX_TIMESTAMP() - %s"
+}

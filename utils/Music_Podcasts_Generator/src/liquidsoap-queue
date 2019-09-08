@@ -1,11 +1,24 @@
 #!/bin/sh
-set -e
+
+## Had to disable this, otherwise script doesn't contunue after wget.
+#set -e
+
 export LANG=en_US.UTF-8
+
+if [ -z "$1" ]; then
+    echo "No config given."
+    exit 1
+fi
+
+if [ ! -f "$1" ]; then
+    echo "Config $1 not found."
+    exit 1
+fi
 
 CONF="$(dirname "$1")/liquidsoap-queue.conf"
 
 if [ ! -f "$CONF" ]; then
-    echo "Rsync config file '$CONF' not found."
+    echo "Config file '$CONF' not found."
     exit 1
 fi
 
@@ -41,5 +54,25 @@ if [ -n "$REMOTE" ]; then
 fi
 
 DIR="$(dirname "$0")"
+EXEC="$DIR/liquidsoap-queue.pyo"
 
-exec python2.7 "$DIR/liquidsoap-queue.pyo" "$@"
+## Use Python from virtualenv if exists.
+LOCALPYTHON="$(dirname "$DIR")/virtualenv/bin/python"
+if [ -f "$LOCALPYTHON" ]; then
+    PYTHON="$LOCALPYTHON"
+else
+    PYTHON='python2.7'
+fi
+
+echo "Python is $PYTHON"
+
+if [ ! -f "$EXEC" ]; then
+    if [ -f "$DIR/liquidsoap-queue.py" ]; then
+        "$PYTHON" -OO -m compileall "$DIR/liquidsoap-queue.py"
+    else 
+        echo "Executable $DIR/liquidsoap-queue.py not found."
+        exit 1
+    fi
+fi
+
+exec "$PYTHON" "$EXEC" "$@"

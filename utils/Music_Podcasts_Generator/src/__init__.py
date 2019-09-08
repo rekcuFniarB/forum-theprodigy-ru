@@ -4,7 +4,7 @@ import simplejson as json
 import sys, os
 from youtube_dl import YoutubeDL as Yt
 from youtube_dl.utils import MaxDownloadsReached
-from time import sleep, time
+from time import sleep
 import subprocess
 import MySQLdb
 import re
@@ -19,21 +19,6 @@ txt_launch_error = '''No path given.
 Example:
     %s /tmp/config.json
     \n''' % sys.argv[0]
-
-sql = {
-    'thread': '''
-        SELECT body, mem.ID_MEMBER as idmem, IFNULL(mem.realName, msg.posterName) as member
-        FROM messages msg LEFT JOIN members mem ON msg.ID_MEMBER = mem.ID_MEMBER 
-        WHERE ID_TOPIC IN ({IDS})
-        AND posterTime > %s''',
-    'board': '''
-        SELECT body, mem.ID_MEMBER as idmem, IFNULL(mem.realName, msg.posterName) as member
-        FROM messages msg LEFT JOIN members mem ON msg.ID_MEMBER = mem.ID_MEMBER
-        LEFT JOIN topics top ON msg.ID_TOPIC = top.ID_TOPIC
-        LEFT JOIN boards brd ON brd.ID_BOARD = top.ID_BOARD
-        WHERE brd.ID_BOARD IN ({IDS})
-        AND posterTime > %s'''
-    }
 
 url_regex = re.compile(r'https?://[^\s\[\]<>"\']+')
 
@@ -60,6 +45,27 @@ def filetitle(filename, striphash = False):
             ## else replace hash placeholder
             title = title.replace('[__HASH__] ', '')
         return title
+
+## put placeholders in SQL query string, e.g.:
+## "SELECT post FROM messages WHERE id IN (%s)" becomes
+## "SELECT post FROM messages WHERE id IN (%s, %s, %s)"
+def preformatSQL(SQL, data):
+    placeholders = []
+    prepared_data = []
+    for val in data:
+        datatype = type(val)
+        if datatype is not list and datatype is not int and datatype is not float and datatype is not str and datatype is not unicode:
+            raise ValueError('Wrond data type supplied.')
+        
+        if datatype is list:
+            ## '%s,%s,%s,...'
+            placeholders.append(','.join(['%s'] * len(val)))
+            prepared_data.extend(val)
+        else:
+            placeholders.append('%s')
+            prepared_data.append(val)
+    
+    return (SQL % tuple(placeholders), tuple(prepared_data))
 
 def yt_hook(f):
     global config, recent_dl
@@ -133,33 +139,26 @@ ytopt = {
     }
 
 def main():
-    timestamp = int(time())
-    
-    time_from = timestamp - (config['period'] * 24 * 60 * 60)
-    
     db = MySQLdb.connect(
         host = config['mysqlhost'], port = config['mysqlport'],
         db = config['mysqldb'], charset = config['mysqlcharset'],
         user = config['mysqluser'], passwd = config['mysqlpasswd'])
     cursor = db.cursor()
     
-    if type(config['id']) is list:
-        ids = config['id']
-        ## fmtstr = '%s,%s,%s,...'
-        fmtstr = ','.join(['%s'] * len(config['id']))
-        ## replace {IDS} with fmtstr
-        actual_sql = sql[config['mode']].format(IDS=fmtstr)
-    else:
-        ids = [config['id']]
-        actual_sql = sql[config['mode']].format(IDS='%s')
-    sql_params = []
-    sql_params.extend(ids)
-    sql_params.append(time_from)
-    cursor.execute(actual_sql, tuple(sql_params))
-    result = cursor.fetchall()
+    ## Expected format: [('body', member_id, "member name"), ...]
+    result = []
+    
+    for datasource in config['sources']:
+        ## get raw SQL query string
+        SQL = SQLs[datasource['SQL']]
+        ## format SQL string
+        prepared = preformatSQL(SQL, datasource['data'])
+        cursor.execute(prepared[0], prepared[1])
+        result.extend(cursor.fetchall())
+    
     db.close()
     
-    if result == None or len(result) == 0:
+    if len(result) == 0:
         err('No tracks found.')
         quit(0)
     
@@ -328,6 +327,13 @@ if __name__ == '__main__':
         quit(0)
 
     config_file = os.path.abspath(sys.argv[1])
+    conf_dir = os.path.dirname(config_file)
+    sql_conf_file = os.path.join(conf_dir, 'sql.json')
+    
+    ## load SQL strings
+    with open(sql_conf_file, 'r') as f:
+        SQLs = json.load(f)
+    
     with open(config_file, 'r') as f:
         config = json.load(f)
         still_running_flag = os.path.join(config['cache'], '.running')
