@@ -27,7 +27,9 @@
     max-width: 25%;
     margin: 0;
     vertical-align: top;
+    box-sizing: border-box;
   }
+  
   nav.cats-menu ul {
     list-style-type: none;
     padding: 0;
@@ -79,9 +81,10 @@
   
   section.posts-list {
       display: inline-block;
-      /*max-width: 70%;*/
+      box-sizing: border-box;
+      /*max-width: 75%;*/
       margin-top: 2px;
-      margin-left: 1em;
+      padding-left: 1em;
       background: transparent;
       flex: auto;
   }
