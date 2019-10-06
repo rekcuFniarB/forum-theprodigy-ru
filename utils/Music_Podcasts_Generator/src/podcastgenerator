@@ -5,6 +5,9 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+## Trying to avoid restricted filenames issue.
+export LANG='en_US.UTF-8'
+
 DIR="$(dirname "$0")"
 
 EXEC="$DIR/__init__.pyo"
