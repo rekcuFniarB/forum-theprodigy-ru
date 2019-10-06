@@ -203,12 +203,13 @@ def main():
     
     ## run youtube_dl for every url
     for url in urls:
-        err('[INFO] Processing URL %s' % url[0])
         urlhash = md5(url[0].encode('utf-8')).hexdigest()[:10]
+        err('[INFO] Processing URL %s <%s>' % (url[0], urlhash))
         
         ## bypass already downloaded urls
         if urlhash not in cache_hashes:
-            ytopt['outtmpl'] = ytopt['outtmpl'].replace('[__HASH__]', urlhash)
+            _ytopt = ytopt.copy()
+            _ytopt['outtmpl'] = ytopt['outtmpl'].replace('[__HASH__]', urlhash)
             with Yt(ytopt) as ytd:
                 # we have to pass single url instead of list of urls
                 # otherwise 'max_downloads' option will not work
