@@ -210,7 +210,7 @@ def main():
         if urlhash not in cache_hashes:
             _ytopt = ytopt.copy()
             _ytopt['outtmpl'] = ytopt['outtmpl'].replace('[__HASH__]', urlhash)
-            with Yt(ytopt) as ytd:
+            with Yt(_ytopt) as ytd:
                 # we have to pass single url instead of list of urls
                 # otherwise 'max_downloads' option will not work
                 try:
