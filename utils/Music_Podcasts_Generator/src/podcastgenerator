@@ -8,6 +8,10 @@ fi
 ## Trying to avoid restricted filenames issue.
 export LANG='en_US.UTF-8'
 
+## Settign PATH. Sometimes crontab doesn't has /usr/local/bin path
+## and ffmpeg may not be visible if it's installed from sources.
+export PATH=/usr/local/bin:/usr/bin:/bin
+
 DIR="$(dirname "$0")"
 
 EXEC="$DIR/__init__.pyo"
