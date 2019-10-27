@@ -24,12 +24,15 @@ div.audioplaylists-player div.player-control {
 }
 div.audioplaylists-player .player-btn {
     display: inline-block;
+    font-family: Verdana, Geneva, sans-serif;
     border: 1px solid;
     border-radius: 0.4em;
-    padding: 0.2em;
+    padding: 0.18em;
     cursor: pointer;
     text-align: center;
-    min-width: 1.8em;
+    width: 2em;
+    height: 2em;
+    overflow: hidden;
     box-sizing: border-box;
 }
 div.audioplaylists-player .player-btn:hover {
