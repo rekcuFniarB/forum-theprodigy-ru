@@ -141,6 +141,7 @@ div.audioplaylists-player div.player-playback-title {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-height: 1.1em;
 }
 div.audioplaylists-player div.player-playback-progress {
     background-color: #606060;
