@@ -1,8 +1,23 @@
 #!/usr/bin/env python3.5
 
-## Simoke websockets push server. It receives messages to the UNIX socket
+##  socket2ws - simple websockets push server.
+##  Copyright (C) 2019  BrainFucker <retratserif@gmail.com>
+##  
+##  This program is free software: you can redistribute it and/or modify
+##  it under the terms of the GNU General Public License as published by
+##  the Free Software Foundation, either version 3 of the License, or
+##  (at your option) any later version.
+##  
+##  This program is distributed in the hope that it will be useful,
+##  but WITHOUT ANY WARRANTY; without even the implied warranty of
+##  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##  GNU General Public License for more details.
+
+
+## Simple websockets push server. It receives messages to the UNIX socket
 ## and sends to all clients connected to websocket.
 ## Expected message format at the UNIX socket is "path\0message".
+
 ## This version if for python3.5.
 
 import websockets
