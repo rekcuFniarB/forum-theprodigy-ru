@@ -3,6 +3,9 @@ UnixSocket2WebSocket
 
 This is a simple websockets push server. It receives messages from UNIX socket and retransmits to clients connected to websockets.
 
+Current version requires Python 3.6 and [Websockets module](https://websockets.readthedocs.io/en/stable/intro.html) 8.1. 
+There is also version compatible with Python 3.5 and websockets 7.0.
+
 Usage
 -----
 
@@ -40,3 +43,5 @@ Example Bash sending messages to websockets through this server:
 ```Bash
 echo -e "/path/\0Hello World!" | socat -d -d - UNIX-CONNECT:/tmp/web.socket
 ```
+
+Message, sent to UNIX soecket, should contain path string and message string separated by null byte, in the form of `/path/\0Message string`. Message string can be also JSON encoded data.
