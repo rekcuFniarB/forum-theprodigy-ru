@@ -1,0 +1,9 @@
+{
+    "host": "0.0.0.0",
+    "port": 8443,
+    "SSLCert": "/tmp/cert.pem",
+    "SSLPrivKey": "/tmp/privkey.pem",
+    "UNIXSocket": "/tmp/websocket.sock",
+    "SSL": true,
+    "debug": true
+}
