@@ -1,6 +1,7 @@
-function Chat(roomName, msgWindow){
+function Chat(server, roomName, msgWindow){
   this.lastTimestamp = null;
   this.msgWindow = msgWindow;
+  this.server = server; // "wss://domain:port"
   this.roomName = roomName;
   this.room = undefined;
   this.active = false;
@@ -12,13 +13,18 @@ function Chat(roomName, msgWindow){
       async: true,
       data: {room: this.roomName, action: 'chatroompoll', since: this.lastTimestamp},
       success: function(messages){
-        for (i=0; i<messages.length; i++){
-          self.printMsg(messages[i]);
-          self.lastTimestamp = messages[i].date;
-        }
+        self.printMsgs(messages);
       }
     });
   }; // End of fallbackPoll()
+  
+  // Print messages list
+  this.printMsgs = function(messages) {
+    for (i=0; i<messages.length; i++){
+      self.printMsg(messages[i]);
+      self.lastTimestamp = messages[i].date;
+    }
+  };
   
   this.printMsg = function(message){
     var date = new Date((parseInt(message.date)) * 1000);
@@ -72,16 +78,17 @@ function Chat(roomName, msgWindow){
   
   this.init = function(){
     var self = this;
-    if (typeof EventSource !== 'undefined'){
+    if (typeof WebSocket !== 'undefined'){
       if (typeof this.room === 'object' && this.room.readyState != this.room.CLOSED)
           this.room.close();
-      this.room = new EventSource('/radio/chat/sse.php?room=' + this.roomName);
+      this.room = new WebSocket(this.server + '/chat/' + this.roomName + '/');
       this.room.onopen = function(){
         self.scroll();
         self.active = true;
       };
       this.room.onmessage = function(event){
-        var data = JSON.parse(event.data);
+          console.log(event.data);
+          var data = JSON.parse(event.data);
         self.printMsg(data);
       };
     }
@@ -93,7 +100,10 @@ function Chat(roomName, msgWindow){
       }, 5000);
       this.active = true;
     }
+    
+    // Initial message
     this.msgWindow.append('<div class="chat-notify">Соединяемся...</div>');
+    
     // Send join notify
     $.ajax('/index.php', {
         type: 'POST',
@@ -105,6 +115,21 @@ function Chat(roomName, msgWindow){
             message: '__JOIN__'
         }
     });
+    
+    //Get last messages befor our joining
+    $.ajax('/index.php', {
+        type: 'GET',
+        async: true,
+        data: {
+            requesttype: 'ajax',
+            room: this.roomName,
+            action: 'lastmessages',
+        },
+        success: function(messages) {
+            self.printMsgs(messages);
+        }
+    });
+    
     $('#chatform').on('submit', function(e){
         e.preventDefault();
         var formData = $(this).serialize();

@@ -5,7 +5,7 @@
 <title>Arena Radio</title>
   <link rel="icon" type="image/png" href="incl/img/Favicon.png" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link type="text/css" href="incl/style.css?v=1546349411" rel="stylesheet" />
+  <link type="text/css" href="incl/style.css?v=1576359780" rel="stylesheet" />
   <meta name="twitter:card" content="summary"/>
   <meta name="twitter:site" content="@theprodigy_ru"/>
   <meta property="og:title" content="Радио Арена"/>
@@ -92,7 +92,7 @@ if (typeof jQuery == 'undefined') {
 </script>
 
 <script src="incl/radio.js?v=1546349411"></script>
-<script src="incl/chat.js?v=1483229042"></script>
+<script src="incl/chat.js?v=1576359780"></script>
 
 <script>
 var radio;
@@ -124,8 +124,8 @@ $(function(){ // Running below when document is ready
 //   }
   
   if (is18){
-      // Chat
-      var chatroom = new Chat('radio', $('#chatmessages'));
+      // Chat ('server', 'chatroom name', chat_UI_element)
+      var chatroom = new Chat('wss://theprodigy.ru:8443', 'radio', $('#chatmessages'));
       // Radio init
       radio = new Radio('#player');
       radio.init();

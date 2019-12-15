@@ -143,7 +143,7 @@ div.skype-info {
     padding-top: 1.5em;
     box-sizing: border-box;
     margin-top: -1.5em;
-    padding-bottom: 2em;
+    padding-bottom: 2.5em;
 }
 
 #chat.chat-detach > div#chat-window > div#chatmessages {height: 100%;}
