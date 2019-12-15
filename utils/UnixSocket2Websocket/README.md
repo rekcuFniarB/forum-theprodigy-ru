@@ -22,7 +22,7 @@ websocket.onmessage = function(e) {
 }
 ```
 
-Above code waits for incoming messages and prints to the console when it't received.
+Above code waits for incoming messages and prints to the console when it's received.
 
 Example PHP code sending messages to websockets through this server:
 
@@ -38,10 +38,10 @@ Example PHP code sending messages to websockets through this server:
     }
 ```
 
-Example Bash sending messages to websockets through this server:
+Example Bash script sending messages to websockets through this server:
 
 ```Bash
 echo -e "/path/\0Hello World!" | socat -d -d - UNIX-CONNECT:/tmp/web.socket
 ```
 
-Message, sent to UNIX soecket, should contain path string and message string separated by null byte, in the form of `/path/\0Message string`. Message string can be also JSON encoded data.
+Message sent to the UNIX soecket should contain path string and message string separated by null byte, in the form of `/path/\0Message string`. Message string can be also JSON encoded data.
