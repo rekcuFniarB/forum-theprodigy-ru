@@ -138,10 +138,10 @@ def prepareexit():
     os.remove(conf['UNIXSocket'])
 
 def main():
-    global USocketServer, conf
+    global USocketServer
     
     with open(sys.argv[1], 'r') as f:
-        conf = json.load(f)
+        conf.update(json.load(f))
     
     tasks = []
     ## Start UNIX socket listening
