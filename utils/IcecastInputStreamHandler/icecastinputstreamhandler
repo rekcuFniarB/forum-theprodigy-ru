@@ -73,27 +73,27 @@ if [ -z "$WAIT" ]; then
     WAIT='15'
 fi
 
-ORIGIN_CODEC="$(ffprobe -hide_banner "http://$HOST/$MOUNT" 2>&1 | grep 'Stream #')"
+ORIGIN_CODEC="$(ffprobe -hide_banner "http://$HOST/$MOUNT" 2>&1 | grep 'Stream #' | grep 'Audio:')"
 
 FMT="$(echo "$CODEC" | grep -Po -e '-f \S+')"
 FMT="$FMT $(echo "$CODEC" | grep -Po -e '-content_type \S+')"
 
 while true; do
     #ffprobe -loglevel fatal -hide_banner "$INPUT"
-    INPUT_CODEC="$(ffprobe -hide_banner "$INPUT" 2>&1 | grep 'Stream #')"
+    INPUT_CODEC="$(ffprobe -hide_banner "$INPUT" 2>&1 | grep 'Stream #' | grep 'Audio:')"
     if [ "$?" -eq 0 ] && [ -n "$INPUT_CODEC" ]; then
         errlog "$(date)  Got incoming stream, starting..."
         if [ _"$INPUT_CODEC" = _"$ORIGIN_CODEC" ]; then
             errlog "Codec is same:"
             errlog "$INPUT_CODEC"
             ## Codec is the same, stream without reencoding
-            ffmpeg -i "$INPUT" -loglevel error -hide_banner -c copy $FMT -ice_name "$NAME" -ice_description "$DESCRIPTION" -ice_url "$URL" -metadata artist="$NAME" -metadata title="$DESCRIPTION" -metadata comment="$URL" "icecast://$LOGIN:$PASSWORD@$HOST/$MOUNT"
+            ffmpeg -i "$INPUT" -loglevel error -hide_banner -c copy $FMT -vn -ice_name "$NAME" -ice_description "$DESCRIPTION" -ice_url "$URL" -metadata artist="$NAME" -metadata title="$DESCRIPTION" -metadata comment="$URL" "icecast://$LOGIN:$PASSWORD@$HOST/$MOUNT"
         else
             errlog "Codecs differ:"
             errlog "$ORIGIN_CODEC"
             errlog "$INPUT_CODEC"
             ## Codec mismatch, stream with reencoding
-            ffmpeg -i "$INPUT" -loglevel error -hide_banner $CODEC -ice_name "$NAME" -ice_description "$DESCRIPTION" -ice_url "$URL" -metadata artist="$NAME" -metadata title="$DESCRIPTION" -metadata comment="$URL" "icecast://$LOGIN:$PASSWORD@$HOST/$MOUNT"
+            ffmpeg -i "$INPUT" -loglevel error -hide_banner $CODEC -vn -ice_name "$NAME" -ice_description "$DESCRIPTION" -ice_url "$URL" -metadata artist="$NAME" -metadata title="$DESCRIPTION" -metadata comment="$URL" "icecast://$LOGIN:$PASSWORD@$HOST/$MOUNT"
         fi
         errlog "$(date)  Stream ended."
     else
