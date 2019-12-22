@@ -1,4 +1,5 @@
 function Chat(server, roomName, msgWindow){
+  var self = this;
   this.lastTimestamp = null;
   this.msgWindow = msgWindow;
   this.server = server; // "wss://domain:port"
@@ -7,7 +8,6 @@ function Chat(server, roomName, msgWindow){
   this.active = false;
   
   this.fallbackPoll = function(){
-    var self = this;
     $.ajax('/index.php', {
       type: 'GET',
       async: true,
@@ -25,6 +25,25 @@ function Chat(server, roomName, msgWindow){
       self.lastTimestamp = messages[i].date;
     }
   };
+  
+  // Timers IDs
+  this._reconnectTimeOut = null;
+  this._pingTimeout = null;
+  
+  // periodically check connection
+  this.ping = function() {
+    clearTimeout(self._reconnectTimeOut);
+    clearTimeout(self._pingTimeout);
+    // Reconnect if no pong (ping response)
+    // Every message or ping delays reconnect time, so this shouldn't happen
+    // if connecton is Ok. Reconnect if no pong in 10 minutes.
+    self._reconnectTimeOut = setTimeout(self.init, 600000);
+    // Ping server every 7 minutes
+    self._pingTimeout = setTimeout(function(){
+        console.log('[DEBUG] Sending ping...');
+        self.room.send('__PING__');
+    }, 420000);
+  }; // ping()
   
   this.printMsg = function(message){
     var date = new Date((parseInt(message.date)) * 1000);
@@ -76,33 +95,44 @@ function Chat(server, roomName, msgWindow){
     }
   }; // End of checkResult()
   
+  this.close = function() {
+    clearTimeout(self._reconnectTimeOut);
+    clearTimeout(self._pingTimeout);
+    self.room.close();
+  };
+  
   this.init = function(){
-    var self = this;
     if (typeof WebSocket !== 'undefined'){
-      if (typeof this.room === 'object' && this.room.readyState != this.room.CLOSED)
-          this.room.close();
-      this.room = new WebSocket(this.server + '/chat/' + this.roomName + '/');
-      this.room.onopen = function(){
+      if (typeof self.room === 'object' && self.room.readyState != self.room.CLOSED)
+          self.close();
+      console.log('[DEBUG] WS init...');
+      self.room = new WebSocket(self.server + '/chat/' + self.roomName + '/');
+      self.room.onopen = function(){
         self.scroll();
         self.active = true;
+        self.ping();
       };
-      this.room.onmessage = function(event){
-          console.log(event.data);
+      self.room.onmessage = function(event){
+        console.log(event.data);
+        if (event.data != '__PONG__') {
           var data = JSON.parse(event.data);
-        self.printMsg(data);
+          self.printMsg(data);
+        }
+        self.ping();
       };
     }
     else {
-    //alert('К сожалению, ваша версия браузера не поддерживается.');
-    //$('button#chat-switch-on, button#chat-switch-off, #chat-window').toggle('slow');
-      this.room = setInterval(function(){
+      console.log('[DEBUG] Fallback poll mode.');
+      //alert('К сожалению, ваша версия браузера не поддерживается.');
+      //$('button#chat-switch-on, button#chat-switch-off, #chat-window').toggle('slow');
+      self.room = setInterval(function(){
         self.fallbackPoll();
       }, 5000);
-      this.active = true;
+      self.active = true;
     }
     
     // Initial message
-    this.msgWindow.append('<div class="chat-notify">Соединяемся...</div>');
+    self.msgWindow.append('<div class="chat-notify">Соединяемся...</div>');
     
     // Send join notify
     $.ajax('/index.php', {
@@ -110,7 +140,7 @@ function Chat(server, roomName, msgWindow){
         async: true,
         data: {
             requesttype: 'ajax',
-            room: this.roomName,
+            room: self.roomName,
             action: 'chatroomsend',
             message: '__JOIN__'
         }
@@ -122,7 +152,7 @@ function Chat(server, roomName, msgWindow){
         async: true,
         data: {
             requesttype: 'ajax',
-            room: this.roomName,
+            room: self.roomName,
             action: 'lastmessages',
         },
         success: function(messages) {
@@ -151,31 +181,30 @@ function Chat(server, roomName, msgWindow){
   
   this.destroy = function(){
     $('#chatform').off('submit');
-    if (typeof this.room === 'object' && this.room.readyState != this.room.CLOSED)
-      this.room.close();
-    if (typeof this.room === 'number')
-      clearInterval(this.room);
+    if (typeof self.room === 'object' && self.room.readyState != self.room.CLOSED)
+      self.close();
+    if (typeof self.room === 'number')
+      clearInterval(self.room);
     $('#chatmessages').html('');
-    this.lastTimestamp = null;
+    self.lastTimestamp = null;
     // Send exit notify
-    if (this.active) {
+    if (self.active) {
         $.ajax('/index.php', {
             type: 'POST',
             async: true,
             data: {
                 requesttype: 'ajax',
-                room: this.roomName,
+                room: self.roomName,
                 action: 'chatroomsend',
                 message: '__EXIT__'
             }
         });
     }
-    this.active = false;
+    self.active = false;
   }; // End of destroy
 
   //// Chat bindings
   // On/Off switch
-  var self = this;
   $('button.chat-switchers').on('click', function(e){
     if($(e.target).hasClass('chat-on-off')) {
       $('button#chat-switch-on, button#chat-switch-off').toggle();

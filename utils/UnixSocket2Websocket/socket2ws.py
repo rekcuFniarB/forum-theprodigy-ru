@@ -115,7 +115,9 @@ async def wshandler(ws, path):
         try:
             ## Without this we loose connection immediately
             incoming = await ws.recv()
-            logmsg(incoming)
+            if incoming == '__PING__':
+                await ws.send('__PONG__')
+            incoming = None
         except (websockets.exceptions.ConnectionClosedOK, websockets.exceptions.ConnectionClosedError):
             logmsg('Connecton closed by', wsid, ws)
             await ws.close()
