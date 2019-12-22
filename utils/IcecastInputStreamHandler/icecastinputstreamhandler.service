@@ -1,0 +1,12 @@
+[Unit]
+Description=Icecast input stream handler (Written by rekcuFniarB)
+After=network.target syslog.target local-fs.target
+
+[Service]
+Type=simple
+ExecStart=/opt/IcecastInputStreamHandler/icecastinputstreamhandler /opt/IcecastInputStreamHandler/default.conf
+User=nobody
+Group=nogroup
+
+[Install]
+WantedBy=multi-user.target

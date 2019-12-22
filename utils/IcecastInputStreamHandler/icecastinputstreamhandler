@@ -1,0 +1,102 @@
+#!/bin/sh
+
+## Wait for stream appear and restream to specified server using specified codec.
+
+## Print messages to stderr
+errlog () {
+    echo "$@" 1>&2
+}
+
+for requirement in ffmpeg ffprobe grep date; do
+    if [ -z "$(which "$requirement")" ]; then
+        errlog "Requirement not found: install $requirement."
+        exit 1
+    fi
+done
+
+
+if [ ! -f "$1" ]; then
+    errlog "Could not open config $1. You can create it from example.conf."
+    exit 1
+else
+    ## Load config
+    . "$1"
+fi
+
+if [ -z "$INPUT" ]; then
+    errlog "Input stream not specified."
+    exit 1
+fi
+
+if [ -z "$PASSWORD" ]; then
+    errlog "Password not specified."
+    exit 1
+fi
+
+if [ -z "$HOST" ]; then
+    errlog "Icecast host not specified."
+    exit 1
+fi
+
+if [ -z "$MOUNT" ]; then
+    errlog "Output stream mountpoint not specified."
+    exit 1
+fi
+
+if [ -z "$LOGIN" ]; then
+    LOGIN="source"
+fi
+
+
+## Default codec settings
+if [ -z "$CODEC" ]; then
+    CODEC="-ar 48000 -c libvorbis -q:a 3 -content_type application/ogg -f ogg"
+fi
+
+if [ -z "$GENRE" ]; then
+    GENRE="Misc"
+fi
+
+if [ -z "$DESCRIPTION" ]; then
+    DESCRIPTION="Test stream description."
+fi
+
+if [ -z "$URL" ]; then
+    URL="https://example.com"
+fi
+
+if [ -z "$NAME" ]; then
+    NAME="Test stream name"
+fi
+
+if [ -z "$WAIT" ]; then
+    WAIT='15'
+fi
+
+ORIGIN_CODEC="$(ffprobe -hide_banner "http://$HOST/$MOUNT" 2>&1 | grep 'Stream #')"
+
+FMT="$(echo "$CODEC" | grep -Po -e '-f \S+')"
+FMT="$FMT $(echo "$CODEC" | grep -Po -e '-content_type \S+')"
+
+while true; do
+    #ffprobe -loglevel fatal -hide_banner "$INPUT"
+    INPUT_CODEC="$(ffprobe -hide_banner "$INPUT" 2>&1 | grep 'Stream #')"
+    if [ "$?" -eq 0 ] && [ -n "$INPUT_CODEC" ]; then
+        errlog "$(date)  Got incoming stream, starting..."
+        if [ _"$INPUT_CODEC" = _"$ORIGIN_CODEC" ]; then
+            errlog "Codec is same:"
+            errlog "$INPUT_CODEC"
+            ## Codec is the same, stream without reencoding
+            ffmpeg -i "$INPUT" -loglevel error -hide_banner -c copy $FMT -ice_name "$NAME" -ice_description "$DESCRIPTION" -ice_url "$URL" -metadata artist="$NAME" -metadata title="$DESCRIPTION" -metadata comment="$URL" "icecast://$LOGIN:$PASSWORD@$HOST/$MOUNT"
+        else
+            errlog "Codecs differ:"
+            errlog "$ORIGIN_CODEC"
+            errlog "$INPUT_CODEC"
+            ## Codec mismatch, stream with reencoding
+            ffmpeg -i "$INPUT" -loglevel error -hide_banner $CODEC -ice_name "$NAME" -ice_description "$DESCRIPTION" -ice_url "$URL" -metadata artist="$NAME" -metadata title="$DESCRIPTION" -metadata comment="$URL" "icecast://$LOGIN:$PASSWORD@$HOST/$MOUNT"
+        fi
+        errlog "$(date)  Stream ended."
+    else
+        sleep "$WAIT"
+    fi
+done
