@@ -37,7 +37,7 @@ function Chat(server, roomName, msgWindow){
     // Reconnect if no pong (ping response)
     // Every message or ping delays reconnect time, so this shouldn't happen
     // if connecton is Ok. Reconnect if no pong in 10 minutes.
-    self._reconnectTimeOut = setTimeout(self.init, 600000);
+    self._reconnectTimeOut = setTimeout(self.initWS, 600000);
     // Ping server every 7 minutes
     self._pingTimeout = setTimeout(function(){
         console.log('[DEBUG] Sending ping...');
@@ -101,25 +101,30 @@ function Chat(server, roomName, msgWindow){
     self.room.close();
   };
   
+  this.initWS = function() {
+    if (typeof self.room === 'object' && self.room.readyState != self.room.CLOSED)
+      self.close();
+    console.log('[DEBUG] WS init...');
+    self.room = new WebSocket(self.server + '/chat/' + self.roomName + '/');
+    self.room.onopen = function(){
+      self.scroll();
+      self.active = true;
+      //self.ping();
+    };
+    self.room.onmessage = function(event){
+      console.log(event.data);
+      if (event.data != '__PONG__') {
+        var data = JSON.parse(event.data);
+        self.printMsg(data);
+      }
+      self.ping();
+    }
+    self.ping();
+  }; // initWS()
+  
   this.init = function(){
     if (typeof WebSocket !== 'undefined'){
-      if (typeof self.room === 'object' && self.room.readyState != self.room.CLOSED)
-          self.close();
-      console.log('[DEBUG] WS init...');
-      self.room = new WebSocket(self.server + '/chat/' + self.roomName + '/');
-      self.room.onopen = function(){
-        self.scroll();
-        self.active = true;
-        self.ping();
-      };
-      self.room.onmessage = function(event){
-        console.log(event.data);
-        if (event.data != '__PONG__') {
-          var data = JSON.parse(event.data);
-          self.printMsg(data);
-        }
-        self.ping();
-      };
+      self.initWS();
     }
     else {
       console.log('[DEBUG] Fallback poll mode.');
