@@ -102,12 +102,12 @@ function Chat(server, roomName, msgWindow){
   };
   
   this.initWS = function() {
+    self.getLastMessages();
     if (typeof self.room === 'object' && self.room.readyState != self.room.CLOSED)
       self.close();
     console.log('[DEBUG] WS init...');
     self.room = new WebSocket(self.server + '/chat/' + self.roomName + '/');
     self.room.onopen = function(){
-      self.scroll();
       self.active = true;
       //self.ping();
     };
@@ -122,36 +122,11 @@ function Chat(server, roomName, msgWindow){
     self.ping();
   }; // initWS()
   
-  this.init = function(){
-    if (typeof WebSocket !== 'undefined'){
-      self.initWS();
-    }
-    else {
-      console.log('[DEBUG] Fallback poll mode.');
-      //alert('К сожалению, ваша версия браузера не поддерживается.');
-      //$('button#chat-switch-on, button#chat-switch-off, #chat-window').toggle('slow');
-      self.room = setInterval(function(){
-        self.fallbackPoll();
-      }, 5000);
-      self.active = true;
-    }
-    
+  //Get last messages before our joining
+  this.getLastMessages = function() {    
     // Initial message
     self.msgWindow.append('<div class="chat-notify">Соединяемся...</div>');
     
-    // Send join notify
-    $.ajax('/index.php', {
-        type: 'POST',
-        async: true,
-        data: {
-            requesttype: 'ajax',
-            room: self.roomName,
-            action: 'chatroomsend',
-            message: '__JOIN__'
-        }
-    });
-    
-    //Get last messages befor our joining
     $.ajax('/index.php', {
         type: 'GET',
         async: true,
@@ -162,6 +137,34 @@ function Chat(server, roomName, msgWindow){
         },
         success: function(messages) {
             self.printMsgs(messages);
+        }
+    });
+  };
+  
+  this.init = function(){
+    if (typeof WebSocket !== 'undefined'){
+      self.initWS();
+    }
+    else {
+      console.log('[DEBUG] Fallback poll mode.');
+      self.getLastMessages();
+      //alert('К сожалению, ваша версия браузера не поддерживается.');
+      //$('button#chat-switch-on, button#chat-switch-off, #chat-window').toggle('slow');
+      self.room = setInterval(function(){
+        self.fallbackPoll();
+      }, 5000);
+      self.active = true;
+    }
+    
+    // Send join notify
+    $.ajax('/index.php', {
+        type: 'POST',
+        async: true,
+        data: {
+            requesttype: 'ajax',
+            room: self.roomName,
+            action: 'chatroomsend',
+            message: '__JOIN__'
         }
     });
     
@@ -231,12 +234,14 @@ function Chat(server, roomName, msgWindow){
         $('button.chat-btn-shrink').show();
         $('button.chat-btn-detach').hide();
         $('#logo').hide();
+        self.scroll();
     }
     else if ($(e.target).hasClass('chat-btn-shrink')) {
         $('#chat').removeClass('chat-detach');
         $('button.chat-btn-shrink').hide();
         $('button.chat-btn-detach').show();
         $('#logo').show();
+        self.scroll();
     }
   });
   $(window).unload(function(){
