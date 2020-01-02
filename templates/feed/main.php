@@ -82,9 +82,9 @@
   section.posts-list {
       display: inline-block;
       box-sizing: border-box;
-      /*max-width: 75%;*/
+      width: 75%;
       margin-top: 2px;
-      padding-left: 1em;
+      padding-left: 0.2em;
       background: transparent;
       flex: auto;
   }
@@ -99,7 +99,7 @@
   section.posts-list > article {
       /*margin: 0.4em;*/
       margin: 1em 0;
-      padding: 0.4em;
+      padding: 1px;
   }
   section.posts-list > article > h2 {
       margin: 0;
@@ -198,7 +198,7 @@
 <?php endif; ?>
 </aside>
 
-<section class="posts-list catbg">
+<section id="main" class="posts-list catbg">
 <h1 class="titlebg"><?= $this->title ?></h1>
 
 <?= $this->yieldView(); ?>
