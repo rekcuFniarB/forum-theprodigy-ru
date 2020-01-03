@@ -383,7 +383,7 @@ var Radio = function(s){
             }
         });
         // Stick player on scroll
-        $(window).scroll(this.player.stick);
+        //$(window).scroll(this.player.stick);
         // Android workaround
          //$('#play-radio-button>a').on('click', function(){
              //self.playRadio(true);
