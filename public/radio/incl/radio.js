@@ -64,7 +64,7 @@ var Radio = function(s){
         if (typeof media === 'undefined' || media == ''){
             this.playRadio();
         } else {
-            if (player.paused && player.currentTime > 0 && !player.ended && player.readyState > 2) {
+            if (!player.isRadio && player.paused && player.currentTime > 0 && !player.ended && player.readyState > 2) {
                 player.play();
             } else {
                 this.playRecord(media);
