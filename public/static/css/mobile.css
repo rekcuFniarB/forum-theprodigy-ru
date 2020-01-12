@@ -1,0 +1,636 @@
+html, body {margin: 0; padding: 0;}
+
+table, tbody, tr, td {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    z-index: auto;
+    box-sizing: border-box;
+}
+
+div {box-sizing: border-box;}
+
+body > header > table,
+body > footer > table,
+body > table,
+body > div,
+div.event-banner {
+    overflow: hidden;
+    margin: 0 2.5%;
+}
+
+div.event-banner {max-width: initial;}
+
+img, img.msg-embed-img, input, textarea, iframe {max-width: 100%;}
+
+input, textarea, select, select > option {
+    font-size: 16px; /* Prevent autozoom in iOS */
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.sphinx-search-topic-form > form > input[name="search"],
+.sphinx-search-topic-form > form > input[name="q"] {
+    width: initial;
+}
+
+td.board_tree {margin: 0.4em;}
+
+#boardTopNav {margin-top: 1px; padding-bottom: 1px;}
+
+tr.message-table-tr {padding-top: 0.7em;}
+tr.message-table-tr:last-child {padding-bottom: 0.7em;}
+table.message-table {
+/*     margin: 0.7em 0 0.7em 0; */
+    position: relative;
+    overflow: hidden;
+}
+
+td.titlebg.topic_img {height: 0; overflow: visible;}
+td.titlebg.topic_img > font > b {display: none;}
+td.titlebg.topic_name {padding: 0.2em 0.2em 0.2em 2.5em;}
+
+table.message-table > tbody > tr > td > table {padding: 0.5em;}
+
+/* Fixing logo size */
+.logo-block > a > img {width: 100%; height: auto;}
+.logo-block {overflow: hidden;}
+/* Center notify text under the logo block */
+.logo-block + td {text-align: center;}
+
+/* User Info style on topic messages page */ 
+/* table.message-table > tbody > tr > td > table > tbody > tr > td > font {display: none;} */
+.memberinfo {visibility: hidden; width: 0; height: 0; overflow: visible; display: block;}
+.memberinfo br, .memberinfo .member-custom-status, .memberinfo .star, memberinfo .votes_link, .memberinfo .comments_link, .memberinfo .brs, .memberinfo .online {display: none;}
+.member-status {display: inline-block; position: relative; top: -0.2em; visibility: hidden; white-space: nowrap;}
+.member-status > b {visibility: visible;}
+.message-table .userinfo {margin-left: 4em; width: 90%; height: 3em; padding-top: 0.4em; white-space: nowrap;}
+div.avatar {visibility: visible; width: 3em; height: 3em; position: absolute; top: 0.4em; left: 0.4em; z-index: 100;}
+div.avatar > img {max-width: 3em; max-height: 3em;}
+.msg-id-date {display: block; text-align: right; top: 1em; position: relative;}
+
+ 
+/* Remove message icon */
+table.message-table > tbody > tr > td > table > tbody > tr > td > table > tbody > tr > td > img {display: none;}
+/* Remove message title */
+table.message-table > tbody > tr > td > table > tbody > tr:nth-child(1) > td > table > tbody > tr:nth-child(1) > td:nth-child(2) > font:nth-child(1) {display: none;} /* FIXME */
+
+/* Place message buttons after nickname */
+.post_table .message-buttons {margin-top: 1.2em; right: 0; min-height: 2em;}
+
+.post_table {margin-top: -2.2em; background-color: transparent;}
+
+table.message-table > tbody > tr > td > table  {
+    background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0.2) 7.6em, rgba(0, 0, 0, 0) 7.6em);
+    background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.2) 7.6em, rgba(0, 0, 0, 0) 7.6em);
+    background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0.2) 7.6em, rgba(0, 0, 0, 0) 7.6em);
+    background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0.2) 7.6em, rgba(0, 0, 0, 0) 7.6em);
+    background-image: linear-gradient(top, rgba(0, 0, 0, 0.2) 7.6em, rgba(0, 0, 0, 0) 7.6em);
+}
+
+table.message-table > tbody > tr > td > table > tbody > tr > td {background-color: transparent;} 
+
+table.message-table > tbody > tr > td > table > tbody > tr:first-child > td > hr {display: none;}
+
+.message_info > .msg-id-date {font-style: italic;}
+
+.message-content {
+    margin-top: 1em;
+    min-height: 5em;
+    overflow-wrap: break-word;
+}
+
+.comments {
+    overflow-wrap: break-word;
+}
+
+table.msg-embed-table > tbody > tr > td {display: inline-block;}
+
+.quote {border: 1px solid; padding: 0.4em;}
+
+/* Fixing karma buttons */
+table[id^=Karma] {display: table; white-space: nowrap;}
+table[id^=Karma] > tbody {display: table-row-group;}
+table[id^=Karma] > tbody > tr {display: table-row;}
+table[id^=Karma] > tbody > tr > td {display: table-cell;} 
+
+/* Short Karma Buttons, Experimental */
+/*
+table[id^=Karma] {
+    margin-bottom: 1em;
+    margin-top: 1em;}
+table[id^=Karma] > tbody > tr > td {display: inline-block;}
+tr[id^=KarmaBtns] > td {visibility: hidden;}
+tr[id^=KarmaBtns] > td[align=right] > a:after {
+    content: "+";
+    visibility: visible;
+    border: 1px solid;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    border-radius: 0.2em;
+    position: relative;
+    left: -3em;}
+tr[id^=KarmaBtns] > td[align=left] > a:before {
+    content: "-";
+    visibility: visible;
+    border: 1px solid;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    border-radius: 0.2em;}
+tr[id^="karmaInfo"] > td {visibility: hidden;}
+span[id^=Applauds] {
+    visibility: visible;
+    position: relative;
+    top: -1.8em;
+    left: 1em;}
+span[id^=Smites] {
+    visibility: visible;
+    position: relative;
+    top: -1.8em;
+    left: -1em;}
+tr[id^=KarmaBtns][style="display: none;"] {
+    display: block !important;
+    pointer-events: none;
+    opacity: 0.5;}
+*/
+
+/* multinick info block */
+div.multinick-info {
+    font-size: 0.7em;
+    width: auto;
+    padding: 0.2em;
+    overflow: hidden;
+}
+
+.user-authenticated {display: none;}
+
+/* Quick Polls */
+.quick-poll-block {overflow: auto;}
+.quick-poll-block > tbody > tr > th, .quick-poll-block > tbody > tr > td {width: 30%; float: left; margin: 1px; padding: 0;}
+
+table.showrecents {
+    margin-bottom: 6em;
+    padding-top: 1px;
+}
+
+
+/* Category rows */
+tr.category-row {
+  margin: 1px 0;
+  /* overflow: hidden; */
+  position: relative;
+}
+
+.cattitle {text-align: center;}
+.cattitle > img {position: absolute; left: 0.3em; top: 0.8em;}
+.cattitle > .catMenu {z-index: 100;}
+
+/* Category new posts flag */
+.col_cat_td1 {width:auto; background-color: transparent; margin-right: 0.2em; position: absolute; top: 0.2em; left: 0;}
+
+/* Hide category posts and topics counters */
+.cat_td3, .cat_td4 {display: none;}
+
+/* Remove blank lines from latest post string */
+/* .cat_td5 br, .col_cat_td3 br {display: none;} */
+ 
+/* Latest post info appearance */
+.cat_td5 .latestPostRealName {margin-left: 2em;}
+.cat_td5 {text-align: right;}
+.cat_td5 > font, .col_cat_td3 > font {font-size: 0.85em;}
+.col_cat_td2 {height: 2em;
+    padding-left: 1.8em; padding-bottom: 0.3em;
+    background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0));
+    background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0));
+    background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0));
+    background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0));
+    background-image: linear-gradient(top, rgba(0, 0, 0, 0.2) 60%, rgba(0, 0, 0, 0)); 
+}
+.col_cat_td2 > font {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    padding-right: 3.5em;
+}
+.col_cat_td3 {
+    font-size: 1.2em;
+    height: 2.6em;
+    text-align: right;
+}
+.col_cat_td3 > font {display: block;}
+.col_cat_td3 > font > a,
+.col_cat_td3 > font > span {
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    padding-right: 0.4em;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+.latest-post-info {text-align: right; position: absolute; right: 0; font-style: italic;}
+.boardViewersPane {position: absolute; top: 0.2em; right: 0.3em; float: none;}
+
+/* Hide block after header */
+#forumColNames, #linkTree {display: none;}
+
+#radioinfo > p {margin: 0; padding: 0.2em;}
+
+/* place block icons upper and to the left */
+.catbg {padding: 0.5em 0;}
+#infoCenter .catbg b {margin-left: 1.7em;}
+.info_img {width: 20px; height: 20px; top: -2.2em; position: relative; margin-bottom: -1.75em; background-color: transparent;} 
+
+
+.board_pageindex {padding: 0.2em 0.4em;}
+
+.board_pageindex b {margin: initial;}
+
+.RecentBarTitle {padding-top: 1px;}
+
+.RecentBarTitle > .titlebg {
+    padding: 0.3em;
+    font-size: 1.2em;
+}
+
+#infoCenter td.catbg {
+    margin-top: 1px;
+    /*margin-bottom: 1px;*/
+}
+
+#infoCenter > tbody > tr > td > table > tbody > tr > td:nth-child(2) {padding: 0.2em 0.4em;}
+
+#chatWall {
+    overflow: auto;
+    overflow-wrap: break-word;
+}
+#chatWall > font > div:nth-child(2) {padding: 0 0.4em;}
+
+/* Recent comments style */
+.RecentComments .info_board, #recentcommentstable .info_board {float: left; width: auto;}
+.info_post > a {margin-left: 0.5em;}
+.showrecents + #recentcommentstable {margin-top: 4em;}
+
+td.RecentComments > table > tbody > tr,
+#recentcommentstable > table > tbody > tr {
+    padding-left: 0.2em; padding-right: 0.2em; width: auto;
+}
+
+/* Quick reply form */ 
+select[name="movethread"] {width: 50% !important; float: left;}
+select[name="modaction"] {width: 50% !important;}
+.quick-reply-form-moderator-actions > tbody > tr:nth-child(1) {display: none;}
+.quick-reply-form-caption {display: none;}
+.quick-reply-form-bbcode-btns,
+.quick-reply-form-smile-btns {width: 100%; text-align: center;}
+.quick-reply-form-bbcode-btns > table,
+.quick-reply-form-smile-btns > table {display: inline-block; width: auto;}
+.quick-reply-form-bbcode-btns > table > tbody,
+.quick-reply-form-smile-btns > table > tbody {text-align: center;}
+.quick-reply-form-bbcode-btns > table > tbody > tr,
+.quick-reply-form-smile-btns > table > tbody > tr {display: inline-block; width: auto;}
+.bbc-btn, .smile-btn {display: inline-block; width: auto;}
+form[name="postmodify"] > br {clear: both;} /* this fixes buttons float issue */
+
+/* Message Index */
+.topicorder, .topicreplies, .topic-icon, .topicviews, .topicstarter {display: none;}
+.topic-item {
+    position: relative;
+    clear: both;
+    padding-top: 1px;
+}
+.topic-item:last-child {padding-bottom: 1px;}
+.topic-status {float: left; width: 1.5em;}
+.topictitle {height: 3.8em;}
+.topictitle > a {
+    float: left;
+    margin-left: 0.2em;
+    margin-top: 0.25em;
+}
+.topictitle > font > a,
+.topictitle > font > font {
+    max-width: 60%;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-left: 0.2em;
+}
+.topiclast {
+    text-align:
+    right;
+    width: 34%;
+    top: 0.4em;
+    right: 0;
+    position: absolute;
+    height: 100%;
+    background-color: transparent;
+    padding-right: 0.4em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.topiclast_time {font-style: italic;}
+
+#chatWallText, #topicBillboard {
+    /*max-height: 10em;*/
+    overflow: auto;
+    overflow-wrap: break-word;
+    padding: 0 0.4em;
+}
+
+.bdescrip {padding: 0 0.4em;}
+
+#viewers {padding: 0.2em 0.4em;}
+#viewers + td  {margin: 0.2em 0.4em;}
+#viewers + td > form {text-align: right;}
+
+/* Comments Pages */
+.comments-page {background-color: transparent;} /* this is for gradient rgba() */
+.comments-page > tbody > tr > td.titlebg:nth-child(1) {float: left; width: auto;}
+.comments-page div.comment {margin: 0;}
+.comments-page div[id^="comments"] {margin: 0 !important;}
+.comments-page > tbody hr {display: none;}
+.comments-page > tbody > tr { /* message header */
+    background-image: -moz-linear-gradient(top, rgba(0, 0, 0, 0.2) 85%, rgba(0, 0, 0, 0));
+    background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.2) 85%, rgba(0, 0, 0, 0));
+    background-image: -o-linear-gradient(top, rgba(0, 0, 0, 0.2) 85%, rgba(0, 0, 0, 0));
+    background-image: -ms-linear-gradient(top, rgba(0, 0, 0, 0.2) 85%, rgba(0, 0, 0, 0));
+    background-image: linear-gradient(top, rgba(0, 0, 0, 0.2) 85%, rgba(0, 0, 0, 0));
+}
+    
+.comments-page > tbody > tr > .titlebg {background-color: transparent;}
+.comments-page > tbody > tr > td.titlebg:last-child > span > font {font-style: italic;} /* date */
+.comments-page > tbody > tr > td {padding: 0.4em;}
+
+
+/* Instant Messages */
+tr.im-index-table-caption > td.titlebg {display: none;}
+tr.im-index-table-caption > td.titlebg:last-child {display: block; text-align: left;}
+.im-index-item {clear: both; position: relative; height: 4em;}
+.im-index-checkbox {position: absolute; top: 0; z-index: 100; width: 2em;}
+.im-index-title { position: absolute; top: 0; margin-left: 2.2em; width: 75%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+.im-index-del {position: absolute; top: 2em; right: 0; z-index: 10; width: 4.5em; overflow: hidden; white-space: nowrap;}
+.im-index-date {position: absolute; top: 2em; width: 95%; margin-left: 2.2em;}
+.im-index-username {position: absolute; top: 0; right: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 20%;}
+.im-index-item > td {height: 50%;}
+.instant-messages-page > tbody > tr:first-child {display: none;}
+.instant-message-userinfo {height: 3.8em; overflow: hidden; position: relative;}
+.instant-message-userinfo > .instant-message-author {margin-left: 4em;}
+.instant-message-userinfo > font {visibility: hidden;}
+.instant-message-subject {text-align: center;}
+.instant-message-userinfo .user-group {position: absolute; top: 1.2em; margin-left: 4em; visibility: visible; font-size: 0.8em;}
+.instant-message-userinfo div.avatar {position: absolute; top: 0; visibility: visible; z-index: 100; display: block; left: 0;}
+.instant-messages-page hr {display: none;}
+.instant-message-user-links {display: none;}
+.instant-message-footer {margin-bottom: 0.5em;}
+
+/* Message Input page */
+.message-input-form-container td[align="right"] {text-align: left;}
+
+/* Admin control center */
+.admin-manage-boards-page > tbody > .admin-manage-boards-item {margin-top: 0.6em; clear: both;}
+.admin-manage-boards-item img {float: left;}
+
+/* Karma Page */
+.karma-page-summary {
+    float: none;
+    /*display: inline-block;*/
+    display: none;
+    height: 2em;
+    overflow: hidden;
+    margin: 0.5em;
+}
+.karma-page-summary > tbody > tr:first-child > td {padding: 0.4em;}
+.karma-page-summary:hover {height: auto;}  /* expand collapsed list */
+.karma-page-summary:active {height: auto;} /* expand collapsed list */
+/* .karma-page-summary-item {clear: both;} */
+.karma-page-summary-item > td:first-child {
+    display: inline-block;
+    width: 80%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: -2%;
+}
+/* .karma-page-summary-item > td:first-child > a:after {content: " :"} */
+.karma-page-summary-item > td:last-child {
+    display: inline-block;
+    width: 19%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.karma-page form > br {display: none;}
+/*.karma-page form input[type="submit"] {float: right;}*/
+.karma-page-actions {
+    margin-top: 0.6em;
+    text-align: left; 
+    /*height: 5em; 
+    overflow: hidden;*/ 
+}
+.karma-page-actions:hover {height: auto;}
+.karma-page-actions:active {height: auto;}
+.karma-page-actions > td {
+    text-align: left;
+    padding: 0.5em;
+}
+.karma-page-actions br {display: none;}
+
+/* Login Page */
+form[name="frmLogin"] > table > tbody > tr > td > table > tbody > tr {clear: both; margin: 1em 0;}
+form[name="frmLogin"] > table > tbody > tr > td > table > tbody > tr > td.windowbg:first-child {float: left; width: auto; margin-right: 1em;}
+form[name="frmLogin"] > table > tbody > tr > td > table > tbody > tr:last-child {width: 10em; position: relative; top: -2em; left: 50%; height: 1em;}
+
+/* Profile Page */
+#profileTable > tbody > tr > td.titlebg {overflow: auto;}
+#profileTable > tbody > tr > td.titlebg > table > tbody > tr {position: relative; padding: 0.4em;}
+#profileTable > tbody > tr > td.titlebg > table > tbody > tr > td {display: inline-block;}
+#profileTable > tbody > tr > td.titlebg > table > tbody > tr > td:nth-child(2) {position: absolute; right: 0.2em;}
+#profileTable > tbody > tr > td.titlebg > table > tbody > tr > td:nth-child(2) > font.text1 {margin-right: 1em;}
+
+#profileTable > tbody > tr > td.userinfo > table > tbody > tr > td {display: inline-block; width: 49%; text-align: initial; padding: 0.2em;}
+#profileTable > tbody > tr > td.userinfo > table > tbody > tr > td:nth-child(1) {text-align: right;}
+#profileTable > tbody > tr > td.userinfo > table > tbody > tr > td:nth-child(2) {text-align: left;}
+#profileTable > tbody > tr > td.userinfo > table > tbody > tr > td:only-child {width: 100%; text-align: center;}
+#profileTable > tbody > tr > td.userinfo {padding: 0.5em;}
+#profileTable > tbody > tr > td.userinfo > table > tbody > tr {text-align: center;}
+#profileTable textarea#reason {width: 100%;}
+
+form[action$="profile2"] > table > tbody > tr {text-align: center; margin-bottom: 1px;}
+form[action$="profile2"] > table > tbody > tr > td {padding: 0.2em;}
+form[action$="profile2"] > table > tbody > tr > td > table > tbody > tr {text-align: center;}
+form[action$="profile2"] > table > tbody > tr > td > table > tbody > tr > td {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 49%;
+    padding: 0.2em;
+}
+form[action$="profile2"] > table > tbody > tr > td > table > tbody > tr > td:nth-child(1) {text-align: right;}
+form[action$="profile2"] > table > tbody > tr > td > table > tbody > tr > td:nth-child(2) {text-align: left;}
+form[action$="profile2"] > table > tbody > tr > td > table > tbody > tr > td:only-child {width: 90%; text-align: center;}
+form[action$="profile2"] > table > tbody > tr > td > table > tbody > tr > td > input,
+form[action$="profile2"] > table > tbody > tr > td > table > tbody > tr > td > textarea,
+form[action$="profile2"] > table > tbody > tr > td > table > tbody > tr > td > font > input,
+form[action$="profile2"] > table > tbody > tr > td > table > tbody > tr > td > font > textarea {max-width: 90%;}
+
+
+#followersCol > .message,
+#followersCol > .comment {
+    padding-bottom: 0.4em;
+}
+
+table.popup-display-message > tbody > tr:first-child > td > div:nth-child(2),
+#followersCol > .message > tbody > tr:first-child > td > div:nth-child(2), 
+#followersCol > .comment > tbody > tr:first-child > td > div:nth-child(2) {
+    padding-right: 0.3em;
+    font-style: italic;
+}
+
+table.popup-display-message > tbody > tr:first-child > td:after,
+#followersCol > .message > tbody > tr:first-child > td:after,
+#followersCol > .comment > tbody > tr:first-child > td:after {
+    display: block;
+    content: ".";
+    visibility: hidden;
+    height: 0;
+    clear: both;
+}
+
+#followersCol font.followers-usertitle {display: none;}
+
+#followersCol div.buttons,
+table.popup-display-message td.buttons {
+    text-align: right;
+    padding-right: 0.4em;
+}
+
+table.popup-display-message > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr:nth-child(1),
+table.popup-display-message > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2),
+table.message > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr:nth-child(1),
+table.comment > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr:nth-child(1),
+table.message > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2),
+table.comment > tbody > tr:nth-child(2) > td:nth-child(1) > table > tbody > tr:nth-child(1) > td:nth-child(2) {
+    overflow: auto;
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+}
+
+table.popup-display-message > tbody > tr:last-child {margin-top: -0.5em;}
+/* End Profile Page */
+
+/* buttons */
+.menusep {display: none;}
+a.button,
+.menubar > font > a,
+.menubar > font > nav > a,
+.yyimbar > a,
+.board_menu > font > a,
+.message-buttons > font > a,
+.moderation-buttons-bar > font > a,
+.board_pageindex > font > a,
+.post_actions > font > a:first-of-type,
+a.reportToModerator
+    {display: inline-block;
+     border: 1px solid;
+     border-radius: 0.2em;
+     margin: 0.15em;
+     padding-left: 0.2em;
+     padding-right: 0.2em;
+     text-decoration: none;
+     font-size: 0.8em;
+    }
+.message-buttons > font > a,
+.message-buttons > font > a > font,
+.board_menu > font > a,
+.board_menu > font > a > font,
+.moderation-buttons-bar > font > a,
+.moderation-buttons-bar > font > a > font {border-color: inherit;
+                                           color: inherit;}
+.message-buttons > font > a:active,
+.message-buttons > font > a:active > font,
+.board_menu > font > a:active,
+.board_menu > font > a:active > font,
+.moderation-buttons-bar > font > a,
+.moderation-buttons-bar > font > a > font {border-color: initial;
+                                           color: initial;}
+.comments-page > tbody > tr > td.message-buttons > font > a:first-child {margin-left: -0.3em;}
+.pageindex-bracket {display: none;}
+.pageindex-current {border: 1px solid;
+                    border-radius: 0.2em;
+                    padding-left: 0.2em;
+                    padding-right: 0.2em;
+                    font-size: 0.8em;}
+
+.go-form {position: relative;}
+
+.board_menu {
+    white-space: normal;
+    padding: 0.2em 0.4em;
+}
+
+/* Search Page (Sphinx) FIXME */
+.search-result-item-header,
+.search-result-item-header > div,
+.search-result-item-header > div > span { display: initial;}
+
+.search-result-item > div> .search-result-item-header > div > .search-result-item-date {
+    display: block;
+    width: 100%;
+    text-align: right;
+    font-style: italic;
+    box-sizing: border-box;
+    padding-top: 2.5em;
+    margin-top: -2.8em;
+    margin-bottom: 1px;
+}
+
+.search-result-item-header > div > span,
+.search-result-item-header > div > a {white-space: normal;}
+
+/* Comment Form */
+/* input[id^="commentBoxTotalLength"] {display: none !important;} */
+div[id^="commentForm"] > form > div.commentBoxTotalLength {display: none;}
+
+
+/*
+ * Merge threads page
+ */
+table.merge-page > tbody > tr > td {
+    padding: 0.5em;
+}
+table.merge-main-table > tbody >  tr > td:nth-child(1) {
+    text-align: left;
+}
+table.merge-main-table > tbody > tr > td:nth-child(2) {
+    text-align: right;
+}
+table.merge-main-table > tbody br {
+    display: none;
+}
+table.merge-page tr.merge-item {
+    border-bottom: 1px dotted gray;
+    padding-top: 0.2em;
+}
+table.merge-page tr.merge-item > td:nth-child(1) {
+    text-align: left;
+}
+table.merge-page tr.merge-item > td:nth-child(2) {
+    text-align: right;
+}
+table.merge-page tr.merge-item > td:nth-child(2) > a:nth-child(1) {
+    display: block;
+    white-space:nowrap;
+    overflow: hidden;
+    margin-left: 10%;
+    margin-right: 20%;
+    text-overflow: ellipsis;
+    text-align: left;
+}
+/* END of merge threads page */
+
