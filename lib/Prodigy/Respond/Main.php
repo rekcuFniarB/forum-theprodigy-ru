@@ -174,7 +174,7 @@ class Main extends Respond {
         }
                 
         $dbst_boards = $app->db->prepare("
-            SELECT DISTINCT c.name AS catName, c.ID_CAT, b.ID_BOARD, b.name AS boardName, b.description, b.moderators, b.numPosts, b.numTopics, c.memberGroups, m.posterName, m.posterTime, m.subject, t.ID_TOPIC, t.numReplies, IFNULL(mem.realName, m.posterName) AS realName, IFNULL(lb.logTime, 0) AS boardTime, IFNULL(lmr.logTime, 0) AS markReadTime, IFNULL(mem.ID_MEMBER, -1) AS ID_MEMBER, IFNULL(lon.viewers, 0) AS numBoardViewers
+            SELECT DISTINCT c.name AS catName, c.ID_CAT, b.ID_BOARD, b.name AS boardName, b.description, b.moderators, b.numPosts, b.numTopics, c.memberGroups, m.posterName, m.posterTime, m.subject, t.ID_TOPIC, t.numReplies, IFNULL(mem.realName, m.posterName) AS realName, IFNULL(lb.logTime, 0) AS boardTime, IFNULL(lmr.logTime, 0) AS markReadTime, IFNULL(mem.ID_MEMBER, -1) AS ID_MEMBER, IFNULL(lon.viewers, 0) AS numBoardViewers, c.catOrder, b.boardOrder
             FROM {$db_prefix}categories AS c
             LEFT JOIN {$db_prefix}boards AS b ON (b.ID_CAT=c.ID_CAT)
             LEFT JOIN {$db_prefix}topics AS t ON (t.ID_TOPIC=b.ID_LAST_TOPIC)
