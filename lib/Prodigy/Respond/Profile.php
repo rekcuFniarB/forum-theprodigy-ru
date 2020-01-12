@@ -550,7 +550,7 @@ class Profile extends Respond
             
             // Prepare sounds list
             $tdat['sounds_prodigy'] = array();
-            $dir = dir(PROJECT_ROOT . '/static/sounds/IM/Prodigy');
+            $dir = dir(PROJECT_ROOT . '/public/static/sounds/IM/Prodigy');
             while ($entry = $dir->read())
             {
                 if ($entry != '.' && $entry != '..')
@@ -564,7 +564,7 @@ class Profile extends Respond
             }
             
             $tdat['sounds_other'] = array();
-            $dir = dir(PROJECT_ROOT . '/static/sounds/IM/Other');
+            $dir = dir(PROJECT_ROOT . '/public/static/sounds/IM/Other');
             while ($entry = $dir->read())
             {
                 if ($entry != '.' && $entry != '..')
