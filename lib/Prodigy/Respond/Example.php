@@ -172,4 +172,11 @@ class Example extends Respond
         //var_dump(ob_get_status(true));
         //return $response;
     }
+    
+    public function phpinfo($request, $response, $service, $app) {
+        if(!$app->conf->debug)
+            return $this->error('Access denied!');
+        $service->layout('examples/simple.layout.php');
+        phpinfo();
+    }
 }

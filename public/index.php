@@ -227,6 +227,7 @@ $router->respond('GET', '/example/', 'example->example');
 //$router->respond('GET', '/example/', 'example->example2');
 $router->respond('GET', '/test/', 'example->testResponse');
 //$router->respond('GET', '/simple/', 'example->simple_example');
+$router->respond('GET', '/phpinfo/', 'example->phpinfo');
 
 $router->with('/feed', '../lib/Prodigy/Feed/index.php'); // TBD (to be done)
 $router->with('/files', '../lib/Prodigy/Cloud/index.php');
