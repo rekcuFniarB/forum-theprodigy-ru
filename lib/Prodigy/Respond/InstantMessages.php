@@ -546,7 +546,8 @@ class InstantMessages extends Respond
             {
                 if(session_id())
                     session_write_close();
-                $app->db->prepare("UPDATE {$app->db->prefix}instant_messages SET readBy=1 WHERE ID_MEMBER_TO=? AND readBy='0' LIMIT ?")->
+                //fastcgi_finish_request(); // this doesn't work expected way on PHP FPM
+                $app->db->prepare("UPDATE {$app->db->prefix}instant_messages USE INDEX(ID_MEMBER_TO) SET readBy=1 WHERE ID_MEMBER_TO=? AND readBy='0' LIMIT ?")->
                     execute(array($app->user->id, $service->imcount[1]));
             }
         });
