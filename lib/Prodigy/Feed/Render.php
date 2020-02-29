@@ -23,15 +23,16 @@ Class Render extends \Prodigy\Respond\Respond {
         $dbprefix = $this->app->db->db_prefix;
         $r = $this->app->db->query(
             "SELECT ID_CAT FROM {$dbprefix}categories ORDER BY catOrder LIMIT 1"
-        ) or database_error(__FILE__, __LINE__, $this->app->db);
-        if ($r->num_rows > 0) {
-            $row = $r->fetch_row();
-            $redirect_url = "{$this->service->baseHref}/{$row[0]}/";
-            //// Redirect to first category if no category selected
-            return $this->response->redirect($redirect_url);
-        } else {
-            return $this->app->srvc->abort('Error', 'No category found.');
-        }
+        );
+        $row = $r->fetch();
+        $r = null;
+        if (!$row)
+            return $this->app->feedsrvc->abort('Error', 'No category found.');
+        
+        $redirect_url = $this->request->uri() . "{$row['ID_CAT']}/";
+        //// Redirect to first category if no category selected
+        return $this->redirect($redirect_url);
+
     } // root()
     
     /*
@@ -116,9 +117,9 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->service->cat = $this->request->cat;
         $this->service->board = $this->request->board;
     
-        $redirect_url = "{$this->service->baseHref}/{$posts[0]['ID_CAT']}/{$this->request->board}/";
         if (count($posts) > 0 && $posts[0]['ID_CAT'] != $this->request->cat) {
             // Board was moved to other category, redirect user to proper cat.
+            $redirect_url = "{$this->service->baseHref}/{$posts[0]['ID_CAT']}/{$this->request->board}/";
             return $this->response->redirect($redirect_url);
         }
     
@@ -130,7 +131,7 @@ Class Render extends \Prodigy\Respond\Respond {
             $this->service->posts = array_merge($posts_sticky, $posts);
         
         if (count($this->service->posts) == 0) {
-            return $this->app->srvc->abort('Error', 'No posts in this board.');
+            return $this->app->feedsrvc->abort('Error', 'No posts in this board.');
         }
         
         $this->service->title = $this->service->menuCatNames[$this->request->cat] . ' &#12299; ' . $this->service->menu[$this->request->cat][$this->request->board]['boardname'];
@@ -147,7 +148,7 @@ Class Render extends \Prodigy\Respond\Respond {
         
         $this->service->rss_link = true;
         
-        $this->service->render('articles.php');
+        $this->render('feed/articles.php');
      
     } // board()
     
@@ -172,7 +173,7 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->service->board = $this->request->board;
         
         if ($r->num_rows == 0) {
-            return $this->app->srvc->abort('Error', 'Post not found.');
+            return $this->app->feedsrvc->abort('Error', 'Post not found.');
         }
         
         $post = $r->fetch_assoc();
@@ -186,20 +187,20 @@ Class Render extends \Prodigy\Respond\Respond {
             return $this->response->redirect("{$redirect_url}edit/");
         }
         
-        if (!$this->app->srvc->editAllowed($this->request->cat, $this->request->board)) {
-            $this->app->srvc->abort('Error', 'Access denied.');
+        if (!$this->app->feedsrvc->editAllowed($this->request->cat, $this->request->board)) {
+            $this->app->feedsrvc->abort('Error', 'Access denied.');
             return;
         }
         
         if (is_null($post['fID'])) {
             //// Try to create subject from content
-            $autosubject = $this->app->srvc->autosubject($post['subject'], $post['body']);
+            $autosubject = $this->app->feedsrvc->autosubject($post['subject'], $post['body']);
             if (is_array($autosubject)) {
                 $post['subject'] = "{$autosubject[0]} &#12299; {$autosubject[1]}";
             }
         }
         
-        $this->app->srvc->sessionRequire();
+        $this->app->feedsrvc->sessionRequire();
         
         if($this->request->method() == 'POST') {
             $this->service->validateParam('subject', 'Empty subject.')->isLen(1, 256);
@@ -211,7 +212,7 @@ Class Render extends \Prodigy\Respond\Respond {
                 $post['subject'] = $this->request->param('subject');
                 $post['annotation'] = $this->request->param('annotation', '');
                 $this->service->sticky = $this->request->param('sticky');
-                $this->app->srvc->build_menu();
+                $this->app->feedsrvc->build_menu();
             }
             elseif ($this->request->param('save', false)) {
                 //// Save annotation
@@ -235,7 +236,7 @@ Class Render extends \Prodigy\Respond\Respond {
                 return $this->response->redirect($redirect_url);
             }
             else {
-                return $this->app->srvc->abort('Error', 'Bad request.');
+                return $this->app->feedsrvc->abort('Error', 'Bad request.');
             }
         } // If method POST
         
@@ -250,28 +251,42 @@ Class Render extends \Prodigy\Respond\Respond {
      * Article page renderer
      */
     public function article() {
+        $check_roskolhoznadzor = $this->app->conf->get('roskolhoznadzor');
+        
         $dbprefix = $this->app->db->db_prefix;
-        $r = $this->app->db->query(
-            "SELECT STRAIGHT_JOIN m.ID_MSG, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(f.subject, m.subject) as subject, annotation, body, IFNULL(mem.realName, mem.memberName) as realname,  mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, f.sticky, f.ID_MSG AS fID
+        $r = $this->app->db->prepare(
+            "SELECT STRAIGHT_JOIN m.ID_MSG, m.status, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(f.subject, m.subject) as subject, annotation, body, IFNULL(mem.realName, mem.memberName) as realname,  mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, f.sticky, f.ID_MSG AS fID
                 FROM {$dbprefix}messages m
                 LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
                 LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
                 LEFT JOIN {$dbprefix}members mem ON m.ID_MEMBER = mem.ID_MEMBER
                 LEFT JOIN {$dbprefix}feed f ON m.ID_MSG = f.ID_MSG
                 LEFT JOIN {$dbprefix}members lm ON annotatedBy = lm.ID_MEMBER
-                WHERE m.ID_MSG = {$this->request->postid}"
-        ) or database_error(__FILE__, __LINE__, $this->app->db);
-        
+                WHERE m.ID_MSG = ?"
+        );
+        $r->execute(array($this->request->postid));
+        $posts = $r->fetchAll();
+        $r = null;
         $this->service->cat = $this->request->cat;
         $this->service->board = $this->request->board;
         
-        if ($r->num_rows == 0) {
-            return $this->app->srvc->abort('Error', 'Post not found.');
+        if (empty($posts)) {
+            return $this->app->feedsrvc->abort('Error', 'Post not found.');
         }
         
-        $posts = array();
-        while ($row = $r->fetch_assoc()) {
-            $posts[] = $row;
+        foreach ($posts as $post) {
+            if ($check_roskolhoznadzor) {
+                if ($post['status'] >= 400) {
+                    // Article is blocked
+                    return $this->app->feedsrvc->httpError($row['status']);
+                }
+                
+                if ($this->service->username == 'Guest' && $is_roskolhoz = $this->app->collection->Security->is_roskolhoznadzor()) {
+                    $this->app->collection->Display->roskolhoznadzor_block($row,  $is_roskolhoz); // block the artticle
+                    
+                    return $this->response->redirect($this->service->baseHref . $this->request->uri()); // reload the page
+                }
+            }
         }
     
         $redirect_url = "{$this->service->baseHref}/{$posts[0]['ID_CAT']}/{$posts[0]['ID_BOARD']}/{$this->request->postid}/";
@@ -284,7 +299,7 @@ Class Render extends \Prodigy\Respond\Respond {
         
         if (is_null($posts[0]['fID'])) {
             //// Try to create subject from content
-            $autosubject = $this->app->srvc->autosubject($posts[0]['subject'], $posts[0]['body']);
+            $autosubject = $this->app->feedsrvc->autosubject($posts[0]['subject'], $posts[0]['body']);
             if (is_array($autosubject)) {
                 $posts[0]['subject'] = "{$autosubject[0]} &#12299; {$autosubject[1]}";
                 $this->service->title = $autosubject[1];
@@ -299,7 +314,7 @@ Class Render extends \Prodigy\Respond\Respond {
         $GLOBALS['opengraph'] = array(
             'title' => mb_convert_encoding($posts[0]['subject'], 'HTML-ENTITIES', $this->app->db->db_charset),
             'description' => mb_convert_encoding(
-                $this->app->srvc->plainText($AnnotationAndBody, 200),
+                $this->app->feedsrvc->plainText($AnnotationAndBody, 200),
                 'HTML-ENTITIES', $this->app->db->db_charset),
             'url' => $redirect_url
         );
@@ -330,7 +345,7 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->service->posts = $posts;
         $this->service->post_view = true;
         
-        $this->service->render('articles.php');
+        $this->render('feed/articles.php');
         return $this->response;
     } // article()
     
@@ -373,17 +388,17 @@ Class Render extends \Prodigy\Respond\Respond {
         
         foreach ($posts as &$post) {
             //// Preparing all output strings 
-            $post['subject'] = $this->app->srvc->string4rss($post['subject']);
-            $post['body'] = $this->app->srvc->plainText($post['body'], 256);
-            $post['body'] = $this->app->srvc->string4rss($post['body']);
-            $post['annotation'] = $this->app->srvc->plainText($post['annotation']);
-            $post['annotation'] = $this->app->srvc->string4rss($post['annotation']);
-            $post['rss-cat'] = $this->app->srvc->string4rss($this->service->menu[$post['ID_CAT']][$post['ID_BOARD']]['boardname']);
+            $post['subject'] = $this->app->feedsrvc->string4rss($post['subject']);
+            $post['body'] = $this->app->feedsrvc->plainText($post['body'], 256);
+            $post['body'] = $this->app->feedsrvc->string4rss($post['body']);
+            $post['annotation'] = $this->app->feedsrvc->plainText($post['annotation']);
+            $post['annotation'] = $this->app->feedsrvc->string4rss($post['annotation']);
+            $post['rss-cat'] = $this->app->feedsrvc->string4rss($this->service->menu[$post['ID_CAT']][$post['ID_BOARD']]['boardname']);
         }
         
         $this->service->pub_date = date('r', $posts[0]['date']);
         
-        $this->service->title = $this->app->srvc->string4rss($this->service->title);
+        $this->service->title = $this->app->feedsrvc->string4rss($this->service->title);
         
         $this->service->posts = $posts;
         

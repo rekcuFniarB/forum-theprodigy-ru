@@ -645,6 +645,11 @@ class Service extends \Klein\ServiceProvider
             // probably already utf-8, just return as is
             return $txt;
     } // utf8
+    
+    public function strip_bb_code($text) {
+        $pattern = '~\[[^\]]+\]~';
+        return preg_replace($pattern, ' ', $text);
+    }
 }
 
 ?>

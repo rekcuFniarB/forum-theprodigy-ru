@@ -21,40 +21,53 @@ class DataQuery {
         $dbprefix = $this->db->db_prefix;
         $q_before = '';
         $before = $this->service->before;
-        if ($before > 0)
-            $q_before = "AND f.ID_MSG < $before";
+        $q_params = array();
         
-        if ($this->request->cat == 0 || $sticky == 2)
+        if ($this->request->cat == 0 || $sticky == 2) {
             $whereCat = "<> 0";
-        else
-            $whereCat = "= {$this->request->cat}";
+        }
+        else {
+            $whereCat = "= ?";
+            $q_params[] = $this->request->cat;
+        }
+        if ($before > 0) {
+            $q_before = "AND f.ID_MSG < ?";
+            $q_params[] = $before;
+        }
         
+        $q_params[] = $sticky;
         $qlimit = $this->service->paginateBy + 1;
+        $q_params[] = $qlimit;
         
         $posts = array();
     
         //// Get annotated messages from selected category
-        $r = $this->db->query(
-            "SELECT STRAIGHT_JOIN f.ID_MSG, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(f.subject, m.subject) as subject, annotation, body, IFNULL(mem.realName, mem.memberName) as realname, mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, f.sticky, f.ID_MSG AS fID
+        $r = $this->db->prepare(
+            "SELECT STRAIGHT_JOIN f.ID_MSG, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(f.subject, m.subject) as subject, annotation, body, m.status, IFNULL(mem.realName, mem.memberName) as realname, mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, f.sticky, f.ID_MSG AS fID
                 FROM {$dbprefix}feed f
                 JOIN {$dbprefix}messages m ON f.ID_MSG = m.ID_MSG
                 LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
                 LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
                 LEFT JOIN {$dbprefix}members mem ON m.ID_MEMBER = mem.ID_MEMBER
                 LEFT JOIN {$dbprefix}members lm ON annotatedBy = lm.ID_MEMBER
-                WHERE b.ID_CAT $whereCat $q_before AND f.sticky = $sticky
-                ORDER BY f.ID_MSG DESC LIMIT $qlimit"
-        ) or database_error(__FILE__, __LINE__, $this->db);
+                WHERE b.ID_CAT $whereCat $q_before AND f.sticky = ?
+                ORDER BY f.ID_MSG DESC LIMIT ?"
+        );
+        $r->execute($q_params);
+        $posts = $r->fetchAll();
+        $r = null;
         
-        if ($r->num_rows == 0) {
-            return $posts;
+        if (!$posts) {
+            return array();
         }
         
-        while ($row = $r->fetch_assoc()) {
-            $posts[] = $row;
-        }
-    
-        if ($r->num_rows > $this->service->paginateBy) {
+        // FIXME probably should do it in template instead
+        // due to it may break pagination.
+        $posts = array_filter($posts, function($pst) {
+            return $pst['status'] < 400;
+        });
+        
+        if (count($posts) > $this->service->paginateBy) {
             $this->service->next_page_available = true;
             unset($posts[$this->service->paginateBy]);
         }
@@ -80,9 +93,9 @@ class DataQuery {
         
         //// Get non annotated messages of category
         $r = $this->db->query(
-            "SELECT STRAIGHT_JOIN tmp.ID_MSG, date, IFNULL(f.subject, tmp.subject) as subject, body, author, tmp.realname, boardname, ID_CAT, ID_BOARD, annotation, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, f.ID_MSG AS fID
+            "SELECT STRAIGHT_JOIN tmp.ID_MSG, date, IFNULL(f.subject, tmp.subject) as subject, body, tmp.status, author, tmp.realname, boardname, ID_CAT, ID_BOARD, annotation, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, f.ID_MSG AS fID
                 FROM (
-                    SELECT STRAIGHT_JOIN ID_MSG, posterTime as date, subject, body, mem.memberName AS author, IFNULL(mem.realName, mem.memberName) AS realname, b.name AS boardname, b.ID_CAT, b.ID_BOARD
+                    SELECT STRAIGHT_JOIN ID_MSG, posterTime as date, subject, body, m.status, mem.memberName AS author, IFNULL(mem.realName, mem.memberName) AS realname, b.name AS boardname, b.ID_CAT, b.ID_BOARD
                     FROM {$dbprefix}messages m
                     LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
                     LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
@@ -107,7 +120,11 @@ class DataQuery {
                     $row['subject'] = "{$autosubject[0]} &#12299; {$autosubject[1]}";
                 }
             }
-            $posts[] = $row;
+            
+            // Skip censored posts
+            if ($row['status'] < 400)
+                $posts[] = $row;
+            
         }
         
         if ($r->num_rows > $this->service->paginateBy) {
@@ -122,37 +139,46 @@ class DataQuery {
         //// Pagination param
         $q_before = '';
         $before = $this->service->before;
-        if ($before > 0)
-            $q_before = "AND f.ID_MSG < $before";
+        $q_params = array();
+        $q_params[] = $this->request->board;
         
+        if ($before > 0) {
+            $q_before = "AND f.ID_MSG < ?";
+            $q_params[] = $before;
+        }
         $dbprefix = $this->db->db_prefix;
         
-        $qlimit = $this->service->paginateBy + 1;
+        $q_params[] = $this->service->paginateBy + 1;
         
         $posts = array();
         
         //// Get annotated messages of selected board
-        $r = $this->db->query(
-            "SELECT STRAIGHT_JOIN f.ID_MSG, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(f.subject, m.subject) as subject, annotation, body, IFNULL(mem.realName, mem.memberName) as realname, mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, f.sticky, f.ID_MSG AS fID
+        $r = $this->db->prepare(
+            "SELECT STRAIGHT_JOIN f.ID_MSG, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(f.subject, m.subject) as subject, annotation, body, m.status, IFNULL(mem.realName, mem.memberName) as realname, mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, f.sticky, f.ID_MSG AS fID
                 FROM {$dbprefix}feed f
                 JOIN {$dbprefix}messages m ON f.ID_MSG = m.ID_MSG
                 LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
                 LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
                 LEFT JOIN {$dbprefix}members mem ON m.ID_MEMBER = mem.ID_MEMBER
                 LEFT JOIN {$dbprefix}members lm ON annotatedBy = lm.ID_MEMBER
-                WHERE b.ID_BOARD = {$this->request->board} $q_before AND f.sticky = 0
-                ORDER BY ID_MSG DESC LIMIT $qlimit"
-        ) or database_error(__FILE__, __LINE__, $this->db);
+                WHERE b.ID_BOARD = ? $q_before AND f.sticky = 0
+                ORDER BY ID_MSG DESC LIMIT ?"
+        );
+        $r->execute($q_params);
+        $posts = $r->fetchAll();
+        $r = null;
         
-        if ($r->num_rows == 0) {
-            return $posts;
+        if (!$posts) {
+            return array();
         }
         
-        while ($row = $r->fetch_assoc()) {
-            $posts[] = $row;
-        }
-    
-        if ($r->num_rows > $this->service->paginateBy) {
+        // FIXME probably shoud do it in template instead
+        // due to it may break pagination.
+        $posts = array_filter($posts, function($pst) {
+            return $pst['status'] < 400;
+        });
+            
+        if (count($posts) > $this->service->paginateBy) {
             $this->service->next_page_available = true;
             unset($posts[$this->service->paginateBy]);
         }
@@ -175,9 +201,9 @@ class DataQuery {
         
             //// Get non annotated messages of selected board
             $r = $this->db->query(
-                "SELECT STRAIGHT_JOIN tmp.ID_MSG, date, IFNULL(f.subject, tmp.subject) as subject, body, author, tmp.realname, boardname, ID_CAT, ID_BOARD, annotation, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, f.sticky, f.ID_MSG AS fID
+                "SELECT STRAIGHT_JOIN tmp.ID_MSG, date, IFNULL(f.subject, tmp.subject) as subject, body, tmp.status, author, tmp.realname, boardname, ID_CAT, ID_BOARD, annotation, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, f.sticky, f.ID_MSG AS fID
                    FROM (
-                     SELECT STRAIGHT_JOIN ID_MSG, posterTime as date, subject, body, mem.memberName AS author, IFNULL(mem.realName, mem.memberName) AS realname, b.name AS boardname, b.ID_CAT, b.ID_BOARD
+                     SELECT STRAIGHT_JOIN ID_MSG, posterTime as date, subject, body, m.status, mem.memberName AS author, IFNULL(mem.realName, mem.memberName) AS realname, b.name AS boardname, b.ID_CAT, b.ID_BOARD
                        FROM {$dbprefix}messages m
                        LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
                        LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
@@ -202,7 +228,9 @@ class DataQuery {
                     $row['subject'] = "{$autosubject[0]} &#12299; {$autosubject[1]}";
                 }
             }
-            $posts[] = $row;
+            // Skip censored articles
+            if ($row['status'] < 400)
+                $posts[] = $row;
         }
         
         if ($r->num_rows > $this->service->paginateBy) {

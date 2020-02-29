@@ -31,9 +31,26 @@ Class Service {
         $this->service->menuCatNames = $catnames;
     }
     
+    public function httpError($code=404) {
+        return $this->abort(null, null, $code);
+    }
+    
     //// Custom error page
-    public function abort($title='Error', $msg='', $code=404) {
+    public function abort($title='', $msg='', $code=404) {
         $response = $this->app->main->response();
+        
+        if (empty($msg))
+            if ($this->app->lng->isset("errors.$code.msg"))
+                $msg = $this->app->lng->get("errors.$code.msg");
+            else
+                $msg = $this->app->lng->get("errors.default.msg");
+            
+            if (empty($title))
+                if ($this->app->lng->isset("errors.$code.title"))
+                    $title = $this->app->lng->get("errors.$code.title");
+                else
+                    $title = $this->app->lng->get("errors.default.title");
+        
         $response->code($code);
         $this->service->title = $title;
         $this->service->message = $msg;
@@ -53,7 +70,7 @@ Class Service {
         if (mb_strlen($tmp_str, $enc) > $len) {
             $this->service->cut = true;
             $tmp_str = mb_substr($tmp_str, 0, $len, $enc);
-            $tmp_str = str_replace("\n", '<br>', $tmp_str);
+            $tmp_str = preg_replace("#\n+#", "<br>\n", $tmp_str);
             return $tmp_str;
         } else {
             $this->service->cut = false;
@@ -77,7 +94,7 @@ Class Service {
             $autosubject = $body;
         }
 
-        $autosubject = strip_bb_code(str_replace(array("\n", "\r", '<br>', '<br />', '<br/>'), ' ', $autosubject));
+        $autosubject = $this->service->strip_bb_code(str_replace(array("\n", "\r", '<br>', '<br />', '<br/>'), ' ', $autosubject));
         //// strip urls
         $autosubject_tmp = preg_replace('#https?://\S+#', '', $autosubject);
         $autosubject = mb_substr($autosubject_tmp, 0, 40, $enc);
@@ -108,12 +125,12 @@ Class Service {
     
     //// remove bb code and links and return plain text
     public function plainText($str, $cut=0) {
-        $str = strip_bb_code(str_replace(array("\n", "\r", '<br>', '<br />', '<br/>'), ' ', $str));
+        $str = $this->service->strip_bb_code(str_replace(array("\n", "\r", '<br>', '<br />', '<br/>'), ' ', $str));
         //// strip urls
         $str = preg_replace('#https?://\S+#', '', $str);
         if ($cut > 0) {
             $str = mb_substr($str, 0, $cut, $this->app->db->db_charset);
-            $last_space = mb_strrpos($autosubject, ' ', 0, $this->app->db->db_charset);
+            $last_space = mb_strrpos($str, ' ', 0, $this->app->db->db_charset);
             if ($last_space !== false && $last_space > 0) {
                 $str = mb_substr($str, 0, $last_space, $this->app->db->db_charset);
                 if ($str != '')
