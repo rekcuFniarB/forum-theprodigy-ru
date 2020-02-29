@@ -723,6 +723,7 @@ class InstantMessages extends Respond
         {
             $GET = $request->paramsGet();
             $form_subject = $GET->form_subject;
+            $service->imto = $GET->to;
             
             if (!empty($PARAMS->imsg))
             {

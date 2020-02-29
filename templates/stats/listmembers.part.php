@@ -2,7 +2,7 @@
   <tr>
     <td class="windowbg2" bgcolor="<?= $this->color['windowbg2'] ?>" align="center">
       <font size="2">
-        <a href="<?= SITE_ROOT ?>/im/send/<?= rawurlencode($member['memberName']) ?>/"><?= $member['online'] ?>
+        <a href="<?= SITE_ROOT ?>/im/new/?to=<?= rawurlencode($member['memberName']) ?>"><?= $member['online'] ?>
       </font>
     </td>
     <td class="windowbg" bgcolor="<?=  $this->color['windowbg'] ?>">

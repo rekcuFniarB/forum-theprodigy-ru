@@ -154,9 +154,9 @@
             
             <?php if($this->conf->onlineEnable && $msg['author']['found']): ?>
               <?php if($msg['isOnline']): ?>
-                <a href="<?= SITE_ROOT?>/im/new/<?= urlencode($msg['author']['name']) ?>/"><?= $this->locale->online2 ?></a>
+                <a href="<?= SITE_ROOT?>/im/new/?to=<?= urlencode($msg['author']['name']) ?>"><?= $this->locale->online2 ?></a>
               <?php else: ?>
-                <a href="<?= SITE_ROOT?>/im/new/<?= urlencode($msg['author']['name']) ?>/"><?= $this->locale->online3 ?></a>
+                <a href="<?= SITE_ROOT?>/im/new/?to=<?= urlencode($msg['author']['name']) ?>"><?= $this->locale->online3 ?></a>
               <?php endif; ?>
               <br><br>
             <?php endif; ?>

@@ -286,11 +286,11 @@
                           <p class="online">
                             <?php if($this->conf->onlineEnable): ?>
                               <?php if ($msg['isOnline'] > 0): ?>
-                                <a href="<?= SITE_ROOT ?>/im/sendto/<?= urlencode($msg['posterName']) ?>/"><?= $this->locale->online2 ?>
+                                <a href="<?= SITE_ROOT ?>/im/new/?to=<?= urlencode($msg['posterName']) ?>"><?= $this->locale->online2 ?>
                                 <br>
                                 <br>
                               <?php else: ?>
-                                <a href="<?= SITE_ROOT ?>/im/sendto/<?= urlencode($msg['posterName']) ?>/"><?= $this->locale->online3 ?>
+                                <a href="<?= SITE_ROOT ?>/im/new/?to=<?= urlencode($msg['posterName']) ?>"><?= $this->locale->online3 ?>
                               <?php endif; ?>
                             <?php endif; ?>
                           </p>
@@ -299,7 +299,7 @@
                             <?= $msg['userset']['personalText'] ?>
                           </p>
                           <p class="otherinfo">
-                            <a class="euser" href="<?= SITE_ROOT ?>/im/sendto/<?= urlencode($msg['posterName']) ?>/" target="_blank"><img src="<?= STATIC_ROOT ?>/img/YaBBImages/private_message.png" title="<?= $this->locale->txt[516] ?>" border="0" /></a> 
+                            <a class="euser" href="<?= SITE_ROOT ?>/im/new/?to=<?= urlencode($msg['posterName']) ?>" target="_blank"><img src="<?= STATIC_ROOT ?>/img/YaBBImages/private_message.png" title="<?= $this->locale->txt[516] ?>" border="0" /></a> 
                             <?= $msg['userset']['websiteUrl'] ?>
                             <?= $msg['userset']['yimon'] ?>
                             <?= $msg['userset']['ICQ'] ?>
@@ -578,9 +578,9 @@
 
                     <?php if ($this->user->name != 'Guest'): ?>
                       <?php if($msg['isOnline']): ?>
-                        <a href="<?= SITE_ROOT ?>/im/sendto/<?= urlencode($msg['posterName']) ?>/"><?= $this->locale->message_sm_on ?></a>
+                        <a href="<?= SITE_ROOT ?>/im/new/?to=<?= urlencode($msg['posterName']) ?>"><?= $this->locale->message_sm_on ?></a>
                       <?php else: ?>
-                        <a href="<?= SITE_ROOT ?>/im/sendto/<?= urlencode($msg['posterName']) ?>/"><?= $this->locale->message_sm_on ?></a>
+                        <a href="<?= SITE_ROOT ?>/im/new/?to=<?= urlencode($msg['posterName']) ?>"><?= $this->locale->message_sm_on ?></a>
                       <?php endif; ?>
                     <?php endif; ?>
                   <?php endif; /* profilebutton */ ?>

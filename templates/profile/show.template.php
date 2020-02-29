@@ -462,7 +462,7 @@
         <td bgcolor="<?= $this->color['windowbg2'] ?>" class="windowbg2 userinfo" valign="top">
           <font size="2">
             <?= $this->locale->txt['113'] ?>
-            <i><a href="<?= SITE_ROOT ?>/im/send/<?= urlencode($this->meminf['memberName']) ?>/"><!--
+            <i><a href="<?= SITE_ROOT ?>/im/new/?to=<?= urlencode($this->meminf['memberName']) ?>"><!--
             <?php if($this->meminf['online'] > 0): ?>
                 --><?= $this->locale->online2 ?><!--
             <?php else: ?>
@@ -470,7 +470,7 @@
             <?php endif; ?>
             --></a></i>
             <br><br>
-            <a href="<?= SITE_ROOT ?>/im/send/<?= urlencode($this->meminf['memberName']) ?>/"><?= $this->locale->txt[688] ?></a>.
+            <a href="<?= SITE_ROOT ?>/im/new/?to=<?= urlencode($this->meminf['memberName']) ?>"><?= $this->locale->txt[688] ?></a>.
             <br><br>
           </font>
         </td>
