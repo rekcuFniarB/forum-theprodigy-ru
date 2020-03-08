@@ -75,18 +75,18 @@ Class Render extends \Prodigy\Respond\Respond {
         }
         
         if ($request->cat == 0) {
-            $service->title = $service->txt['feed_all_cats'];
+            $service->title = $app->locale->txt['feed_all_cats'];
         } else {
             $service->title = $service->menuCatNames[$request->cat];
         }
         
         if ($all)
-            $service->title .= " ({$service->txt['feed_unfiltered']})";
+            $service->title .= " ({$app->locale->txt['feed_unfiltered']})";
         
         //// Build opengraph data
         $GLOBALS['opengraph'] = array(
             'title' => mb_convert_encoding($service->title, 'HTML-ENTITIES', $app->db->db_charset),
-            'url' => $service->baseHref . $request->uri(),
+            'url' => $service->siteurl . $request->uri(),
             'image' => "{$service->protocol}{$service->host}/YaBBImages/opengraph_bg.png"
         );
         
@@ -121,7 +121,7 @@ Class Render extends \Prodigy\Respond\Respond {
     
         if (count($posts) > 0 && $posts[0]['ID_CAT'] != $this->request->cat) {
             // Board was moved to other category, redirect user to proper cat.
-            $redirect_url = "{$this->service->baseHref}/{$posts[0]['ID_CAT']}/{$this->request->board}/";
+            $redirect_url = "{$this->service->httphost}{$this->service->namespace}/{$posts[0]['ID_CAT']}/{$this->request->board}/";
             return $this->response->redirect($redirect_url);
         }
     
@@ -134,18 +134,19 @@ Class Render extends \Prodigy\Respond\Respond {
         
         if (count($this->service->posts) == 0) {
             return $this->app->feedsrvc->abort('Error', 'No posts in this board.');
+            //return $this->error('No posts in this board.');
         }
         
         $this->service->title = $this->service->menuCatNames[$this->request->cat] . ' &#12299; ' . $this->service->menu[$this->request->cat][$this->request->board]['boardname'];
         
         if ($all)
-            $this->service->title .= " ({$this->service->txt['feed_unfiltered']})";
+            $this->service->title .= " ({$this->app->locale->txt['feed_unfiltered']})";
         
         //// Build opengraph data
         $GLOBALS['opengraph'] = array(
             'title' => mb_convert_encoding($this->service->title, 'HTML-ENTITIES', $this->app->db->db_charset),
-            'url' => $this->service->baseHref . $this->request->uri(),
-            'image' => "{$this->service->protocol}{$this->service->host}/YaBBImages/opengraph_bg.png"
+            'url' => $this->service->siteurl . $this->request->uri(),
+            'image' => $this->service->httphost . STATIC_ROOT . "/img/YaBBImages/opengraph_bg.png"
         );
         
         $this->service->rss_link = true;
@@ -182,7 +183,7 @@ Class Render extends \Prodigy\Respond\Respond {
         
         $this->service->sticky = $post['sticky'];
         
-        $redirect_url = "{$this->service->baseHref}/{$post['ID_CAT']}/{$post['ID_BOARD']}/{$this->request->postid}/";
+        $redirect_url = "{$this->service->httphost}{$this->service->namespace}/{$post['ID_CAT']}/{$post['ID_BOARD']}/{$this->request->postid}/";
     
         if($this->request->cat != $post['ID_CAT'] || $this->request->board != $post['ID_BOARD']) {
             //// Redirect to proper place if post was moved
@@ -274,6 +275,7 @@ Class Render extends \Prodigy\Respond\Respond {
         
         if (empty($posts)) {
             return $this->app->feedsrvc->abort('Error', 'Post not found.');
+            //return $this->error('Post not found.');
         }
         
         foreach ($posts as $post) {
@@ -286,12 +288,12 @@ Class Render extends \Prodigy\Respond\Respond {
                 if ($this->service->username == 'Guest' && $is_roskolhoz = $this->app->collection->Security->is_roskolhoznadzor()) {
                     $this->app->collection->Display->roskolhoznadzor_block($row,  $is_roskolhoz); // block the artticle
                     
-                    return $this->response->redirect($this->service->baseHref . $this->request->uri()); // reload the page
+                    return $this->response->redirect($this->service->httphost . $this->request->uri()); // reload the page
                 }
             }
         }
     
-        $redirect_url = "{$this->service->baseHref}/{$posts[0]['ID_CAT']}/{$posts[0]['ID_BOARD']}/{$this->request->postid}/";
+        $redirect_url = "{$this->service->httphost}{$this->service->namespace}/{$posts[0]['ID_CAT']}/{$posts[0]['ID_BOARD']}/{$this->request->postid}/";
         if($this->request->cat != $posts[0]['ID_CAT'] || $this->request->board != $posts[0]['ID_BOARD']) {
             //// Redirect to proper place if post was moved
             return $this->response->redirect($redirect_url);
@@ -351,6 +353,13 @@ Class Render extends \Prodigy\Respond\Respond {
         return $this->response;
     } // article()
     
+    public function boardrss() {
+        return $this->rss('board');
+    }
+    public function catrss() {
+        return $this->rss('cat');
+    }
+    
     /**
      * Render RSS
      * @param string $what what to render. Possible values 'cat' for category or 'board' for board.
@@ -361,7 +370,7 @@ Class Render extends \Prodigy\Respond\Respond {
         $posts = array();
         if ($what == 'cat') {
             if ($this->request->cat == 0) {
-                $this->service->title = $this->service->txt['feed_all_cats'];
+                $this->service->title = $this->app->locale->txt['feed_all_cats'];
             } else {
                 $this->service->title = $this->service->menuCatNames[$this->request->cat];
             }
@@ -372,7 +381,7 @@ Class Render extends \Prodigy\Respond\Respond {
                 $posts = $this->app->feedData->getAnnotatedCat();
             }
             
-            $this->service->main_link = "{$this->service->baseHref}/{$this->request->cat}/";
+            $this->service->main_link = "{$this->service->siteurl}/feed/{$this->request->cat}/";
         } else {
             $this->service->title = $this->service->menuCatNames[$this->request->cat] . ' &#12299; ' . $this->service->menu[$this->request->cat][$this->request->board]['boardname'];
             
@@ -382,11 +391,11 @@ Class Render extends \Prodigy\Respond\Respond {
                 $posts = $this->app->feedData->getAnnotatedBoard();
             }
             
-            $this->service->main_link = "{$this->service->baseHref}/{$this->request->cat}/{$this->request->board}/";
+            $this->service->main_link = "{$this->service->siteurl}/feed/{$this->request->cat}/{$this->request->board}/";
         }
         
         if (isset($this->request->all))
-                $this->service->title .= " ({$this->service->txt['feed_unfiltered']})";
+                $this->service->title .= " ({$this->app->locale->txt['feed_unfiltered']})";
         
         foreach ($posts as &$post) {
             //// Preparing all output strings 
@@ -405,8 +414,8 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->service->posts = $posts;
         
         $this->response->header('Content-Type', 'application/rss+xml; charset=UTF-8');
-        $this->service->layout('rss.php');
-        $this->service->render('rss.php');
+        $this->service->layout(PROJECT_ROOT . '/templates/feed/rss.php');
+        $this->service->render(PROJECT_ROOT . '/templates/feed/rss.php');
         return $this->response;
     } // rss()
 }

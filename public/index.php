@@ -64,7 +64,8 @@ $router->respond(function($request, $response, $service, $app, $router) {
     
     $service->protocol = $protocol;
     $service->host = $host;
-    $service->siteurl = $protocol . $host . SITE_ROOT;
+    $service->httphost = "$protocol$host";
+    $service->siteurl = $protocol . $host . SITE_ROOT; // with install prefix dir
     //$service->baseHref = "$protocol$host{$service->appDir}";
     define('SITE_URL', $service->siteurl);
     

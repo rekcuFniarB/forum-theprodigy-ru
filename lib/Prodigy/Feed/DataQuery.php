@@ -79,20 +79,26 @@ class DataQuery {
         $dbprefix = $this->db->db_prefix;
         $q_before = '';
         $before = $this->service->before;
-        if ($before > 0)
-            $q_before = "AND ID_MSG < $before";
+        $q_args = array();
         
         if ($this->request->cat == 0)
             $whereCat = "<> 0";
-        else
-            $whereCat = "= {$this->request->cat}";
+        else {
+            $whereCat = "= ?";
+            $q_args[] = $this->request->cat;
+        }
         
-        $qlimit = $this->service->paginateBy + 1;
+        if ($before > 0) {
+            $q_before = "AND ID_MSG < ?";
+            $q_args[] = $before;
+        }
+        
+        $q_args[] = $this->service->paginateBy + 1;
         
         $posts = array();
         
         //// Get non annotated messages of category
-        $r = $this->db->query(
+        $r = $this->db->prepare(
             "SELECT STRAIGHT_JOIN tmp.ID_MSG, date, IFNULL(f.subject, tmp.subject) as subject, body, tmp.status, author, tmp.realname, boardname, ID_CAT, ID_BOARD, annotation, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, f.ID_MSG AS fID
                 FROM (
                     SELECT STRAIGHT_JOIN ID_MSG, posterTime as date, subject, body, m.status, mem.memberName AS author, IFNULL(mem.realName, mem.memberName) AS realname, b.name AS boardname, b.ID_CAT, b.ID_BOARD
@@ -101,21 +107,23 @@ class DataQuery {
                     LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
                     LEFT JOIN {$dbprefix}members mem ON m.ID_MEMBER = mem.ID_MEMBER
                     WHERE b.ID_CAT $whereCat $q_before
-                    ORDER BY m.ID_MSG DESC LIMIT $qlimit
+                    ORDER BY m.ID_MSG DESC LIMIT ?
                 ) tmp
                 LEFT JOIN {$dbprefix}feed f ON f.ID_MSG = tmp.ID_MSG
                 LEFT JOIN {$dbprefix}members lm ON annotatedBy = lm.ID_MEMBER
                 ORDER BY tmp.ID_MSG DESC"
-            ) or database_error(__FILE__, __LINE__, $this->db);
-            
-        if ($r->num_rows == 0) {
-            return $posts;
+            );
+        $r->execute($q_args);
+        $rows = $r->fetchAll();
+        $r = null;
+        if (empty($rows)) {
+            return $posts; // empty array
         }
         
-        while ($row = $r->fetch_assoc()) {
+        foreach ($rows as $row) {
             if (is_null($row['fID'])) {
                 //// Try to create subject from content
-                $autosubject = $this->service->app->srvc->autosubject($row['subject'], $row['body']);
+                $autosubject = $this->app->feedsrvc->autosubject($row['subject'], $row['body']);
                 if (is_array($autosubject)) {
                     $row['subject'] = "{$autosubject[0]} &#12299; {$autosubject[1]}";
                 }
@@ -127,7 +135,7 @@ class DataQuery {
             
         }
         
-        if ($r->num_rows > $this->service->paginateBy) {
+        if (count($rows) > $this->service->paginateBy) {
             $this->service->next_page_available = true;
             unset($posts[$this->service->paginateBy]);
         }
@@ -189,18 +197,22 @@ class DataQuery {
     public function getNonAnnotatedBoard() {
         //// Pagination param
         $q_before = '';
+        $q_args = array($this->request->board);
         $before = $this->service->before;
-        if ($before > 0)
-            $q_before = "AND m.ID_MSG < $before";
+        
+        if ($before > 0) {
+            $q_before = "AND m.ID_MSG < ?";
+            $q_args[] = $before;
+        }
         
         $dbprefix = $this->db->db_prefix;
         
-        $qlimit = $this->service->paginateBy + 1;
+        $q_args[] = $this->service->paginateBy + 1;
         
         $posts = array();
         
             //// Get non annotated messages of selected board
-            $r = $this->db->query(
+            $r = $this->db->prepare(
                 "SELECT STRAIGHT_JOIN tmp.ID_MSG, date, IFNULL(f.subject, tmp.subject) as subject, body, tmp.status, author, tmp.realname, boardname, ID_CAT, ID_BOARD, annotation, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, f.sticky, f.ID_MSG AS fID
                    FROM (
                      SELECT STRAIGHT_JOIN ID_MSG, posterTime as date, subject, body, m.status, mem.memberName AS author, IFNULL(mem.realName, mem.memberName) AS realname, b.name AS boardname, b.ID_CAT, b.ID_BOARD
@@ -208,22 +220,25 @@ class DataQuery {
                        LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
                        LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
                        LEFT JOIN {$dbprefix}members mem ON m.ID_MEMBER = mem.ID_MEMBER
-                     WHERE b.ID_BOARD = {$this->request->board} $q_before
-                     ORDER BY m.ID_MSG DESC LIMIT $qlimit
+                     WHERE b.ID_BOARD = ? $q_before
+                     ORDER BY m.ID_MSG DESC LIMIT ?
                    ) tmp
                    LEFT JOIN {$dbprefix}feed f ON f.ID_MSG = tmp.ID_MSG
                    LEFT JOIN {$dbprefix}members lm ON annotatedBy = lm.ID_MEMBER
                    ORDER BY tmp.ID_MSG DESC"
-            ) or database_error(__FILE__, __LINE__, $this->db);
+            );
+        $r->execute($q_args);
+        $rows = $r->fetchAll();
+        $r = null;
         
-        if ($r->num_rows == 0) {
-            return $posts;
+        if (empty($rows)) {
+            return $posts; // empty array
         }
         
-        while ($row = $r->fetch_assoc()) {
+        foreach ($rows as $row) {
             if (is_null($row['fID'])) {
                 //// Try to create subject from content
-                $autosubject = $this->service->app->srvc->autosubject($row['subject'], $row['body']);
+                $autosubject = $this->app->feedsrvc->autosubject($row['subject'], $row['body']);
                 if (is_array($autosubject)) {
                     $row['subject'] = "{$autosubject[0]} &#12299; {$autosubject[1]}";
                 }
@@ -233,7 +248,7 @@ class DataQuery {
                 $posts[] = $row;
         }
         
-        if ($r->num_rows > $this->service->paginateBy) {
+        if (count($rows) > $this->service->paginateBy) {
             $this->service->next_page_available = true;
             unset($posts[$this->service->paginateBy]);
         }
@@ -286,15 +301,16 @@ class DataQuery {
             }
             
             //// get prev page 
-            $r = $this->db->query($qString) or database_error(__FILE__, __LINE__, $this->db);
+            $r = $this->db->query($qString);
         
             $prev_pages = array();
-            while ($row = $r->fetch_row()) {
-                $prev_pages[] = $row[0];
+            while ($row = $r->fetchColumn()) {
+                $prev_pages[] = $row;
             }
+            $r = null;
             $prev_pages = array_reverse($prev_pages);
         
-            if ($r->num_rows == $this->service->paginateBy) {
+            if (count($prev_pages) == $this->service->paginateBy) {
                 //// it's not first page, return link to previous page
                 $this->service->pagePrev = $prev_pages[0];
             } else {

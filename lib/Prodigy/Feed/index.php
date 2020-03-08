@@ -39,16 +39,12 @@ $this->respond('GET', '/[i:cat]/[i:board]/[i:postid]/', 'feedRender->article');
 $this->respond(array('POST','GET'), '/[i:cat]/[i:board]/[i:postid]/edit/', 'feedRender->article_edit');
 //// Show board
 $this->respond('GET', '/[i:cat]/[i:board]/[all:all]?/', 'feedRender->board');
-//// RSS for board TODO
-// $klein->respond('GET', '/[i:cat]/[i:board]/[all:all]?/rss.xml', function($request, $response, $service, $app) {
-//     $app->render->rss('board');
-// });
+//// RSS for board
+$this->respond('GET', '/[i:cat]/[i:board]/[all:all]?/rss.xml', 'feedRender->boardrss');
 //// Show category
 $this->respond('GET', '/[i:cat]/[all:all]?/', 'feedRender->category');
-//// RSS for cat TODO
-// $klein->respond('GET', '/[i:cat]/[all:all]?/rss.xml', function($request, $response, $service, $app) {
-//     $app->render->rss('cat');
-// });
+//// RSS for cat
+$this->respond('GET', '/[i:cat]/[all:all]?/rss.xml', 'feedRender->catrss');
 
 //// Root view
 $this->respond('GET', '/', 'feedRender->root');
