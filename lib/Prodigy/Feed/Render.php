@@ -193,9 +193,12 @@ Class Render extends \Prodigy\Respond\Respond {
             return $app->feedsrvc->abort('Error', 'No posts in this board.');
         }
         
-        $topic_info = $app->feedData->getTopicInfo($posts[0]['fID']);
+        $service->title = $service->menuCatNames[$request->cat] . ' &#12299; ' . $service->menu[$request->cat][$request->board]['boardname'];
         
-        $service->title = $service->menuCatNames[$request->cat] . ' &#12299; ' . $service->menu[$request->cat][$request->board]['boardname'] . ' &#12299; ' . $topic_info['subject'];
+        if (!empty($posts)) {
+            $topic_info = $app->feedData->getTopicInfo($posts[0]['fID']);
+            $service->title .= ' &#12299; ' . $topic_info['subject'];
+        }
         
         //// Build opengraph data
         $GLOBALS['opengraph'] = array(
