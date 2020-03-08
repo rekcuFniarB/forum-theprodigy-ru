@@ -19,6 +19,7 @@ Class Render extends \Prodigy\Respond\Respond {
 //         $this->response = $app->main->response();
 //         $this->service->namespace = $router->getNamespace();
 //     }
+//// Above already done in parent constructor.
 
     public function root() {
     //// Goto default category
@@ -161,7 +162,7 @@ Class Render extends \Prodigy\Respond\Respond {
      */
     public function article_edit() {
         $dbprefix = $this->app->db->db_prefix;
-        $r = $this->app->db->query(
+        $r = $this->app->db->prepare(
             "SELECT STRAIGHT_JOIN m.ID_MSG, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(l.subject, m.subject) as subject, annotation, body, IFNULL(mem.realName, mem.memberName) as realname, mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, l.sticky, l.ID_MSG as fID
                 FROM {$dbprefix}messages m
                 LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
@@ -169,17 +170,18 @@ Class Render extends \Prodigy\Respond\Respond {
                 LEFT JOIN {$dbprefix}members mem ON m.ID_MEMBER = mem.ID_MEMBER
                 LEFT JOIN {$dbprefix}feed l ON m.ID_MSG = l.ID_MSG
                 LEFT JOIN {$dbprefix}members lm ON annotatedBy = lm.ID_MEMBER
-                WHERE m.ID_MSG = {$this->request->postid}"
-        ) or database_error(__FILE__, __LINE__, $this->app->db);
+                WHERE m.ID_MSG = ?"
+        );
+        $r->execute(array($this->request->postid));
         
         $this->service->cat = $this->request->cat;
         $this->service->board = $this->request->board;
         
-        if ($r->num_rows == 0) {
+        $post = $r->fetch();
+        $r = null;
+        if (empty($post)) {
             return $this->app->feedsrvc->abort('Error', 'Post not found.');
         }
-        
-        $post = $r->fetch_assoc();
         
         $this->service->sticky = $post['sticky'];
         
@@ -187,11 +189,11 @@ Class Render extends \Prodigy\Respond\Respond {
     
         if($this->request->cat != $post['ID_CAT'] || $this->request->board != $post['ID_BOARD']) {
             //// Redirect to proper place if post was moved
-            return $this->response->redirect("{$redirect_url}edit/");
+            return $this->redirect("{$redirect_url}edit/");
         }
         
         if (!$this->app->feedsrvc->editAllowed($this->request->cat, $this->request->board)) {
-            $this->app->feedsrvc->abort('Error', 'Access denied.');
+            $this->app->feedsrvc->abort('Error', 'Access denied.', 403);
             return;
         }
         
@@ -203,7 +205,8 @@ Class Render extends \Prodigy\Respond\Respond {
             }
         }
         
-        $this->app->feedsrvc->sessionRequire();
+        // CSRF token
+        $this->service->sessid = $this->app->session->id;
         
         if($this->request->method() == 'POST') {
             $this->service->validateParam('subject', 'Empty subject.')->isLen(1, 256);
@@ -219,24 +222,32 @@ Class Render extends \Prodigy\Respond\Respond {
             }
             elseif ($this->request->param('save', false)) {
                 //// Save annotation
-                $subject = $this->app->db->escape_string($this->request->param('subject'));
-                $annotation = $this->app->db->escape_string($this->request->param('annotation'));
-                $sticky = $this->request->param('sticky', 0);
-                $memid = $GLOBALS['ID_MEMBER'];
-                
-                $req = $this->app->db->query("INSERT INTO {$dbprefix}feed
+                $req = $this->app->db->prepare("INSERT INTO {$dbprefix}feed
                     (ID_MSG, sticky, subject, annotation, annotatedBy)
-                      values ({$this->request->postid}, $sticky, '$subject', '$annotation', $memid)
+                      values (?, ?, ?, ?, ?)
                     ON DUPLICATE KEY UPDATE
-                      sticky = $sticky, subject = '$subject', annotation = '$annotation', annotatedBy = $memid"
-                    ) or database_error(__FILE__, __LINE__, $this->app->db);
-                return $this->response->redirect($redirect_url);
+                      sticky = ?, subject = ?, annotation = ?, annotatedBy = ?"
+                    );
+                $req->execute(array(
+                    $this->request->postid,
+                    $this->request->param('sticky', 0),
+                    $this->request->param('subject'),
+                    $this->request->param('annotation'),
+                    $this->app->user->id,
+                    $this->request->param('sticky', 0),
+                    $this->request->param('subject'),
+                    $this->request->param('annotation'),
+                    $this->app->user->id,
+                ));
+                $req = null;
+                return $this->redirect($redirect_url);
             }
             elseif ($this->request->param('delete', false)) {
                 //// Delete annotation
-                $req = $this->app->db->query("DELETE FROM {$dbprefix}feed WHERE ID_MSG = {$this->request->postid}")
-                    or database_error(__FILE__, __LINE__, $this->app->db);
-                return $this->response->redirect($redirect_url);
+                $req = $this->app->db->prepare("DELETE FROM {$dbprefix}feed WHERE ID_MSG = ?");
+                $req->execute(array($this->request->postid));
+                $req = null;
+                return $this->redirect($redirect_url);
             }
             else {
                 return $this->app->feedsrvc->abort('Error', 'Bad request.');
@@ -247,7 +258,7 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->service->post = $post;
         $this->service->title = $this->service->menuCatNames[$this->request->cat] . ' &#12299; ' . $post['boardname'];
         
-        $this->service->render('edit.php');
+        $this->render('feed/edit.php');
     } // article_edit()
     
     /*
@@ -415,7 +426,7 @@ Class Render extends \Prodigy\Respond\Respond {
         
         $this->response->header('Content-Type', 'application/rss+xml; charset=UTF-8');
         $this->service->layout(PROJECT_ROOT . '/templates/feed/rss.php');
-        $this->service->render(PROJECT_ROOT . '/templates/feed/rss.php');
+        $this->service->render(PROJECT_ROOT . '/templates/feed/rss.php'); // Have to set twice for some reason.
         return $this->response;
     } // rss()
 }

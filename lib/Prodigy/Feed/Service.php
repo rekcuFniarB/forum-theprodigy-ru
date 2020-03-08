@@ -149,16 +149,17 @@ Class Service {
     
     //// Is annotation edit allowed?
     public function editAllowed($idcat=null, $idboard=null) {
-        if ($this->service->username == 'Guest' || $this->service->userid <= 0)
+        if ($this->app->user->guest || $this->app->user->id <= 0)
             return false;
         
-        if ($this->service->user_status == 'Global Moderator' || $this->service->user_status == 'Administrator')
+        if ($this->app->user->isStaff())
             return true;
         
         if (!is_null($idcat) && !is_null($idboard)) {
             if (!isset ($this->service->menu))
                 $this->build_menu();
-            if (in_array($this->service->username, $this->service->menu[$idcat][$idboard]['moderators'])) {
+            
+            if (in_array($this->app->user->name, $this->service->menu[$idcat][$idboard]['moderators'])) {
                 return true;
             }
         }

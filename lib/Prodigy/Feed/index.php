@@ -9,11 +9,11 @@ $this->registerServices(
 );
 
 //// Defaults for POST requests
-$this->respond('POST', null, function($request, $response, $service, $app) {
-    $app->feedsrvc->sessionRequire();
+$this->respond('POST', null, function($request, $response, $service, $app) use ($namespace) {
+    $service->namespace = SITE_ROOT . $namespace;
     //// Check for CSRF
     $service->validateParam('csrf', 'CSRF token missing.')->isAlnum();
-    if ($request->param('csrf') != $service->sessid) $app->srvc->abort('Error', 'Session error.');
+    if ($request->param('csrf') != $app->session->id) $app->feedsrvc->abort('Error', 'Session error.');
 });
 
 //// Defaults for GET requests
