@@ -1,0 +1,33 @@
+a.nav-item {
+    background-color: #afc6db;
+    color: #000000;
+    font-size: 1em;
+}
+a.nav-item.current {
+    background-color: #6394BD;
+    opacity: unset;
+}
+a.nav-item:visited {
+    background-color: #afc6db;
+    color: #000000;
+    font-size: 1em;
+}
+a.nav-item:link {
+    background-color: #afc6db;
+    color: #000000;
+    font-size: 1em;
+}
+a.nav-item:hover {
+    background-color: #6394BD;
+    color: #ffffff;
+    opacity: unset;
+}
+a.nav-item.current {
+    background-color: #6394BD;
+    opacity: unset;
+}
+nav.cats-menu li > a.current {
+      opacity: unset;
+      background-color: #6394BD;
+      color: #ffffff;
+  }

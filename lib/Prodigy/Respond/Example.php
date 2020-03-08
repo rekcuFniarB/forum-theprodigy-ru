@@ -136,7 +136,7 @@ class Example extends Respond
         //var_dump($request->paramsGet()->get('qwerty'));
         
         //return $app->errors->abort('Test', 'Testing ...');
-        
+        var_dump($app->locale->get('txt.errors'));
         //throw new \Prodigy\Errors\TemplateException('Example Template Exception', 1);
         
         $this->render('examples/example.php');

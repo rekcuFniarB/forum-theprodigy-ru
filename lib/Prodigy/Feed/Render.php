@@ -11,11 +11,13 @@ Class Render extends \Prodigy\Respond\Respond {
 //     private $request;
 //     private $response;
 //     
-//     public function __construct($app) {
+//     public function __construct($router) {
+//         parent::__construct($router);
 //         $this->app = $app;
 //         $this->service = $app->main->service();
 //         $this->request = $app->main->request();
 //         $this->response = $app->main->response();
+//         $this->service->namespace = $router->getNamespace();
 //     }
 
     public function root() {

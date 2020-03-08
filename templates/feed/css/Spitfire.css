@@ -1,0 +1,22 @@
+article > h2.windowbg,
+article > div.article-info {
+    background-color: #FFBA0A;
+}
+
+a.nav-item {
+    background-color: #FFBA0A;
+    color: #000000;
+}
+a.nav-item:visited {
+    color: #000000;
+}
+a.nav-item:link {
+    color: #000000;
+}
+
+a.nav-item.current,
+nav.cats-menu li > a.current,
+a.nav-item:hover {
+    background-color: #FFDA50;
+    opacity: unset;
+}

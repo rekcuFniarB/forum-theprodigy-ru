@@ -1,0 +1,10 @@
+a.nav-item {
+    background-color: #469EC0;
+    color: #000000;
+}
+a.nav-item:visited {
+    color: #000000 !important;
+}
+a.nav-item:link {
+    color: #000000 !important;
+}

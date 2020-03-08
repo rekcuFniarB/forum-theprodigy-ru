@@ -1,0 +1,17 @@
+a.nav-item {
+    background-color: #51767C;
+    color: #ffffff;
+}
+a.nav-item:visited {
+    color: #ffffff;
+}
+a.nav-item:link {
+    color: #ffffff;
+}
+
+a.nav-item.current,
+nav.cats-menu li > a.current,
+a.nav-item:hover {
+    background-color: #6D9072;
+    opacity: unset;
+}

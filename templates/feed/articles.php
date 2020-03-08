@@ -1,3 +1,4 @@
+<?php $this->partial('feed/header.php') ?>
 
 <?php foreach ($this->posts as $k => $article) { ?>
   <article class="windowbg2" id="article<?= $article['ID_MSG'] ?>">
@@ -53,3 +54,5 @@
 </div>
 <?php endif; ?>
 <!-- /Pagination -->
+
+<?php $this->partial('feed/footer.php');

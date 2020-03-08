@@ -8,17 +8,26 @@ $this->registerServices(
     )
 );
 
+//// Defaults for POST requests
+$this->respond('POST', null, function($request, $response, $service, $app) {
+    $app->feedsrvc->sessionRequire();
+    //// Check for CSRF
+    $service->validateParam('csrf', 'CSRF token missing.')->isAlnum();
+    if ($request->param('csrf') != $service->sessid) $app->srvc->abort('Error', 'Session error.');
+});
+
 //// Defaults for GET requests
-$this->respond('GET', null, function($request, $response, $service, $app) {
+$this->respond('GET', null, function($request, $response, $service, $app) use ($namespace) {
     if ($response->isSent()) return;
-//     $app->srvc->build_menu();
-    
+    $app->feedsrvc->build_menu();
+    //$service->namespace = $this->route_factory->getNamespace();
     $service->before = intval($request->param('before', null));
     $service->pageNext = 0;
     $service->pagePrev = 0;
     $service->paginateBy = 25;
     $service->next_page_available = false;
     $service->post_view = false;
+    $service->namespace = SITE_ROOT . $namespace;
 });
 
 $this->respond('GET', '/test/', 'main->example');

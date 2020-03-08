@@ -2,7 +2,7 @@
 
 namespace Prodigy;
 
-class Localization {
+class Localization extends \rekcuFniarB\arrayQuery\queriedArray {
 
     private $app;
     private $router;
@@ -50,7 +50,7 @@ class Localization {
         foreach ($vars as $k => $v) {
             $this->$k = $v;
         }
-        
+        parent::__construct($vars);
         $this->lngfile = $locale;
     } // set_locale()
     
@@ -70,8 +70,8 @@ class Localization {
         return $this->txt($name);
     }
     
-    public function __invoke($name, $default = '') {
-        return $this->txt($name, $default);
-    }
+    //public function __invoke($name, $default = '') {
+    //    return $this->txt($name, $default);
+    //}
 
 }

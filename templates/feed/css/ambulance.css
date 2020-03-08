@@ -1,0 +1,29 @@
+a.nav-item {
+    background-color: #404040;
+    color: #ffffff;
+    font-size: 0.9em;
+}
+a.nav-item:visited {
+    background-color: #404040;
+    color: #ffffff;
+}
+a.nav-item:link {
+    background-color: #404040;
+    color: #ffffff;
+    font-size: 0.9em;
+}
+a.nav-item:hover {
+    color: #ffffff;
+}
+
+a.nav-item.current,
+a.nav-item.current:visited,
+a.nav-item.current:link,
+a.nav-item:hover {
+    opacity: initial;
+    background-color: #606060;
+}
+
+section.posts-list > article {
+    background-color: #404040;
+}

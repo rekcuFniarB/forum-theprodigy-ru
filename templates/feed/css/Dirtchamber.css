@@ -1,0 +1,24 @@
+.feed-main-container {
+    background-color: #636363;
+    padding: 0.5em;
+}
+a.nav-item {
+    background-color: #C05430;
+    color: #000000;
+}
+a.nav-item:visited {
+    color: #000000;
+}
+a.nav-item:link {
+    color: #000000;
+}
+/*a.nav-item:hover {
+    color: #ffffff;
+}*/
+
+section.posts-list > article {
+    background-color: #707070;
+}
+section.posts-list > article > .article-info {
+    background-color: #636363;
+}

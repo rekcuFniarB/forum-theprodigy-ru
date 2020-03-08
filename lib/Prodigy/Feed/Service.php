@@ -5,9 +5,12 @@ namespace Prodigy\Feed;
 Class Service {
     private $app;
     private $service;
+    private $router;
+    
     public function __construct($router) {
         $this->app = $router->app();
         $this->service = $router->service();
+        $this->router = $router;
     }
     public function build_menu () {
         //// Build menu
@@ -16,14 +19,17 @@ Class Service {
             "SELECT ID_BOARD, b.name AS boardname, b.moderators, b.ID_CAT, c.name AS catname, boardOrder, catOrder
               FROM {$dbprefix}boards b LEFT JOIN {$dbprefix}categories c ON b.ID_CAT = c.ID_CAT
               ORDER BY catOrder, boardOrder"
-        ) or database_error(__FILE__, __LINE__, $this->app->db);
+        );
         $boardscats = array();
         $catnames = array();
-        while ($row = $r->fetch_assoc()) {
+        $rows = $r->fetchAll();
+        $r = null;
+        foreach ($rows as $row) {
             if (!isset($boardscats[$row['ID_CAT']])) {
                 $boardscats[$row['ID_CAT']] = array();
                 $catnames[$row['ID_CAT']] = $row['catname'];
             }
+            $r = null;
             $row['moderators'] = explode(',', $row['moderators']);
             $boardscats[$row['ID_CAT']][$row['ID_BOARD']] = $row;
         }
@@ -37,24 +43,24 @@ Class Service {
     
     //// Custom error page
     public function abort($title='', $msg='', $code=404) {
-        $response = $this->app->main->response();
+        $response = $this->router->response();
         
         if (empty($msg))
-            if ($this->app->lng->isset("errors.$code.msg"))
-                $msg = $this->app->lng->get("errors.$code.msg");
+            if ($this->app->locale->isset("txt.errors.$code.msg"))
+                $msg = $this->app->locale->get("txt.errors.$code.msg");
             else
-                $msg = $this->app->lng->get("errors.default.msg");
+                $msg = $this->app->locale->get("txt.errors.default.msg");
             
             if (empty($title))
-                if ($this->app->lng->isset("errors.$code.title"))
-                    $title = $this->app->lng->get("errors.$code.title");
+                if ($this->app->locale->isset("errors.$code.title"))
+                    $title = $this->app->locale->get("errors.$code.title");
                 else
-                    $title = $this->app->lng->get("errors.default.title");
+                    $title = $this->app->locale->get("errors.default.title");
         
         $response->code($code);
         $this->service->title = $title;
         $this->service->message = $msg;
-        $this->service->render('error.php');
+        $this->app->dumb->render('feed/error.php');
         $response->send();
         return $response;
     }

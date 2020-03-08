@@ -924,6 +924,33 @@ $txt['globmod'] = 'Глобальный Модератор';
 
 $txt['main'] = 'Main';
 
+$txt['errors'] = array(
+    400 => array(
+        'title' => '[400] Bad Request',
+        'msg' => 'The server could not understand the request due to invalid syntax.'
+    ),
+    404 => array (
+        'title' => '[404] Not found',
+        'msg' => 'Requested page not found.'
+    ),
+    403 => array (
+        'title' => '[403] Forbidden',
+        'msg' => 'You don\'t have permission to access this place.'
+    ),
+    418 => array (
+        'title' => 'I\'m a teapot',
+        'msg' => 'The server refuses the attempt to brew coffee with a teapot.'
+    ),
+    451 => array (
+        'title' => '[451] Unavailable For Legal Reasons',
+        'msg' => 'Requested page cannot legally be provided due to censorship by a government.'
+    ),
+    'default' => array (
+        'title' => 'An error occurred',
+        'msg' => 'Unknown error.'
+    ),
+);
+
 $txt['yse1'] = 'Failed to make backup of Settings.php';
 $txt['yse2'] = 'Installed \'Mods\' Settings and Options';
 $txt['yse3'] = 'This page allows you to change the settings of mods installed in your forum.';
