@@ -159,6 +159,11 @@
       position: relative;
       top: 0.1em;
   }
+  
+  article.feed .topic-lnk {
+    margin-top: 2em;
+    text-align: right;
+  }
     
   <?php $this->partial("feed/css/{$this->app->user->skin}.css"); ?>
 </style>

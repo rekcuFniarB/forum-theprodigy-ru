@@ -1,7 +1,7 @@
 <?php $this->partial('feed/header.php') ?>
 
 <?php foreach ($this->posts as $k => $article) { ?>
-  <article class="windowbg2" id="article<?= $article['ID_MSG'] ?>">
+  <article class="feed windowbg2" id="article<?= $article['ID_MSG'] ?>">
     <h2 class="windowbg"><?= $this->esc($article['boardname']) ?>
       <span class="article-title-delimeter">&#12299;</span>
       <a href="<?= $this->namespace ?>/<?= $article['ID_CAT'] ?>/<?= $article['ID_BOARD'] ?>/<?= $article['ID_MSG'] ?>/"><?= $this->esc($article['subject']); ?></a>
@@ -18,8 +18,12 @@
           ... <a href="<?= $this->namespace ?>/<?= $article['ID_CAT'] ?>/<?= $article['ID_BOARD'] ?>/<?= $article['ID_MSG'] ?>/" class="msgurl read-more-link"><?= $this->locale->txt['feed_read_more'] ?></a>
         <?php endif; ?>
       <?php endif; ?>
-      
-    </div>
+      <?php if(!empty($this->topic)): ?>
+        <div class="topic-lnk">
+            Все публикации на тему <a href="<?= $this->namespace ?>/<?= $article['ID_CAT'] ?>/<?= $article['ID_BOARD'] ?>/t<?= $this->topic['id'] ?>/"><?= $this->esc($this->topic['subject']) ?></a>
+        </div>
+      <?php endif; ?>
+    </div> <!-- .article-content -->
     <div class="article-info windowbg3">
       <!-- article info -->
       <div>

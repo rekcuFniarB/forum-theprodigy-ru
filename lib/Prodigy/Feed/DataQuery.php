@@ -1,6 +1,6 @@
 <?php
 /*
- * Data query methods
+ * Data query methods (models)
  */
 
 namespace Prodigy\Feed;
@@ -193,6 +193,56 @@ class DataQuery {
         
         return $posts;
     } // getAnnotatedBoard()
+
+    public function getPostsByTopic($topic) {
+        //// Pagination param
+        $q_before = '';
+        $before = $this->service->before;
+        $q_params = array($topic);
+        
+        if ($before > 0) {
+            $q_before = "AND f.ID_MSG < ?";
+            $q_params[] = $before;
+        }
+        $dbprefix = $this->db->db_prefix;
+        
+        $q_params[] = $this->service->paginateBy + 1;
+        
+        $posts = array();
+        
+        //// Get articles by specified topic
+        $r = $this->db->prepare(
+            "SELECT STRAIGHT_JOIN f.ID_MSG, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(f.subject, m.subject) as subject, annotation, body, m.status, IFNULL(mem.realName, mem.memberName) as realname, mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, f.sticky, f.ID_MSG AS fID
+                FROM {$dbprefix}feed f
+                JOIN {$dbprefix}messages m ON f.ID_MSG = m.ID_MSG
+                LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
+                LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
+                LEFT JOIN {$dbprefix}members mem ON m.ID_MEMBER = mem.ID_MEMBER
+                LEFT JOIN {$dbprefix}members lm ON annotatedBy = lm.ID_MEMBER
+                WHERE m.ID_TOPIC = ? $q_before AND f.sticky = 0
+                ORDER BY f.ID_MSG DESC LIMIT ?"
+        );
+        $r->execute($q_params);
+        $posts = $r->fetchAll();
+        $r = null;
+        
+        if (!$posts) {
+            return array();
+        }
+        
+        // FIXME probably shoud do it in template instead
+        // due to it may break pagination.
+        $posts = array_filter($posts, function($pst) {
+            return $pst['status'] < 400;
+        });
+            
+        if (count($posts) > $this->service->paginateBy) {
+            $this->service->next_page_available = true;
+            unset($posts[$this->service->paginateBy]);
+        }
+        
+        return $posts;
+    } // getPostsByTopic()
     
     public function getNonAnnotatedBoard() {
         //// Pagination param
@@ -268,18 +318,29 @@ class DataQuery {
         if ($this->service->before > 0) {
             $dbprefix = $this->db->db_prefix;
             
-            if ($this->request->cat == 0)
-                $whereCat = "<> 0";
-            else
-                $whereCat = "= {$this->request->cat}";
+            $q_args = array();
             
             if ($mode == 'cat') {
+                if ($this->request->cat == 0)
+                    $whereCat = "<> 0";
+                else {
+                    $whereCat = "= ?";
+                    $q_args[] = $this->request->cat;
+                }
                 $q_where = "b.ID_CAT $whereCat";
             }
             elseif ($mode == 'board') {
-                $q_where = "b.ID_BOARD = {$this->request->board}";
+                $q_where = "b.ID_BOARD = ?";
+                $q_args[] = $this->request->board;
+            }
+            elseif ($mode == 'topic') {
+                $q_where = "m.ID_TOPIC = ?";
+                $q_args[] = $this->request->topic;
             }
             else return;
+            
+            $q_args[] = $this->service->before;
+            $q_args[] = $this->service->paginateBy;
             
             if ($all) {
                 $qString =
@@ -287,8 +348,8 @@ class DataQuery {
                     FROM {$dbprefix}messages m
                     LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
                     LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
-                    WHERE $q_where AND m.ID_MSG > {$this->service->before}
-                    ORDER BY ID_MSG LIMIT {$this->service->paginateBy}";
+                    WHERE $q_where AND m.ID_MSG > ?
+                    ORDER BY ID_MSG LIMIT ?";
             } else {
                 $qString = 
                     "SELECT STRAIGHT_JOIN f.ID_MSG
@@ -296,12 +357,13 @@ class DataQuery {
                     JOIN {$dbprefix} messages m ON m.ID_MSG = f.ID_MSG
                     LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
                     LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
-                    WHERE $q_where AND f.ID_MSG > {$this->service->before} and f.sticky = 0
-                    ORDER BY f.ID_MSG LIMIT {$this->service->paginateBy}";
+                    WHERE $q_where AND f.ID_MSG > ? and f.sticky = 0
+                    ORDER BY f.ID_MSG LIMIT ?";
             }
             
             //// get prev page 
-            $r = $this->db->query($qString);
+            $r = $this->db->prepare($qString);
+            $r->execute($q_args);
         
             $prev_pages = array();
             while ($row = $r->fetchColumn()) {
@@ -319,6 +381,20 @@ class DataQuery {
             }
         } // $before > 0
     } // buildPagination()
+    
+    /**
+     * Get thread subject
+     * @param int $msgid  message ID
+     * @return string
+     */
+    public function getTopicInfo($topic) {
+        $db_prefix = $this->db->db_prefix;
+        $req = $this->db->prepare("SELECT ID_TOPIC as id, subject FROM messages WHERE ID_TOPIC = (SELECT ID_TOPIC FROM messages WHERE ID_MSG = ?) ORDER BY ID_MSG limit 1");
+        $req->execute(array($topic));
+        $topic = $req->fetch();
+        $req = null;
+        return $topic;
+    }
     
 }
 

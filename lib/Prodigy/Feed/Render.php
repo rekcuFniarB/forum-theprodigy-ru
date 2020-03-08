@@ -155,6 +155,61 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->render('feed/articles.php');
      
     } // board()
+
+    /**
+     * Articles by topic controller
+     */
+    public function topic($request, $response, $service, $app) {
+        $this->service->displayFilterLnk = true;
+        
+        
+        if ($this->service->before == 0) {
+            $posts_sticky = array_merge(
+                $this->app->feedData->getAnnotatedCat(2),
+                $this->app->feedData->getAnnotatedCat(1)
+            );
+        }
+        
+        $posts = $app->feedData->getPostsByTopic($request->topic);
+        
+        
+        $service->cat = $request->cat;
+        $service->board = $request->board;
+    
+        if (count($posts) > 0 && $posts[0]['ID_CAT'] != $request->cat) {
+            // Board was moved to other category, redirect user to proper cat.
+            $redirect_url = "{$service->httphost}{$service->namespace}/{$posts[0]['ID_CAT']}/{$request->board}/";
+            return $this->redirect($redirect_url);
+        }
+    
+        $app->feedData->buildPagination($posts, 'topic');
+    
+        if ($service->before != 0)
+            $service->posts = $posts;
+        else
+            $service->posts = array_merge($posts_sticky, $posts);
+        
+        if (count($service->posts) == 0) {
+            return $app->feedsrvc->abort('Error', 'No posts in this board.');
+        }
+        
+        $topic_info = $app->feedData->getTopicInfo($posts[0]['fID']);
+        
+        $service->title = $service->menuCatNames[$request->cat] . ' &#12299; ' . $service->menu[$request->cat][$request->board]['boardname'] . ' &#12299; ' . $topic_info['subject'];
+        
+        //// Build opengraph data
+        $GLOBALS['opengraph'] = array(
+            'title' => mb_convert_encoding($service->title, 'HTML-ENTITIES', $app->db->db_charset),
+            'url' => $service->siteurl . $request->uri(),
+            'image' => $service->httphost . STATIC_ROOT . "/img/YaBBImages/opengraph_bg.png"
+        );
+        
+        //$service->rss_link = true;
+        
+        return $this->render('feed/articles.php');
+     
+    } // topic()
+
     
     /*
      * Article edit page renderer
@@ -359,6 +414,8 @@ Class Render extends \Prodigy\Respond\Respond {
         
         $this->service->posts = $posts;
         $this->service->post_view = true;
+        
+        $this->service->topic = $this->app->feedData->getTopicInfo($this->request->postid);
         
         $this->render('feed/articles.php');
         return $this->response;

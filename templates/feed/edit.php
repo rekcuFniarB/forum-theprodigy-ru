@@ -27,7 +27,9 @@
     <span class="article-title-delimeter">»</span>
     <a href="<?= $this->namespace ?>/<?= $this->post['ID_CAT'] ?>/<?= $this->post['ID_BOARD'] ?>/<?= $this->post['ID_MSG'] ?>/"><?=$this->esc($this->post['subject']); ?></a>
   </h2>
-  <div class="article-annotation"><?= $this->DoUBBC($this->post['annotation']) ?></div>
+  <?php if(!empty($this->post['annotation'])): ?>
+        <div class="article-annotation"><?= $this->DoUBBC($this->post['annotation']) ?></div>
+  <?php endif; ?>
   <div class="article-content"><?= $this->DoUBBC($this->post['body']); ?></div>
   <div class="article-info windowbg3">
     <!-- article info -->
