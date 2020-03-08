@@ -113,8 +113,16 @@
       /*text-align: left;*/
   }
   section.posts-list > article > div.article-annotation {
-    margin-top: 0.4em;
+    margin: 1em;
   }
+  .article-annotation::after {
+    display: block;
+    content: " ";
+    width: 10%;
+    border-bottom: 1px solid #808080;
+    margin-top: 1em;
+  }
+
   section.posts-list > article > div.article-content {
       margin: 1em;
       /*margin-bottom: 1em;*/
@@ -150,8 +158,8 @@
       font-size: 2em;
       position: relative;
       top: 0.1em;
-}
-  
+  }
+    
   <?php $this->partial("feed/css/{$this->app->user->skin}.css"); ?>
 </style>
 

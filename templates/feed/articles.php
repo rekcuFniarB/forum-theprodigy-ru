@@ -6,7 +6,9 @@
       <span class="article-title-delimeter">&#12299;</span>
       <a href="<?= $this->namespace ?>/<?= $article['ID_CAT'] ?>/<?= $article['ID_BOARD'] ?>/<?= $article['ID_MSG'] ?>/"><?= $this->esc($article['subject']); ?></a>
     </h2>
-    <div class="article-annotation"><?= $this->DoUBBC($article['annotation']) ?></div>
+    <?php if(!empty($article['annotation'])): ?>
+        <div class="article-annotation"><?= $this->DoUBBC($article['annotation']) ?></div>
+    <?php endif; ?>
     <div class="article-content">
       <?php if($this->post_view): ?>
         <?= $this->DoUBBC($article['body']) ?>
