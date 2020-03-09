@@ -1737,7 +1737,7 @@ $txt['enhancedban_deactivated'] = 'Данный пользователь деактивирован.';
 
 $txt['feed'] = 'Лента';
 $txt['feed_all_cats'] = 'Все категории';
-$txt['feed_unfiltered'] = 'без фильтра';
+$txt['feed_unfiltered'] = 'без апрува';
 $txt['feed_show_approved'] = 'Показать одобренное';
 $txt['feed_show_non_approved'] = 'Публикации без апрува';
 $txt['feed_read_more'] = 'читать полностью';
