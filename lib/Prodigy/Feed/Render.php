@@ -163,10 +163,10 @@ Class Render extends \Prodigy\Respond\Respond {
         $this->service->displayFilterLnk = false;
         
         
-        if ($this->service->before == 0) {
+        if ($service->before == 0) {
             $posts_sticky = array_merge(
-                $this->app->feedData->getAnnotatedCat(2),
-                $this->app->feedData->getAnnotatedCat(1)
+                $app->feedData->getAnnotatedCat(2),
+                $app->feedData->getAnnotatedCat(1)
             );
         }
         
@@ -176,9 +176,9 @@ Class Render extends \Prodigy\Respond\Respond {
         $service->cat = $request->cat;
         $service->board = $request->board;
     
-        if (count($posts) > 0 && $posts[0]['ID_CAT'] != $request->cat) {
+        if (count($posts) > 0 && ($posts[0]['ID_CAT'] != $request->cat || $posts[0]['ID_BOARD'] != $request->board)) {
             // Board was moved to other category, redirect user to proper cat.
-            $redirect_url = "{$service->httphost}{$service->namespace}/{$posts[0]['ID_CAT']}/{$request->board}/";
+            $redirect_url = "{$service->httphost}{$service->namespace}/{$posts[0]['ID_CAT']}/{$posts[0]['ID_BOARD']}/t{$request->topic}/";
             return $this->redirect($redirect_url);
         }
     
