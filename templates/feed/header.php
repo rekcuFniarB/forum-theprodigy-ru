@@ -165,7 +165,7 @@
     text-align: right;
   }
     
-  <?php $this->partial("feed/css/{$this->app->user->skin}.css"); ?>
+  <?php $this->include("feed/css/{$this->app->user->skin}.css"); ?>
 </style>
 
 <div class="feed-main-container">

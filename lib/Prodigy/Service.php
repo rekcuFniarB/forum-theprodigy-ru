@@ -89,6 +89,12 @@ class Service extends \Klein\ServiceProvider
         return parent::partial(PROJECT_ROOT . '/templates/' . $view, $data);
     }
     
+    public function include($view, array $data = array())
+    {
+        $template = PROJECT_ROOT . '/templates/' . $view;
+        if (file_exists($template))
+            return parent::partial($template, $data);
+    }
     
     /**
      * This is $this->partial() wrapper allowing to cache first call output
