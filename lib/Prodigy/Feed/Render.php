@@ -160,7 +160,7 @@ Class Render extends \Prodigy\Respond\Respond {
      * Articles by topic controller
      */
     public function topic($request, $response, $service, $app) {
-        $this->service->displayFilterLnk = true;
+        $this->service->displayFilterLnk = false;
         
         
         if ($this->service->before == 0) {
@@ -207,7 +207,7 @@ Class Render extends \Prodigy\Respond\Respond {
             'image' => $service->httphost . STATIC_ROOT . "/img/YaBBImages/opengraph_bg.png"
         );
         
-        //$service->rss_link = true;
+        $service->rss_link = true;
         
         return $this->render('feed/articles.php');
      
@@ -430,6 +430,9 @@ Class Render extends \Prodigy\Respond\Respond {
     public function catrss() {
         return $this->rss('cat');
     }
+    public function topicrss() {
+        return $this->rss('topic');
+    }
     
     /**
      * Render RSS
@@ -453,7 +456,8 @@ Class Render extends \Prodigy\Respond\Respond {
             }
             
             $this->service->main_link = "{$this->service->siteurl}/feed/{$this->request->cat}/";
-        } else {
+        }
+        elseif ($what == 'board') {
             $this->service->title = $this->service->menuCatNames[$this->request->cat] . ' &#12299; ' . $this->service->menu[$this->request->cat][$this->request->board]['boardname'];
             
             if (isset($this->request->all)) {
@@ -463,6 +467,11 @@ Class Render extends \Prodigy\Respond\Respond {
             }
             
             $this->service->main_link = "{$this->service->siteurl}/feed/{$this->request->cat}/{$this->request->board}/";
+        }
+        elseif ($what == 'topic') {
+            $this->service->title = $this->service->menuCatNames[$this->request->cat] . ' &#12299; ' . $this->service->menu[$this->request->cat][$this->request->board]['boardname'];
+            $posts = $this->app->feedData->getPostsByTopic($this->request->topic);
+            $this->service->main_link = "{$this->service->siteurl}/feed/{$this->request->cat}/{$this->request->board}/t{$this->request->topic}/";
         }
         
         if (isset($this->request->all))

@@ -1739,7 +1739,7 @@ $txt['feed'] = 'Лента';
 $txt['feed_all_cats'] = 'Все категории';
 $txt['feed_unfiltered'] = 'без фильтра';
 $txt['feed_show_approved'] = 'Показать одобренное';
-$txt['feed_show_non_approved'] = 'Показать без фильтра';
+$txt['feed_show_non_approved'] = 'Публикации без апрува';
 $txt['feed_read_more'] = 'читать полностью';
 $txt['feed_post_by'] = 'Автор';
 $txt['feed_check_by'] = 'Проверено';
@@ -1756,6 +1756,7 @@ $txt['feed_del'] = 'Удалить';
 $txt['feed_preview'] = 'Предпросмотр';
 $txt['feed_save'] = 'Сохранить';
 $txt['feed_mod_lnk'] = 'Добавить/изменить публикацию в ленте';
+$txt['feed_subscribe_to'] = 'Подписаться на';
 
 $txt['rename_theme_to'] = 'Изменить название темы на:';
 

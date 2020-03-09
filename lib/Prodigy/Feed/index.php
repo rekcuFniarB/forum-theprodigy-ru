@@ -47,6 +47,9 @@ $this->respond('GET', '/[i:cat]/[all:all]?/', 'feedRender->category');
 $this->respond('GET', '/[i:cat]/[all:all]?/rss.xml', 'feedRender->catrss');
 //// Articles by topic
 $this->respond('GET', '/[i:cat]/[i:board]/t[i:topic]/', 'feedRender->topic');
+//// RSS for topic
+$this->respond('GET', '/[i:cat]/[i:board]/t[i:topic]/rss.xml', 'feedRender->topicrss');
+
 //// Root view
 $this->respond('GET', '/', 'feedRender->root');
 ?>

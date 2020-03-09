@@ -202,7 +202,7 @@
   <?php endif; ?>
 </nav>
 <?php if(isset($this->rss_link)): ?>
-  <a href="./rss.xml" type="application/rss+xml" class="rss-link">RSS</a>
+  <a href="./rss.xml" type="application/rss+xml" class="rss-link" title="<?= $this->locale->txt['feed_subscribe_to'] ?> <?= $this->esc($this->title) ?>">RSS</a>
 <?php endif; ?>
 </aside>
 

@@ -1720,6 +1720,7 @@ $txt['feed_del'] = 'Remove';
 $txt['feed_preview'] = 'Preview';
 $txt['feed_save'] = 'Save';
 $txt['feed_mod_lnk'] = 'Add/edit article to feed';
+$txt['feed_subscribe_to'] = 'Subscribe to';
 
 $txt['moveTopic1'] = 'Post a redirection topic';
 
