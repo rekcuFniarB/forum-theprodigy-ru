@@ -93,13 +93,13 @@ class Threads extends Respond
         {
             // Check if a log exists, so we can go to next unreaded message page
             $dbst = $db->prepare("
-                SELECT GREATEST(IFNULL(lt.logTime, 0), IFNULL(lmr.logTime,0)) AS logtime, COUNT(m.ID_MSG), MAX(m.ID_MSG)
+                SELECT GREATEST(IFNULL(lt.logTime, 0), IFNULL(lmr.logTime,0)) AS logtime, COUNT(m.ID_MSG), MAX(m.ID_MSG), t.ID_TOPIC
                 FROM {$db_prefix}topics AS t
                 LEFT JOIN {$db_prefix}log_topics AS lt ON (lt.ID_TOPIC=t.ID_TOPIC AND lt.ID_MEMBER=?)
                 LEFT JOIN {$db_prefix}log_mark_read AS lmr ON (lmr.ID_BOARD=t.ID_BOARD AND lmr.ID_MEMBER=?)
                 LEFT JOIN {$db_prefix}messages AS m ON (m.ID_TOPIC=t.ID_TOPIC)
                 WHERE (t.ID_TOPIC = ?)
-                GROUP BY t.ID_TOPIC");
+                GROUP BY t.ID_TOPIC, logtime");
             $dbst->execute(array($ID_MEMBER, $ID_MEMBER, $threadid));
             list($ltLastRead, $numMessages, $newestMessage) = $dbst->fetch(\PDO::FETCH_NUM);
             $dbst = null;
@@ -130,7 +130,7 @@ class Threads extends Respond
                     WHERE ID_TOPIC = ?
                     AND posterTime > ?");
                 $dbst->execute(array($threadid, $ltLastRead));
-                $firstUnreadMessage = $dbrq->fetchColumn();
+                $firstUnreadMessage = $dbst->fetchColumn();
                 $dbst = null;
                 $newMsgID = "#msg$firstUnreadMessage";
             }
