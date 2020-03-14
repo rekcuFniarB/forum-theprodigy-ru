@@ -57,6 +57,10 @@ class Security
         return 0; // TODO
     } // enhanced_banning()
     
+    public function remove_expired_bans() {
+        $this->app->db->query("DELETE FROM {$this->app->db->db_prefix}banned_enh WHERE BannedUntil < " . time());
+    }
+    
     // Is visitor from Roskolhoznadzor
     public function is_roskolhoznadzor() {
         $REMOTE_ADDR = $this->request->server()->get('REMOTE_ADDR');

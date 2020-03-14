@@ -1,0 +1,193 @@
+    <script language="JavaScript1.2" type="text/javascript"><!--
+        function invertAll(field, headerfield)
+        {
+            for (i = 0; i < field.length; i++) {
+                if (headerfield.checked == false )
+                    field[i].checked = true;
+                else
+                    field[i].checked = false;
+                }
+                headerfield.checked = !(headerfield.checked);
+        }
+        function Set_Enable (oControl,oObject)
+        {
+            if (document.all[oControl].checked)
+            {
+                document.all[oObject].value = \'\';
+                document.all[oObject].disabled = true;
+            }
+            else
+            {
+                document.all[oObject].disabled = false;
+                document.all[oObject].focus();
+            }
+        }
+    //--></script>
+    
+    <form action="." method="post">
+        <table border="0" cellspacing="0" cellpadding="1" align="center" width="630">
+            <tr>
+                <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                    <table border="0" cellspacing="0" cellpadding="4" align="center" width="630">
+                        <tr>
+                            <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                                <b><?= $this->locale->txt['enhancedban22'] ?>:</b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="windowbg enh-ban-input-block" bgcolor="<?= $this->color['windowbg'] ?>" align="center">
+                                <div>
+                                    <div><?= $this->locale->txt[35] ?>:</div>
+                                    <div>
+                                        <input name="uname" type="text" id="uname" value="<?= $this->aMember['memberName'] ?>" size="20">
+                                    </div>
+                                </div>
+                                <div>
+                                    <div><?= $this->locale->txt['enhancedban23'] ?>&nbsp;<?= $this->locale->txt[307] ?>:</div>
+                                    <div>
+                                        <input name="email" type="text" id="email" value="<?= $this->aMember['emailAddress'] ?>" size="20">
+                                    </div>
+                                </div>
+                                <div>
+                                    <div><?= $this->locale->txt['enhancedban23'] ?>&nbsp;<?= $this->locale->txt['enhancedban4'] ?>:</div>
+                                    <div>
+                                        <input name="ipaddy" type="text" id="ipaddy" value="<?= $this->aMember['memberIP'] ?>" size="20">
+                                    </div>
+                                </div>
+                                <div>
+                                    <div><?= $this->locale->txt['enhancedban23'] ?>&nbsp;<?= $this->locale->txt['enhancedban28'] ?>:</div>
+                                    <div>
+                                        <input name="fingerprint" type="text" id="fingerprint" size="20">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" align="center">
+                                <table border="0" cellspacing="0" cellpadding="0" align="center">
+                                    <tr>
+                                        <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" align="left">
+                                            <?= $this->locale->txt['enhancedban11'] ?>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" align="left">
+                                            <textarea name="reason" id="reason" cols="74" rows="5"></textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" align="center">
+                                <font size="2">
+                                    <?= $this->locale->txt['enhancedban8'] ?>&nbsp;<input name="timetoban" type="text" id="timetoban" value="" size="20" disabled>
+                                </font>&nbsp;<?= $this->locale->txt['enhancedban7'] ?>:&nbsp;<input name="timecheck" class="windowbg" type="checkbox" style="background-color: <?= $this->color['windowbg'] ?>" onclick="Set_Enable('timecheck','timetoban')" checked/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" align="center">
+                                <br>
+                                <input type="submit" name="submit" value="<?= $this->locale->txt['enhancedban5'] ?>">
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" name="sc" value="<?= $this->sessionid ?>" />
+        <input type="hidden" name="ban" value="ban">
+    </form>
+    <form action="." method="post" onsubmit="if (!confirm('<?= $this->locale->txt['enhancedban15'] ?>?')) return false;">
+        <table border="0" cellspacing="0" cellpadding="0" align="center" width="100%">
+            <tr>
+                <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                    <table border="0" cellspacing="1" cellpadding="3" align="center" width="100%">
+                        <tr>
+                            <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                                <font size=2>
+                                    <a title="<?= $this->locale->txt[43] ?> <?= $this->locale->txt[525] ?> <?= $this->locale->txt[35] ?>" href="?order=1&amp;desc=<?= $this->aDesc[0] ?>"><b><span class="text1"><?= $this->locale->txt[35] ?></span></b></a>
+                                </font>
+                            </td>
+                        <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                            <font size=2>
+                                <a title="<?= $this->locale->txt[43] ?> <?= $this->locale->txt[525] ?> <?= $this->locale->txt[307] ?>" href="?order=2&amp;desc=<?= $this->aDesc[1] ?>"><b><span class="text1"><?= $this->locale->txt[307] ?></span></b></a>
+                            </font>
+                        </td>
+                        <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                            <font size=2>
+                                <a title="<?= $this->locale->txt[43] ?> <?= $this->locale->txt[525] ?> <?= $this->locale->txt['enhancedban4'] ?>" href="?order=3&amp;desc=<?= $this->aDesc[2] ?>"><b><span class="text1"><?= $this->locale->txt['enhancedban4'] ?></span></b></a>
+                            </font>
+                        </td>
+                        <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                            <font size=2>
+                                <a title="<?= $this->locale->txt[43] ?> <?= $this->locale->txt[525] ?> <?= $this->locale->txt['enhancedban13'] ?>" href="?order=4&amp;desc=<?= $this->aDesc[3] ?>"><b><span class="text1"><?= $this->locale->txt['enhancedban13'] ?></span></b></a>
+                            </font>
+                        </td>
+                        <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                            <font size=2>
+                                <a title="<?= $this->locale->txt[43] ?> <?= $this->locale->txt[525] ?> <?= $this->locale->txt['enhancedban14'] ?>" href="?order=5&amp;desc=<?= $this->aDesc[4] ?>"><b><span class="text1"><?= $this->locale->txt['enhancedban14'] ?></span></b></a>
+                            </font>
+                        </td>
+                        <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                            <font size=2>
+                                <a title="<?= $this->locale->txt[43] ?> <?= $this->locale->txt[525] ?> BannedBy" href="?order=6&amp;desc=<?= $this->aDesc[4] ?>"><b><span class="text1">BannedBy</span></b></a>
+                            </font>
+                        </td>
+                        <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                            <input class="titlebg" type="checkbox" style="background-color: <?= $this->color['titlebg'] ?>" onclick="invertAll(this.form, this)" />
+                        </td>
+                    </tr>
+                    
+                    <?php if(empty($this->banned_members)): ?>
+                        <tr>
+                            <td colspan="6" align="left" class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                                <font size=2>
+                                    <b><?= $this->locale->txt['enhancedban21'] ?></b>
+                                </font>
+                            </td>
+                        </tr>
+                    <?php else: ?>
+                        <?php foreach($this->banned_members as $banned): ?>
+                            <tr>
+                                <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                                    <a href="<?= $this->siteurl ?>/people/<?= rawurlencode($banned['Name']) ?>/"><?= $this->esc($banned['Name']) ?></a>
+                                </td>
+                                <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                                    <?= $this->esc($banned['Mail']) ?>
+                                </td>
+                                <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                                    <?= $this->esc($banned['IP']) ?>
+                                </td>
+                                <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                                    <?= $this->esc($banned['Reason']) ?>
+                                </td>
+                                <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                                    <?= $banned['BannedUntil'] ?>
+                                </td>
+                                <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                                    <?php if(!empty($banned['bbMemberName']) and !empty($banned['bbRealName'])): ?>
+                                        <a href="<?= $this->siteurl ?>/people/<?= rawurldecode($banned['bbMemberName']) ?>/"><?= $this->esc($banned['bbRealName']) ?></a>
+                                    <?php else: ?>
+                                        Не найдено
+                                    <?php endif; ?>
+                                </td>
+                                <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                                    <input class="windowbg" type="checkbox" name="unban_<?= $banned['ID_BANNED'] ?>" />
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    
+                    <tr>
+                        <td colspan="6" class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" align="right">
+                            <input type="submit" name="submit" value="<?= $this->locale->txt['enhancedban19'] ?>">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" name="sc" value="<?= $this->sessiondid?>" />
+    <input type="hidden" name="ban" value="remove">
+</form>
