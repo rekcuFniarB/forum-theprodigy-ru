@@ -360,10 +360,10 @@ Class Render extends \Prodigy\Respond\Respond {
                     return $this->app->feedsrvc->httpError($post['status']);
                 }
                 
-                if ($this->service->username == 'Guest' && $is_roskolhoz = $this->app->collection->Security->is_roskolhoznadzor()) {
-                    $this->app->collection->Display->roskolhoznadzor_block($row,  $is_roskolhoz); // block the artticle
+                if ($this->app->user->guest && $is_roskolhoz = $this->app->security->is_roskolhoznadzor()) {
+                    $this->app->thread->roskolhoznadzor_block($post,  $is_roskolhoz); // block the artticle
                     
-                    return $this->response->redirect($this->service->httphost . $this->request->uri()); // reload the page
+                    return $this->redirect($this->service->siteurl . $this->request->uri()); // reload the page
                 }
             }
         }
