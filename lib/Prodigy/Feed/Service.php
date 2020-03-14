@@ -52,10 +52,10 @@ Class Service {
                 $msg = $this->app->locale->get("txt.errors.default.msg");
             
             if (empty($title))
-                if ($this->app->locale->isset("errors.$code.title"))
-                    $title = $this->app->locale->get("errors.$code.title");
+                if ($this->app->locale->isset("txt.errors.$code.title"))
+                    $title = $this->app->locale->get("txt.errors.$code.title");
                 else
-                    $title = $this->app->locale->get("errors.default.title");
+                    $title = $this->app->locale->get("txt.errors.default.title");
         
         $response->code($code);
         $this->service->title = $title;
