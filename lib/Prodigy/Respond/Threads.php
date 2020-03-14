@@ -190,6 +190,9 @@ class Threads extends Respond
             return $this->findBoard($currentboard, $threadid);
         }
         
+        if ($app->user->guest && $is_roskolhoz = $app->security->is_roskolhoznadzor())
+            $this->roskolhoznadzor_block($this->getMsgByStart($start, $threadid),  $is_roskolhoz);
+        
         // read topic rating
         $service->topicPosRating = !isset($topicinfo['topicPosRating']) ? 0 : $topicinfo['topicPosRating'];
         $service->topicNegRating = !isset($topicinfo['topicNegRating']) ? 0 : $topicinfo['topicNegRating'];
@@ -413,7 +416,7 @@ class Threads extends Respond
         
         if (count($messages))
             $dbrq = $db->query("
-                SELECT m.ID_MSG, m.subject, m.posterName, m.posterEmail, m.posterTime, m.ID_MEMBER, m.icon, m.posterIP, m.body, m.smiliesEnabled, m.modifiedTime, m.modifiedName, m.attachmentFilename, m.attachmentSize, m.nowListening, m.multinick, IFNULL(mem.realName, m.posterName) AS posterDisplayName, IFNULL(lo.logTime, 0) AS isOnline, m.comments, mem.blockComments POST_COMMENTS_BLOCKED, m.closeComments, m.agent, qpolls.POLL_TITLE, cs.notify
+                SELECT m.ID_MSG, m.subject, m.posterName, m.posterEmail, m.posterTime, m.ID_MEMBER, m.icon, m.posterIP, m.body, m.smiliesEnabled, m.modifiedTime, m.modifiedName, m.attachmentFilename, m.attachmentSize, m.nowListening, m.multinick, IFNULL(mem.realName, m.posterName) AS posterDisplayName, IFNULL(lo.logTime, 0) AS isOnline, m.comments, mem.blockComments POST_COMMENTS_BLOCKED, m.closeComments, m.agent, qpolls.POLL_TITLE, cs.notify, m.status
                 FROM {$db->db_prefix}messages AS m
                 LEFT JOIN {$db->db_prefix}members AS mem ON (mem.ID_MEMBER=m.ID_MEMBER)
                 LEFT JOIN {$db->db_prefix}log_online AS lo ON (lo.identity=mem.ID_MEMBER)
@@ -426,6 +429,13 @@ class Threads extends Respond
         
         while ($message = $dbrq->fetch())
         {
+            if ($app->conf->roskolhoznadzor) {
+                    if ($message['status'] >= 400) {
+                        // if page contains any forbidden message, show an error.
+                        return $this->error(null, $message['status']);
+                    }
+            }
+            
             if ($app->conf->hard_ignore && $app->user->inIgnore($message['posterName'])) {
                 // Skip ignored
                 continue;
@@ -599,6 +609,7 @@ class Threads extends Respond
             $messages[$message['ID_MSG']] = $message;
             $counter ++;
         } // while messages from DB
+        $dbrq = null;
         
         $service->messages = $messages;
         
@@ -680,6 +691,52 @@ class Threads extends Respond
         $service->action = 'newthread';
         return $this->reply($request, $response, $service, $app);
     }
+    
+    /**
+    * Get message by paginator value and thread id.
+    * 
+    * @global type $app            Service locator bject.
+    * @global type $modSettings    Modsettings.
+    * @param type $start           Paginator value from Display()
+    * @param type $threadid        Thread ID
+    * @return array || boolean     Message or FALSE
+    */
+    public function getMsgByStart($start, $threadid) {
+        global $app, $modSettings;
+        
+        $order = $this->app->conf->viewNewestFirst == 1 ? 'DESC' : '';
+        $dbrq = $this->app->db->prepare("SELECT ID_MSG, status FROM {$this->app->db->db_prefix}messages WHERE ID_TOPIC = ? ORDER BY ID_MSG $order LIMIT ?,1");
+        $dbrq->execute(array($threadid, $start));
+        $result = $dbrq->fetch();
+        $dbrq = null;
+        return $result;
+    }
+    
+    /**
+     * This function blocks specified message.
+     * It's riggered when a visitor comes from particular IP defined in config.
+     * 
+     * @param array $msg      Message info. At least we need 'MSG_ID' and 'status' values.
+     * @param string $comment comment to send in notification to admins.
+     */
+    public function roskolhoznadzor_block($msg, $comment='странный тип') {
+        $SERVER = $this->request->server();
+        $REMOTE_ADDR = $SERVER->get('REMOTE_ADDR');
+        $HTTP_REFERER = $SERVER->get('HTTP_REFERER');
+        $HTTP_USER_AGENT = $SERVER->get('HTTP_USER_AGENT');
+        
+        if ($msg['status'] < 400) {
+            // not blocked yet
+            $dbrq = $this->app->db->prepare("UPDATE {$this->app->db->db_prefix}messages SET status = 451 WHERE ID_MSG = ?");
+            $dbrq->execute(array($msg['ID_MSG']));
+            
+            $referer = !empty($HTTP_REFERER) ? "Referer: $HTTP_REFERER\n" : '';
+            
+            // Send notification to admins
+            $this->app->im->notifyAdmins("Предположительно заходил $comment",
+            "Предположительно заходил $comment с IP [url=https://ipinfo.io/{$REMOTE_ADDR}]{$REMOTE_ADDR}[/url]\n User-Agent: {$HTTP_USER_AGENT}\n$referer\nНа всякий случай была заблокирована страница [url]{$this->service->siteurl}/{$msg['ID_MSG']}[/url], следует перепроверить.");
+        } 
+    } // roskolhoznadzor_block()
     
     public function reply($request, $response, $service, $app)
     {

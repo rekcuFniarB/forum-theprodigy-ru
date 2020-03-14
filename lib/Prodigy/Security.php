@@ -56,6 +56,25 @@ class Security
     {
         return 0; // TODO
     } // enhanced_banning()
+    
+    // Is visitor from Roskolhoznadzor
+    public function is_roskolhoznadzor() {
+        $REMOTE_ADDR = $this->request->server()->get('REMOTE_ADDR');
+        $knownIPs = $this->app->conf->roskolhoznadzor['IP'];
+        
+        if (!is_array($knownIPs))
+            return false;
+        
+        foreach ($knownIPs as $IP => $comment) {
+            if (strpos($REMOTE_ADDR, $IP) === 0) {
+                // IP match!
+                return $comment;
+            }
+        }
+        
+        // No match, return false
+        return false;
+    } // is_roskolhoznadzor()
 }
 
 ?>
