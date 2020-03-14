@@ -61,12 +61,6 @@ class DataQuery {
             return array();
         }
         
-        // FIXME probably should do it in template instead
-        // due to it may break pagination.
-        $posts = array_filter($posts, function($pst) {
-            return $pst['status'] < 400;
-        });
-        
         if (count($posts) > $this->service->paginateBy) {
             $this->service->next_page_available = true;
             unset($posts[$this->service->paginateBy]);
@@ -129,13 +123,10 @@ class DataQuery {
                 }
             }
             
-            // Skip censored posts
-            if ($row['status'] < 400)
-                $posts[] = $row;
-            
+            $posts[] = $row;
         }
         
-        if (count($rows) > $this->service->paginateBy) {
+        if (count($posts) > $this->service->paginateBy) {
             $this->service->next_page_available = true;
             unset($posts[$this->service->paginateBy]);
         }
@@ -180,12 +171,6 @@ class DataQuery {
             return array();
         }
         
-        // FIXME probably shoud do it in template instead
-        // due to it may break pagination.
-        $posts = array_filter($posts, function($pst) {
-            return $pst['status'] < 400;
-        });
-            
         if (count($posts) > $this->service->paginateBy) {
             $this->service->next_page_available = true;
             unset($posts[$this->service->paginateBy]);
@@ -230,12 +215,6 @@ class DataQuery {
             return array();
         }
         
-        // FIXME probably shoud do it in template instead
-        // due to it may break pagination.
-        $posts = array_filter($posts, function($pst) {
-            return $pst['status'] < 400;
-        });
-            
         if (count($posts) > $this->service->paginateBy) {
             $this->service->next_page_available = true;
             unset($posts[$this->service->paginateBy]);
@@ -293,16 +272,14 @@ class DataQuery {
                     $row['subject'] = "{$autosubject[0]} &#12299; {$autosubject[1]}";
                 }
             }
-            // Skip censored articles
-            if ($row['status'] < 400)
-                $posts[] = $row;
+            $posts[] = $row;
         }
         
-        if (count($rows) > $this->service->paginateBy) {
+        if (count($posts) > $this->service->paginateBy) {
             $this->service->next_page_available = true;
             unset($posts[$this->service->paginateBy]);
         }
-    
+        
         return $posts;
     } // getNonAnnotatedBoard()
     
@@ -396,6 +373,16 @@ class DataQuery {
         return $topic;
     }
     
+    /**
+     * Remove censored posts
+     * @param array $posts  Array of posts
+     * @return array        Array of filtered posts
+     */
+    public function filterForbiddenPosts($posts) {
+        return array_filter($posts, function($post) {
+            return $post['status'] < 400;
+        });
+    }
 }
 
 ?>

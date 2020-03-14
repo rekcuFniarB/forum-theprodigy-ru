@@ -22,7 +22,7 @@ Class Render extends \Prodigy\Respond\Respond {
 //// Above already done in parent constructor.
 
     public function root() {
-    //// Goto default category
+        //// Goto default category
         $dbprefix = $this->app->db->db_prefix;
         $r = $this->app->db->query(
             "SELECT ID_CAT FROM {$dbprefix}categories ORDER BY catOrder LIMIT 1"
@@ -65,6 +65,8 @@ Class Render extends \Prodigy\Respond\Respond {
         $service->board = null;
         
         $app->feedData->buildPagination($posts, 'cat');
+        
+        $posts = $app->feedData->filterForbiddenPosts($posts);
     
         if ($all || $service->before != 0)
             $service->posts = $posts;
@@ -127,7 +129,9 @@ Class Render extends \Prodigy\Respond\Respond {
         }
     
         $this->app->feedData->buildPagination($posts, 'board');
-    
+        
+        $posts = $app->feedData->filterForbiddenPosts($posts);
+        
         if ($all || $this->service->before != 0)
             $this->service->posts = $posts;
         else
@@ -183,7 +187,9 @@ Class Render extends \Prodigy\Respond\Respond {
         }
     
         $app->feedData->buildPagination($posts, 'topic');
-    
+        
+        $posts = $app->feedData->filterForbiddenPosts($posts);
+        
         if ($service->before != 0)
             $service->posts = $posts;
         else
@@ -351,7 +357,7 @@ Class Render extends \Prodigy\Respond\Respond {
             if ($check_roskolhoznadzor) {
                 if ($post['status'] >= 400) {
                     // Article is blocked
-                    return $this->app->feedsrvc->httpError($row['status']);
+                    return $this->app->feedsrvc->httpError($post['status']);
                 }
                 
                 if ($this->service->username == 'Guest' && $is_roskolhoz = $this->app->collection->Security->is_roskolhoznadzor()) {
@@ -476,6 +482,8 @@ Class Render extends \Prodigy\Respond\Respond {
         
         if (isset($this->request->all))
                 $this->service->title .= " ({$this->app->locale->txt['feed_unfiltered']})";
+        
+        $posts = $app->feedData->filterForbiddenPosts($posts);
         
         foreach ($posts as &$post) {
             //// Preparing all output strings 
