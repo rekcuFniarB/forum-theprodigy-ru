@@ -536,9 +536,17 @@ abstract class Respond {
      */
     public function error($msg, $code = 404)
     {
-        // look for stored message or return self
-        $error_message = $this->app->locale->txt($msg, $msg);
-        return $this->app->errors->abort($this->app->locale->txt(106), $error_message, $code);
+        // If no message supplied, try to get message for $code
+        if (empty($msg)) {
+            $error_message = $this->app->locale->get("txt.errors.$code.msg", $this->app->locale->get("txt.errors.default.msg"));
+            $title = $this->app->locale->get("txt.errors.$code.title", $this->app->locale->get("txt.errors.default.title"));
+        }
+        else {
+            // look for stored message or return self
+            $error_message = $this->app->locale->txt($msg, $msg);
+            $title = $this->app->locale->txt(106);
+        }
+        return $this->app->errors->abort($title, $error_message, $code);
     }
     
     /**
