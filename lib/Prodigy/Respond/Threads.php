@@ -1254,7 +1254,7 @@ class Threads extends Respond
         {
             if ($app->user->guest and !in_array(crc32($rname), array_keys($cookie_nicks)) and sizeof($cookie_nicks) >= 2)
             {
-                $app->in->notifyAdminsLater("Возможный мультиник", print_r($cookie_nicks, true) . "\r\n\r\n" . $rname . ", $REMOTE_ADDR");
+                $app->im->notifyAdminsLater("Возможный мультиник", print_r($cookie_nicks, true) . "\r\n\r\n" . $rname . ", $REMOTE_ADDR");
                 return $this->error("Ты уже использовал другой ник для ответа на форуме. Пожалуйста, используй его и далее. С вопросами обращайся на <a href=\"mailto:dig7er@gmail.com\">dig7er@gmail.com</a>");
             }
         }

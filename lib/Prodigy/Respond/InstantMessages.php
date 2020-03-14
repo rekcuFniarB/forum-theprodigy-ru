@@ -3,10 +3,12 @@ namespace Prodigy\Respond;
 
 class InstantMessages extends Respond
 {
-    public function __construct($router)
-    {
-        parent::__construct($router);
-    }
+    protected $notify_admins;
+    
+    //public function __construct($router)
+    //{
+    //    parent::__construct($router);
+    //}
 
     public function getCount()
     {
@@ -400,6 +402,57 @@ class InstantMessages extends Respond
         if (!empty($mail_to))
             $this->sendmail($mail_to, $subject, $message, null, true);
     } // send_notice()
+    
+    /**
+     * Sends notifications to admins.
+     * @param $subject - subject
+     * @param $message - notification message
+     * @param $fromID - sender ID.
+     * @param $fromName - user name (login).
+     */
+    public function notifyAdmins($subject, $message, $fromID=null, $fromName=null){
+        $db_prefix = $this->app->db->db_prefix;
+        $r = $this->app->db->query("SELECT memberName, ID_MEMBER, emailAddress, im_email_notify FROM {$db_prefix}members WHERE memberGroup='Administrator'");
+        $admins = $r->fetchAll();
+        $r = null;
+        $receivers = array();
+        // List of admins who don't want to receive notifications
+        $dontNotifyAdmins = $this->app->conf->get('dontNotifyAdmins', array());
+        
+        foreach($admins as $admin){
+            if (!in_array($admin['ID_MEMBER'], $dontNotifyAdmins) && !in_array($admin['memberName'], $dontNotifyAdmins)){
+                $receivers[] = $admin['ID_MEMBER'];
+            }
+        }
+        if (!empty($receivers)){
+            $this->send_notice($receivers, $subject, $message, $fromID, $fromName);
+        }
+    } // NotifyAdmins()
+    
+    /**
+     * Store messages to send to admins in the end of process
+     * Calling without params sends stored messages.
+     * @param $subject - subject
+     * @param $message - message
+     */
+    public function notifyAdminsLater($subject = null, $message = null) {
+        if (!isset($this->notify_admins))
+            $this->notify_admins = array();
+        
+        if (!is_null($subject) && !is_null($message)) {
+            //// Store messages to send to admins later
+            $this->notify_admins[] = array($subject, $message);
+        } else {
+            //// Send stored messages to admins
+            if (isset($this->notify_admins)) {
+                foreach ($this->notify_admins as $message) {
+                    $this->notifyAdmins($message[0], $message[1]);
+                }
+                // Erase sent messages list
+                $this->notify_admins = array();
+            }
+        }
+    } // notifyAdminsLater()
     
     public function inbox($request, $response, $service, $app)
     {
