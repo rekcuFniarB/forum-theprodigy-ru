@@ -96,6 +96,7 @@ Class Admin extends \Prodigy\Respond\Respond {
             return $ban;
         }, $banned_members);
         
+        $aMember = array('memberName' => '', 'emailAddress' => '', 'memberIP' => '');
         
         // Get requested member detail and fill fields with his info
         if (!empty($GET->memid))
@@ -112,6 +113,7 @@ Class Admin extends \Prodigy\Respond\Respond {
             array(
                 'aDesc' => $aDesc,
                 'banned_members' => $banned_members,
+                'aMember' => $aMember,
             )
         );
         
