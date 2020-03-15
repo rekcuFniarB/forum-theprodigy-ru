@@ -695,15 +695,11 @@ class Threads extends Respond
     /**
     * Get message by paginator value and thread id.
     * 
-    * @global type $app            Service locator bject.
-    * @global type $modSettings    Modsettings.
     * @param type $start           Paginator value from Display()
     * @param type $threadid        Thread ID
     * @return array || boolean     Message or FALSE
     */
     public function getMsgByStart($start, $threadid) {
-        global $app, $modSettings;
-        
         $order = $this->app->conf->viewNewestFirst == 1 ? 'DESC' : '';
         $dbrq = $this->app->db->prepare("SELECT ID_MSG, status FROM {$this->app->db->db_prefix}messages WHERE ID_TOPIC = ? ORDER BY ID_MSG $order LIMIT ?,1");
         $dbrq->execute(array($threadid, $start));
