@@ -322,11 +322,12 @@
               <tr>
                 <td colspan="2" class="windowbg2" bgcolor="<?= $this->color['windowbg2'] ?>">
                   <?php if($this->meminf['banned']): ?>
-                      <form action="<?= SITE_ROOT ?>/security/unban/<?= $this->meminf['ID_MEMBER'] ?>/" name="banform" method="POST" onsubmit="if(!confirm('<?= $this->locale->enhancedban24 ?>')) return false;">
+                      <form action="<?= SITE_ROOT ?>/admin/bans/" name="banform" method="POST" onsubmit="if(!confirm('<?= $this->locale->enhancedban24 ?>')) return false;">
                   <?php else: ?>
-                      <form action="<?= SITE_ROOT ?>/security/ban/<?= $this->meminf['ID_MEMBER'] ?>/" name="banform" method="POST">
+                      <form action="<?= SITE_ROOT ?>/admin/bans/" name="banform" method="POST">
                   <?php endif; ?>
                   <input type="hidden" name="sc" value="<?= $this->sessionid ?>">
+                  <input type="hidden" name="memid" value="<?= $this->meminf['ID_MEMBER'] ?>">
                   
                   <script language="JavaScript1.2" type="text/javascript"><!--
                     function Set_Enable (oControl,oObject)
@@ -376,6 +377,7 @@
                               <tr>
                               <td bgcolor="<?= $this->color['windowbg2'] ?>" class="windowbg2" align="center">
                                 <br>
+                                  <input type="hidden" name="ban" value="remove">
                                   <input type="submit" value="<?= $this->locale->enhancedban19 ?>">
                             <?php else: /* not banned */?>
                                     <?= $this->locale->enhancedban16 ?> <?= $this->locale->enhancedban17 ?> <?= $this->locale->enhancedban18 ?>
@@ -408,6 +410,7 @@
                               <tr>
                                 <td bgcolor="<?= $this->color['windowbg2'] ?>" class="windowbg2" align="center">
                                   <br>
+                                  <input type="hidden" name="ban" value="ban">
                                   <input type="submit" value="<?= $this->locale->enhancedban5 ?>">
                                   <input type="button" value="<?= $this->locale->txt[752] ?>" onclick="Moderation.toggleProfileBanDialog(event)">
                             <?php endif; /* banned / not banned */?>

@@ -8,4 +8,4 @@ $this->registerServices(
 );
 
 // Show bans list
-$this->respond('GET', '/bans/', 'admin->bans');
+$this->respond(array('GET', 'POST'), '/bans/', 'admin->bans');

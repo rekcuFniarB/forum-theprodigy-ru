@@ -54,6 +54,13 @@ class Session {
         $_SESSION[$name] = $value;
         return $default;
     }
+    
+    /**
+     * Synonym of store()
+     */
+    public function set($name, $value, $default = nul) {
+        return $this->store($name, $value, $default);
+    }
 
     /**
      * Remove stored data from session.

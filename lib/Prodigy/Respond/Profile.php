@@ -363,10 +363,10 @@ class Profile extends Respond
             // User was banned
             $banned_info = $app->security->enhanced_banning($user, true);
             if(is_array($banned_info)){
-                if(!empty($banned_info[0]))
-                    $meminf['banneduntil'] = ' ' . $app->locale->enhancedban20 . ' ' . $app->subs->timeformat($banned_info[0]);
-                if(!empty($banned_info[1]))
-                    $meminf['banreason'] = $banned_info[1];
+                if(!empty($banned_info['BannedUntil']))
+                    $meminf['banneduntil'] = ' ' . $app->locale->enhancedban20 . ' ' . $app->subs->timeformat($banned_info['BannedUntil']);
+                if(!empty($banned_info['Reason']))
+                    $meminf['banreason'] = $banned_info['Reason'];
                 $meminf['banned'] = 1;
             }
         }

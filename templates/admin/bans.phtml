@@ -13,7 +13,7 @@
         {
             if (document.all[oControl].checked)
             {
-                document.all[oObject].value = \'\';
+                document.all[oObject].value = '';
                 document.all[oObject].disabled = true;
             }
             else
@@ -188,6 +188,6 @@
             </td>
         </tr>
     </table>
-    <input type="hidden" name="sc" value="<?= $this->sessiondid?>" />
+    <input type="hidden" name="sc" value="<?= $this->sessionid?>" />
     <input type="hidden" name="ban" value="remove">
 </form>
