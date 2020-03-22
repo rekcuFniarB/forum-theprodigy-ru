@@ -178,6 +178,12 @@ class Profile extends Respond
     public function show($request, $response, $service, $app)
     {
         $user = $request->paramsNamed()->get('user');
+        if (strpos($user, '+') !== false) {
+            // Get rid of "+" in the URL TODO should fix links in templates too
+            $user = str_replace('+', ' ', $user);
+            $user = rawurlencode($user);
+            return $this->redirect("/people/$user/");
+        }
         
         $db_prefix = $app->db->prefix;
         $dbst = $app->db->prepare("
