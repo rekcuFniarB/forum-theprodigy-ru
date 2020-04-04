@@ -86,14 +86,23 @@ class Service extends \Klein\ServiceProvider
      */
     public function partial($view, array $data = array())
     {
-        return parent::partial(PROJECT_ROOT . '/templates/' . $view, $data);
+        if (!empty($data)) {
+            $original_shared_data = $this->shared_data;
+            //$this->shared_data = new DataCollection($data);
+        }
+        $result =  parent::partial(PROJECT_ROOT . '/templates/' . $view, $data);
+        // Restore shared data
+        if (!empty($original_shared_data))
+            $this->shared_data = $original_shared_data;
+        
+        return $result;
     }
     
     public function include($view, array $data = array())
     {
         $template = PROJECT_ROOT . '/templates/' . $view;
         if (file_exists($template))
-            return parent::partial($template, $data);
+            return $this->partial($view, $data);
     }
     
     /**

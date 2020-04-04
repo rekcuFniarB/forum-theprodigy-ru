@@ -407,21 +407,25 @@ class Main extends Respond {
         $row = $dbst->fetch();
         $dbst = null;
         if (empty($row))
-            return '';
+            return null;
+        
         $row['subject'] = $this->app->subs->CensorTxt($row['subject']);
         if ($recentsender == 'admin') {
-            $row['subject'] = ((strlen($this->service->un_html_entities($row['subject']))>25) ? ($this->service->esc(substr($this->service->un_html_entities($row['subject']), 0, 22)) . "...") : $this->service->esc($row['subject']));
-            $post = "\"<a href=\"{$this->service->siteurl}/b{$row['ID_BOARD']}/t{$row['ID_TOPIC']}/new/\">$row[subject]</a>\" (" . $this->app->subs->timeformat($row['posterTime']) . ")\n";
+            $row['subject'] = strlen($this->service->un_html_entities($row['subject'])) > 25 ? substr($this->service->un_html_entities($row['subject']), 0, 22) . "..." : $row['subject'];
         }
-        else {
-            $row['subject'] = $this->service->esc($row['subject']);
-            $post = "{$this->app->locale->txt[234]} \"<a href=\"{$this->service->siteurl}/b{$row['ID_BOARD']}/t{$row['ID_TOPIC']}/new/\">{$row['subject']}</a>\" {$this->app->locale->txt[235]} (" . $this->app->subs->timeformat($row['posterTime']) . ")<br>\n";
-        }
+        
+        $post = array(
+                'board' => $row['ID_BOARD'],
+                'topic' => $row['ID_TOPIC'],
+                'subject' => $row['subject'],
+                'time' => $this->app->subs->timeformat($row['posterTime']),
+                'recentsender' => $recentsender,
+        );
 
         return $post;
     } // LastPost()
     
-    public function LastPostings() {
+    public function LastPostings() { // TODO rewrite as LastPost()
         $showlatestcount = 15;
         
         if (!isset($recentsender))
@@ -505,7 +509,7 @@ class Main extends Respond {
         return $post;
     } // LastPostings()
     
-    public function LastPostComments($recentsender = '') {
+    public function LastPostComments($recentsender = '') { // TODO rewrite as $this->LastPost()
         $showlatestcount = 15;
         
         $db_prefix = $this->app->db->prefix;

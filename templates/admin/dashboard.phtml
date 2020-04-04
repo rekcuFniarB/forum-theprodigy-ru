@@ -276,7 +276,9 @@
                             <b><?= $this->locale->txt[659] ?></b>
                         </font>
                         <font size="1">
-                            <?= $this->lastPost ?>
+                            <?php if (!empty($this->lastPost)): ?>
+                                <?php $this->partial('parts/lastpost.phtml', $this->lastPost) ?>
+                            <?php endif; ?>
                         </font>
                         <br />
                         <br />

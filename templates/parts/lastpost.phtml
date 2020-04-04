@@ -1,0 +1,6 @@
+<?php if($this->recentsender == 'admin'): ?>
+    <a href="<?= $this->siteurl?>/b<?= $this->board ?>/t<?= $this->topic ?>/new/"><?= $this->get('subject') ?></a> (<?= $this->time ?>)
+<?php else: ?>
+    <?= $this->locale->txt[234] ?>
+    <a href="<?= $this->siteurl ?>/b<?= $this->board ?>/t<?= $this->topic ?>/new/"><?= $this->get('subject') ?></a> <?= $this->locale->txt[235] ?> (<?= $this->time ?>)
+<?php endif; ?>

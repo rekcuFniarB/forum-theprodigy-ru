@@ -178,7 +178,9 @@
                 <td class="windowbg2 RecentPosts">
                   <a href="<?= SITE_ROOT ?>/recent/"><b><?= $this->locale->txt(214) ?></b></a><br>
                   <font size="1">
-                    <?= $this->last_post ?>
+                    <?php if(!empty($this->last_post)): ?>
+                        <?php $this->partial('parts/lastpost.phtml', $this->last_post) ?>
+                    <?php endif; ?>
                   </font>
                 </td>
               </tr>
@@ -245,7 +247,9 @@
                         <font size="1">
                           <?= $this->locale->txt(94) ?> <?= $this->locale->txt(64) ?> <b> <?= $this->totalt ?></b> &nbsp;&nbsp;&nbsp;&nbsp; <?= $this->locale->txt(94) ?> <?= $this->locale->txt(95) ?> <b> <?= $this->totalm ?></b><br>
                           <?= $this->locale->txt(659) ?>
-                          <?= $this->last_post_admin ?>
+                          <?php if(!empty($this->last_post_admin)): ?>
+                              <?php $this->partial('parts/lastpost.phtml', $this->last_post_admin) ?>
+                          <?php endif; ?>
                           <br>
                           <a href="<?= SITE_ROOT ?>/recent/"><?= $this->locale->txt(234) ?></a>
                           <?php if ($this->conf->trackStats == 1): ?>
