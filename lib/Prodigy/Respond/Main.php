@@ -401,7 +401,7 @@ class Main extends Respond {
             LEFT JOIN {$db_prefix}messages AS m ON (m.ID_MSG=t.ID_LAST_MSG)
             LEFT JOIN {$db_prefix}messages AS m2 ON (m2.ID_MSG=t.ID_FIRST_MSG)
             WHERE (FIND_IN_SET(?, c.memberGroups) != 0 OR c.memberGroups='' OR ? LIKE 'Administrator' OR ? LIKE 'Global Moderator')
-            RDER BY m.posterTime DESC
+            ORDER BY m.posterTime DESC
             LIMIT 1");
         $dbst->execute(array($usergroup, $usergroup, $usergroup));
         $row = $dbst->fetch();
@@ -410,11 +410,12 @@ class Main extends Respond {
             return '';
         $row['subject'] = $this->app->subs->CensorTxt($row['subject']);
         if ($recentsender == 'admin') {
-            $row['subject'] = ((strlen($this->app->subs->un_html_entities($row['subject']))>25) ? ($this->app->subs->htmlescape(substr($this->app->subs->un_html_entities($row['subject']), 0, 22)) . "...") : $row['subject']);
-            $post = "\"<a href=\"{$this->app->conf->scripturl}?board=$row[ID_BOARD];action=display;threadid=$row[ID_TOPIC];start=new\">$row[subject]</a>\" (" . $this->app->subs->timeformat($row['posterTime']) . ")\n";
+            $row['subject'] = ((strlen($this->service->un_html_entities($row['subject']))>25) ? ($this->service->esc(substr($this->service->un_html_entities($row['subject']), 0, 22)) . "...") : $this->service->esc($row['subject']));
+            $post = "\"<a href=\"{$this->service->siteurl}/b{$row['ID_BOARD']}/t{$row['ID_TOPIC']}/new/\">$row[subject]</a>\" (" . $this->app->subs->timeformat($row['posterTime']) . ")\n";
         }
         else {
-            $post = "{$this->app->locale->txt[234]} \"<a href=\"{$this->app->conf->scripturl}?board=$row[ID_BOARD];action=display;threadid=$row[ID_TOPIC];start=new\">$row[subject]</a>\" {$this->app->locale->txt[235]} (" . timeformat($row['posterTime']) . ")<br>\n";
+            $row['subject'] = $this->service->esc($row['subject']);
+            $post = "{$this->app->locale->txt[234]} \"<a href=\"{$this->service->siteurl}/b{$row['ID_BOARD']}/t{$row['ID_TOPIC']}/new/\">{$row['subject']}</a>\" {$this->app->locale->txt[235]} (" . $this->app->subs->timeformat($row['posterTime']) . ")<br>\n";
         }
 
         return $post;

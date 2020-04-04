@@ -1,0 +1,355 @@
+<script language="javascript" type="text/javascript">
+<!--
+    function reqWin(desktopURL)
+    {
+        desktop = window.open(desktopURL, "name", "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=400,height=200,resizable=no");
+    }
+// -->
+</script>
+
+<table border="0" cellpadding="0" cellspacing="6" align="center" width="100%">
+    <tr>
+        <td colspan="2" width="100%">
+            <table border="0" cellpadding="5" cellspacing="1" align="center" bgcolor="<?= $this->color['bordercolor'] ?>" class="bordercolor" width="100%">
+                <tr>
+                    <td bgcolor="<?= $this->color['titlebg'] ?>" class="titlebg" height="23" align="center" colspan="2">
+                        <font size="4" color="<?= $this->color['titletext'] ?>"><?= $this->locale->txt[208] ?></font>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" valign="top" align="center" width="50%">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td colspan="2">
+                                    <a href="javascript:reqWin('<?= $this->namespace ?>/help/13/')" class="help"><img src="<?= $this->imagesdir ?>/helptopics.gif" border="0" alt="<?= $this->locale->txt[119] ?>" /></a>
+                                    <b><?= $this->locale->txt['yse217'] ?></b>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <img src="<?= $this->imagesdir ?>/blank.gif" height="6" width="4" alt="" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <table>
+                                        <tr><td colspan="2"><?= $this->locale->txt['lfyi'] ?></td></tr></table></td></tr>
+                                    </table>
+                                </td>
+                                <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" width="50%" valign="top">
+                                    <font size="2">
+                                        <b><?= $this->locale->txt[248] ?> <?= $this->get('adminName') ?>!</b>
+                                    </font>
+                                    <font size="1">
+                                        <br />
+                                        <?= $this->locale->txt[644] ?>
+                                    </font>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" width="50%">
+                        <table border="0" cellpadding="4" cellspacing="1" align="center" bgcolor="<?= $this->color['bordercolor'] ?>" class="bordercolor" width="100%">
+                            <tr>
+                                <td class="catbg" bgcolor="<?= $this->color['catbg'] ?>"><font size="4" class="catbg"><?= $this->locale->txt[424] ?></font></td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="<?= $this->color['windowbg'] ?>" height="21" class="windowbg">
+                                    <img src="<?= $this->imagesdir ?>/board.gif" alt="" border="0" />
+                                    <font size="3">
+                                        <b><?= $this->locale->txt[427] ?></b>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="<?= $this->color['windowbg2'] ?>" height="21" class="windowbg2">
+                                    <font size="2">
+                                        <a href="<?= $this->namespace ?>/editnews/"><?= $this->locale->txt[7] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/editagreement/"><?= $this->locale->txt['yse11'] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/managecats/"><?= $this->locale->txt[3] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/manageboards/"><?= $this->locale->txt[4] ?></a>
+                                        <br />
+                                        <!--<a href="<?= $this->namespace ?>/packages/"><?= $this->locale->txt['package1'] ?></a>-->
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/manageattachments/"><?= $this->locale->txt['yse201'] ?></a>
+                                        <br />
+                                        <br />
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="<?= $this->color['windowbg'] ?>" height="21" class="windowbg">
+                                    <img src="<?= $this->imagesdir ?>/board.gif" alt="" border="0" />
+                                    <font size="3">
+                                        <b><?= $this->locale->txt[426] ?></b>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="<?= $this->color['windowbg2'] ?>" height="21" class="windowbg2">
+                                    <form action="<?= $this->namespace ?>/viewinactive/" method="post">
+                                        <font size="2">
+                                            <a href="<?= $this->namespace ?>/viewmembers/"><?= $this->locale->txt[5] ?></a>
+                                            <br />
+                                            <a href="<?= $this->namespace ?>/viewnopostmembers/"><?= $this->locale->txt['viewnopostmembers1'] ?></a>
+                                            <br />
+                                            <a href="<?= $this->namespace ?>/modmemgr/"><?= $this->locale->txt[8] ?></a>
+                                            <br />
+                                            <a href="<?= $this->namespace ?>/mailing/"><?= $this->locale->txt[6] ?></a>
+                                            <br />
+                                            <a href="<?= $this->namespace ?>/bans/"><?= $this->locale->txt[206] ?></a>
+                                            <br />
+                                            <a href="<?= $this->namespace ?>/setreserve/"><?= $this->locale->txt[207] ?></a>
+                                            <br /><br />
+                                            <?= $this->locale->txt['yse71'] ?>
+                                            <input type="text" name="mindays" size="2" maxlength="3" value="30" />
+                                            <?= $this->locale->txt['yse72'] ?>
+                                            <input type="submit" value="<?= $this->locale->txt[305] ?>" />
+                                        </font>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="<?= $this->color['windowbg'] ?>" height="21" class="windowbg">
+                                    <img src="<?= $this->imagesdir ?>/board.gif" alt="" border="0" />
+                                    <font size="3">
+                                        <b><?= $this->locale->txt[428] ?></b>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td bgcolor="<?= $this->color['windowbg2'] ?>" height="21" class="windowbg2">
+                                    <font size="2">
+                                        <a href="<?= $this->namespace ?>/smilies/"><?= $this->locale->asmtxt['01'] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/modtemp/"><?= $this->locale->txt[216] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/modsettings/"><?= $this->locale->txt[222] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/modifyModSettings/"><?= $this->locale->txt['yse2'] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/setcensor/"><?= $this->locale->txt[135] ?></a>
+                                        <br />
+                                        <br />
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr>
+                            <td bgcolor="<?= $this->color['windowbg'] ?>" height="21" class="windowbg">
+                                <img src="<?= $this->imagesdir ?>/board.gif" alt="" border="0" />
+                                <font size="3">
+                                    <b><?= $this->locale->txt[501] ?></b>
+                                </font>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="340" bgcolor="<?= $this->color['windowbg2'] ?>" height="21" class="windowbg2">
+                                <form action="<?= $this->namespace ?>/removeoldthreads/" method="post">
+                                    <font size="2">
+                                        <a href="<?= $this->namespace ?>/undelete/"><?= $this->locale->txt['undelete1'] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/repairboards/"><?= $this->locale->txt[610] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/boardrecount/"><?= $this->locale->txt[502] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/clean_log/"><?= $this->locale->txt[202] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/viewErrorLog/"><?= $this->locale->txt['errlog1'] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/optimizetables/"><?= $this->locale->txt['yse281'] ?></a>
+                                        <br />
+                                        <a href="<?= $this->namespace ?>/dumpdb/"><?= $this->locale->txt('yse286a', 'Dump database') ?></a>
+                                        <br />
+                                        <?= $this->locale->txt[124] ?>
+                                        <input type="text" name="maxdays" size="2" value="<?= $this->maxdays ?>" />
+                                        <?= $this->locale->txt[579] ?>
+                                        <input type="submit" value="<?= $this->locale->txt[31] ?>" />
+                                    </font>
+                                </form>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td valign="top" width="100%">
+                    <table border="0" cellpadding="4" cellspacing="1" align="center" bgcolor="<?= $this->color['bordercolor'] ?>" class="bordercolor" width="100%">
+                        <tr>
+                            <td class="catbg" bgcolor="<?= $this->color['catbg'] ?>">
+                                <font size="4" class="catbg"><?= $this->locale->txt[645] ?></font>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td bgcolor="<?= $this->color['windowbg'] ?>" class="windowbg" height="21">
+                                <img src="<?= $this->imagesdir ?>/cat.gif" alt="" border="0" />
+                                <font size="3">
+                                    <b><?= $this->locale->txt[94] ?></b>
+                                </font>
+                                <br />
+                            </td>
+                        </tr>
+                        <tr>
+                        <td bgcolor="<?= $this->color['windowbg2'] ?>" class="windowbg2">
+                            <table border="0" cellpadding="1" cellspacing="0" width="100%">
+                                <tr>
+                                    <td>
+                                        <font size="2">
+                                            <?= $this->locale->txt[488] ?>
+                                        </font>
+                                    </td>
+                                <td align="right">
+                                    <font size="2"><?= $this->memcount ?></font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <font size="2">
+                                        <?= $this->locale->txt[489] ?>
+                                    </font>
+                                </td>
+                                <td align="right">
+                                    <font size="2">
+                                        <?= $this->totalm ?>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <font size="2">
+                                        <?= $this->locale->txt[490] ?>
+                                    </font>
+                                </td>
+                                <td align="right">
+                                    <font size="2">
+                                        <?= $this->totalt ?>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <font size="2">
+                                        <?= $this->locale->txt[658] ?>
+                                    </font>
+                                </td>
+                                <td align="right">
+                                    <font size="2">
+                                        <?= $this->numcats ?>
+                                    </font>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <font size="2">
+                                        <?= $this->locale->txt[665] ?>
+                                    </font>
+                                </td>
+                                <td align="right">
+                                    <font size="2">
+                                        <?= $this->numboards ?>
+                                    </font>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="<?= $this->color['windowbg'] ?>" class="windowbg" height="21">
+                        <img src="<?= $this->imagesdir ?>/cat.gif" alt="" border="0" />
+                        <font size="3">
+                            <b><?= $this->locale->txt[657] ?></b>
+                        </font>
+                        <br />
+                    </td>
+                </tr>
+                <tr>
+                    <td bgcolor="<?= $this->color['windowbg2'] ?>" class="windowbg2">
+                        <font size="2">
+                            <b><?= $this->locale->txt[656] ?></b>
+                        </font>
+                        <font size="1">
+                            <a href="<?= $this->siteurl ?>/people/<?= rawurlencode($this->latestmember) ?>/"><?= $this->get('latestRealName') ?></a></font>
+                        <br />
+                        <font size="2">
+                            <b><?= $this->locale->txt[659] ?></b>
+                        </font>
+                        <font size="1">
+                            <?= $this->lastPost ?>
+                        </font>
+                        <br />
+                        <br />
+                        <font size="2">
+                            <b><?= $this->locale->txt[684] ?>:</b>
+                        </font>
+                        <font size="1">
+                            <?php $this->menu_begin() ?>
+                            <?php foreach ($this->admins as $admin): ?><!--
+                             --><?= $this->menusep(',') ?>
+                                <a href="<?= $this->siteurl ?>/people/<?= rawurlencode($admin['memberName']) ?>/" class="list-comma"><?= $this->esc($admin['realName']) ?></a><!--
+                         --><?php endforeach; ?>
+                        </font>
+                        <br><br>
+                        <font size="2">
+                            <b><?= $this->locale->txt[425] ?>:</b>
+                        </font>
+                        <font size="1">
+                            <?= $this->locale->YaBBversion ?>/<img src="http://www.yabbse.org/images/yabbsever.gif" alt="" />
+                        </font>
+                        <br />
+                        <div align="center">
+                            <font size="2">
+                                <a href="<?= $this->namespace ?>/detailedversion/"><?= $this->locale->txt[429] ?></a>
+                            </font>
+                        </div>
+                        <br />
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <table border="0" cellpadding="5" cellspacing="1" align="center" bgcolor="<?= $this->color['bordercolor'] ?>" class="bordercolor" width="100%">
+                <tr>
+                    <td class="catbg" bgcolor="<?= $this->color['catbg'] ?>">
+                        <img src="<?= $this->imagesdir ?>/xx.gif" alt="" border="0" />
+                        <font size="4" class="catbg">
+                            <?= $this->locale->txt[571] ?>
+                        </font>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                        <font size="1">
+                            Developers: rekcuFniarB, Dig7er.
+                            <br><br>
+                            Below is a list of credits of the past team members who made YaBB SE possible. The YaBB SE team wants to thank everyone who help make YaBB SE what it is today. We would also like to thank YOU YaBB SE cronies for installing and using our boards.<br />
+                            <br />
+                            <i>List of Team Members, the driving force behind YaBB SE releases. Thanks to all those who contributed!</i>
+                            <br><br>
+                            <i><b>YaBB SE Admin Team:</b></i>
+                            Jeff Lewis, Joseph Fung, Zef Hemel, Ted, Alex Rolko, Keitaro-Kun, Compuart, Nemesis, Parham, and John R.
+                            <br><br>
+                            <i><b>YaBB SE Support Team</b></i>
+                            Andrea, Mediman, David, Mach8, Manju
+                            <br><br>
+                            <i><b>YaBB SE Dev Team</b></i>
+                            Christian Land, Meriadoc, Chris Cromer, Dave Smulders, Greg Robson, Omar Bazavilvazo, Björn, Unknown W. Brackets <-- yes that is a real user.<br />
+                            <br>
+                            <i><b>YaBB SE Mod Team</b></i>
+                            [CV]XXL, Big P, Chris Cromer, Michael, Indestructible, Kalin Somphane, Groundup, Spaceman-Spiff, Delinquently insane, and Jack.R.Abbit
+                            <br><br>
+                            <i><b>YaBB SE Beta Testers:</b></i>
+                            Edwin Weij, Daniel D., Webby, J@rno, Chris Boston, Agelmar, Pegleg, Zippo, Tim C, Hypocrite, and Manco
+                            <br><br >
+                            <i><b>Misc:</b></i>
+                            Thank goes out to Mach8 for being Mach8. Not only do you give great support but you also make this community fun and exciting to come to. Without you YaBB SE community would be dull and boring. We luv you... Also a special thanks goes out to Zain for hosting YaBB SE at InfoDoma, you are a lifesaver for the YaBB SE community. Thanks!
+                            <br><br>
+                            For anyone we may missed, Thank You!
+                            <br>
+                        </font>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

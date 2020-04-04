@@ -54,9 +54,12 @@ class Localization extends \rekcuFniarB\arrayQuery\queriedArray {
         $this->lngfile = $locale;
     } // set_locale()
     
-    public function txt($name, $default = '') {
+    public function txt($name, $default = null) {
         if (null === $this->lngfile)
             $this->set_locale($this->app->conf->language);
+        
+        if (null === $default)
+            $default = $name;
         
         if (isset($this->txt[$name]))
             return $this->txt[$name];

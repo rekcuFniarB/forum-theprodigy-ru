@@ -9,3 +9,4 @@ $this->registerServices(
 
 // Show bans list
 $this->respond(array('GET', 'POST'), '/bans/', 'admin->bans');
+$this->respond('GET', '/', 'admin->dashboard');

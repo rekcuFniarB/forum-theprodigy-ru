@@ -5,6 +5,44 @@ namespace Prodigy\Admin;
 // Admin controller
 Class Admin extends \Prodigy\Respond\Respond {
     
+    public function __construct($router)
+    {
+        parent::__construct($router);
+        $this->service->namespace = SITE_ROOT . '/admin';
+    }
+    
+    // Admin dashbooard controller
+    public function dashboard($request, $response, $service, $app) {
+        if (!$app->user->isAdmin())
+            return $this->error(null, 403);
+        
+        $db_prefix = $app->db->prefix;
+        
+        $data = array(
+            'title' => $app->locale->txt[208],
+            'adminName' => $app->user->realName,
+            'maxdays' => $app->conf->maxdays,
+            'totalt' => $app->conf->totalTopics,
+            'totalm' => $app->conf->totalMessages,
+            'memcount' => $app->conf->memberCount,
+            'latestmember' => $app->conf->latestMember,
+            'latestRealName' => $app->conf->latestRealName,
+            'lastPost' => $app->main->LastPost('admin'),
+        );
+        
+        $dbrq = $app->db->query("SELECT COUNT(*) FROM {$db_prefix}categories");
+        $data['numcats'] = $dbrq->fetch(\PDO::FETCH_COLUMN); $dbrq = null;
+        
+        $dbrq = $app->db->query("SELECT COUNT(*) FROM {$db_prefix}boards");
+        $data['numboards'] = $dbrq->fetch(\PDO::FETCH_COLUMN); $dbrq = null;
+        
+        // and load the administrators
+        $dbrq = $app->db->query("SELECT memberName, realName FROM {$db_prefix}members WHERE memberGroup='Administrator'");
+        $data['admins'] = $dbrq->fetchAll(); $dbrq = null;
+        
+        return $this->render('admin/dashboard.phtml', $data);
+    } // dashboard()
+    
     // Bans list controller
     public function bans($request, $response, $service, $app)
     {

@@ -614,7 +614,7 @@ class Service extends \Klein\ServiceProvider
         if ($this->menu_initial) {
             $this->menu_initial = false;
         } else {
-            echo $menusep;
+            return $menusep;
         }
     }
     
