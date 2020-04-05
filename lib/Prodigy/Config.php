@@ -152,15 +152,12 @@ class Config {
         if ($this->modsettings[$name] === $value)
             return true;
         
-        $_name = $this->app->db->escape_string($name);
-        $_value = $this->app->db->escape_string($value);
-        $rslt = $this->app->db->query("INSERT INTO {$this->app->db->prefix}settings (variable, value)
-            VALUES ('$_name', '$_value')
-            ON DUPLICATE KEY UPDATE variable = '$_name', value = '$_value'");
-        if ($rslt)
-            $this->modsettings[$name] = $value;
-        
-        return $rslt;
+        $dbst = $this->app->db->prepare("INSERT INTO {$this->app->db->prefix}settings (variable, value)
+            VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE variable = ?, value = ?");
+        $dbst->execute(array($name, $value, $name, $value));
+        $dbst = null;
+        $this->modsettings[$name] = $value;
     }
     
     /**

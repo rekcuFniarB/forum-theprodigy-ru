@@ -1,0 +1,42 @@
+<script language="javascript" type="text/javascript">
+<!--
+    function reqWin(desktopURL)
+    {
+        desktop = window.open(desktopURL, "name", "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=400,height=200,resizable=no");
+    }
+// -->
+</script>
+
+<form action="." method="post">
+    <table border="0" width="70%" cellspacing="1" cellpadding="3" bgcolor="<?= $this->color['bordercolor'] ?>" class="bordercolor" align="center">
+        <tr>
+            <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>">
+                <a href="javascript:reqWin('<?= $this->namespace ?>/help/2/')" class="help"><img src="<?= $this->imagesdir ?>/helptopics.gif" border="0" alt="<?= $this->locale->txt[119] ?>" /> </a>
+                <font size="2" class="text1" color="<?= $this->color['titletext'] ?>">
+                    <b><?= $this->locale->txt[7] ?></b>
+                </font>
+            </td>
+        </tr>
+        <tr>
+            <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>">
+                <br />
+                <font size="1">
+                    <?= $this->locale->txt[670] ?>
+                </font>
+                <br /><br />
+            </td>
+        </tr>
+        <tr>
+            <td class="windowbg2" bgcolor="<?= $this->color['windowbg2'] ?>" align="center">
+                <br />
+                <font size="2">
+                    <textarea cols="70" rows="8" name="news"><?= $this->get('news') ?></textarea>
+                    <br />
+                    <input type="submit" value="<?= $this->locale->txt[10] ?>" />
+                </font>
+                <br />
+            </td>
+        </tr>
+    </table>
+    <input type="hidden" name="sc" value="<?= $this->sessionid ?>">
+</form>

@@ -43,6 +43,23 @@ Class Admin extends \Prodigy\Respond\Respond {
         return $this->render('admin/dashboard.phtml', $data);
     } // dashboard()
     
+    public function editnews($request, $response, $service, $app) {
+        $data = array(
+            'news' => $app->conf->news,
+            'title' => $app->locale->txt[7]
+        );
+        
+        if ($request->method('GET')) {
+            return $this->render('admin/editnews.phtml', $data);
+        }
+        elseif ($request->method('POST')) {
+            $app->session->check('post');
+            $news = $request->paramsPost()->news;
+            $app->conf->modSet('news', $news);
+            return $this->redirect('/admin/');
+        }
+    } // editnews()
+    
     // Bans list controller
     public function bans($request, $response, $service, $app)
     {
