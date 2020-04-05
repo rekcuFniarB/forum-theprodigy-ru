@@ -44,6 +44,9 @@ Class Admin extends \Prodigy\Respond\Respond {
     } // dashboard()
     
     public function editnews($request, $response, $service, $app) {
+        if (!$app->user->isAdmin())
+            return $this->error(null, 403);
+        
         $data = array(
             'news' => $app->conf->news,
             'title' => $app->locale->txt[7]
@@ -59,6 +62,31 @@ Class Admin extends \Prodigy\Respond\Respond {
             return $this->redirect('/admin/');
         }
     } // editnews()
+    
+    public function editagreement($request, $response, $service, $app)
+    {
+        if (!$app->user->isAdmin())
+            return $this->error(null, 403);
+        
+        if ($request->method('GET'))
+        {
+            
+            $data = array(
+                'title' => $app->locale->yse11
+            );
+            
+            $dbrq = $app->db->query("SELECT value FROM {$app->db->prefix}settings WHERE variable='agreement'");
+            $data['agreement'] = $dbrq->fetchColumn();
+            $dbrq = null;
+            return $this->render('admin/editagreement.phtml', $data);
+        }
+        elseif ($request->method('POST'))
+        {
+            $app->session->check('post');
+            $app->conf->modSet('agreement', $request->paramsPost()->agreement);
+            return $this->redirect('/admin/');
+        }
+    }
     
     // Bans list controller
     public function bans($request, $response, $service, $app)

@@ -149,7 +149,7 @@ class Config {
      */
     public function modSet($name, $value)
     {
-        if ($this->modsettings[$name] === $value)
+        if (isset($this->modsettings[$name]) && $this->modsettings[$name] === $value)
             return true;
         
         $dbst = $this->app->db->prepare("INSERT INTO {$this->app->db->prefix}settings (variable, value)
