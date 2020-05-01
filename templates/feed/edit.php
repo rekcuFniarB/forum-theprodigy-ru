@@ -1,5 +1,11 @@
 <?php $this->partial('feed/header.php'); ?>
 
+<?php if(!empty($this->is_new_art)): ?>
+    <div class="warning">
+        <?= $this->locale->txt('feed_edit_title') ?>
+    </div>
+<?php endif; ?>
+
 <form method="post" action=".">
   <div>
     <input type="text" name="subject" placeholder="subject" maxlength="120" autocomplete="off" value="<?=$this->esc($this->post['subject']) ?>" required>

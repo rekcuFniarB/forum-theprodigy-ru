@@ -659,3 +659,14 @@ nav.linktree {
 nav.linktree > font {
     display: inline-block;
 }
+
+.warning {
+    display: inline-block;
+    background-color: #ffa0a0;
+    padding: 1em;
+    margin: 1em;
+    color: #400000;
+    font-size: 1.1em;
+    border: 1px solid #400000;
+    border-radius: 3px;
+}
