@@ -130,7 +130,7 @@ Class Render extends \Prodigy\Respond\Respond {
     
         $this->app->feedData->buildPagination($posts, 'board');
         
-        $posts = $app->feedData->filterForbiddenPosts($posts);
+        $posts = $this->app->feedData->filterForbiddenPosts($posts);
         
         if ($all || $this->service->before != 0)
             $this->service->posts = $posts;
@@ -262,6 +262,7 @@ Class Render extends \Prodigy\Respond\Respond {
         }
         
         if (is_null($post['fID'])) {
+            $this->service->is_new_art = true;
             //// Try to create subject from content
             $autosubject = $this->app->feedsrvc->autosubject($post['subject'], $post['body']);
             if (is_array($autosubject)) {
@@ -483,7 +484,7 @@ Class Render extends \Prodigy\Respond\Respond {
         if (isset($this->request->all))
                 $this->service->title .= " ({$this->app->locale->txt['feed_unfiltered']})";
         
-        $posts = $app->feedData->filterForbiddenPosts($posts);
+        $posts = $this->app->feedData->filterForbiddenPosts($posts);
         
         foreach ($posts as &$post) {
             //// Preparing all output strings 
