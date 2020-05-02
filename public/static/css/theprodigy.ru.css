@@ -98,6 +98,7 @@ img.msg-embed-img {
  * Quotes
  */
 table.quote-msg-meta { margin-top: 1em; }
+/* table.quote-msg { margin-bottom: 1em; } */
 table.quote-msg + br { display: none; }
 
 /* MESSAGE COMMENTS FORM */
@@ -214,7 +215,6 @@ a.session-settings-btn {
     height: 20px;
     background-image: url('../img/YaBBImages/settings.png');
 }
-
 a.orange-arrow-right {float: right;}
 
 /* Karma Page */
@@ -273,8 +273,8 @@ div.comment-content a.msgurl[href$=".gif"] {cursor: zoom-in;}
 
 /* Youtube Embed */
 .youtube-embed {
-    width: 640px;
-    max-width: 100%;
+    max-width: 640px;
+    /*max-width: 100%;*/
     position: relative;
     background-color: #000000;
 }
@@ -397,6 +397,9 @@ div.display-mode-switch > a {
 /*
  * Search page
  */
+.sphinx-search-page {
+    padding: 1.5em;
+}
 .sphinx-search-page > div.bordercolor {
     padding: 1px;
 }
@@ -412,10 +415,11 @@ div.display-mode-switch > a {
     font-size: 0.9em;
 }
 .sphinx-search-form {
-    margin-bottom: 0.3em;
+    /*margin-bottom: 0.3em;*/
+    padding-bottom: 4em;
 }
 .search-result-item {
-    margin-bottom: 0.4em;
+    /*margin-bottom: 0.4em;*/
     overflow: auto;
 }
 .search-result-item > div.bordercolor:first-child {
@@ -425,7 +429,7 @@ div.display-mode-switch > a {
     font-size: 1.2em;
     display: table;
     width: 100%;
-    border-spacing: 1px 0;
+    border-spacing: 1px;
 }
 .search-result-item-header > div {
     display: table-row;
@@ -443,10 +447,16 @@ div.display-mode-switch > a {
 .search-result-item-subject {
     width: 100%;
 }
-.search-result-item-message {margin: 0.4em; font-size: 0.8rem;}
+.search-result-item-message {
+    font-size: 0.8rem;
+    padding: 1em;
+}
 .search-result-item-comments {
     font-size: 1.2em;
-    margin: 0 0.4em;
+    padding: 0.1em 0.5em;
+}
+.search-result-item .msg-and-comments {
+    margin: 0 1px 1px 1px;
 }
 .search-result-item-hr.bordercolor {
     /*border: 1px dotted;*/
@@ -455,6 +465,10 @@ div.display-mode-switch > a {
     height: 1px;
     padding: 0;
 }
+.search-result-spacer {
+    padding: 2em;
+}
+
 #sph-input-search-text {
     width: 25em;
 }
@@ -548,11 +562,7 @@ a.rss-link {
 
 div.soundcloud-embed {
     position: relative;
-    /*display: table-row;*/
     box-sizing: border-box;
-    /*overflow: auto;*/
-    /*background: url('/YaBBImages/soundcloud-template-ind25.png') no-repeat;
-    background-size: contain; */
     background-color: #f5f5f5;
     min-height: 166px;
     max-height: 450px;
@@ -596,9 +606,9 @@ div.soundcloud-embed > a.soundcloud-embed-lnk {
     width: 100%;
     height: 100%;
     top: 0;
+    left: 0;
 }
 /* END Soundcloud embed */
-
 
 div.error-page > h1 {
     padding: 0.2em;
@@ -651,7 +661,6 @@ div.audio-player {
     max-width: 100%;
 }
 /* END mediaelementjs */
-
 
 nav.linktree {
     display: inline-block;
