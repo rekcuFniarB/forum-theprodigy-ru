@@ -14,6 +14,11 @@
     <textarea name="annotation" maxlength="256" autocomplete="off" placeholder="<?= $this->locale->txt['feed_textarea'] ?>"><?=$this->esc($this->post['annotation']) ?></textarea>
   </div>
   <div>
+    <?php if($this->reason_required): ?>
+        <input type="text" name="reason" maxlength="255" required placeholder="<?= $this->locale->txt('mdfrznplchldr') ?>" value="<?= $this->esc($this->post['reason']) ?>">
+    <?php endif; ?>
+  </div>
+  <div>
     <?= $this->locale->txt['feed_sticky'] ?>:
       <input type="radio" name="sticky" value="0" <?= $this->sticky == 0 ? 'checked' : '' ?> id="stickySwitch0">
         <label for="stickySwitch0"><?= $this->locale->txt['feed_sticky_no'] ?></label>
@@ -31,7 +36,7 @@
 <article class="windowbg2" id="article<?= $this->post['ID_MSG'] ?>">
   <h2 class="windowbg"><?=$this->esc($this->post['boardname']) ?>
     <span class="article-title-delimeter">»</span>
-    <a href="<?= $this->namespace ?>/<?= $this->post['ID_CAT'] ?>/<?= $this->post['ID_BOARD'] ?>/<?= $this->post['ID_MSG'] ?>/"><?=$this->esc($this->post['subject']); ?></a>
+    <a href="<?= $this->namespace ?>/<?= $this->post['ID_CAT'] ?>/<?= $this->post['ID_BOARD'] ?>/<?= $this->post['ID_MSG'] ?>/"><?=$this->esc($this->post['subject']) ?></a>
   </h2>
   <?php if(!empty($this->post['annotation'])): ?>
         <div class="article-annotation"><?= $this->DoUBBC($this->post['annotation']) ?></div>

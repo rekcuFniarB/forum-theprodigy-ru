@@ -227,7 +227,7 @@ Class Render extends \Prodigy\Respond\Respond {
     public function article_edit() {
         $dbprefix = $this->app->db->db_prefix;
         $r = $this->app->db->prepare(
-            "SELECT STRAIGHT_JOIN m.ID_MSG, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(l.subject, m.subject) as subject, annotation, body, IFNULL(mem.realName, mem.memberName) as realname, mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, l.sticky, l.ID_MSG as fID
+            "SELECT STRAIGHT_JOIN m.ID_MSG, posterTime as date, lm.memberName AS annotatedByName, IFNULL(lm.realName, lm.memberName) AS annotatedByRN, IFNULL(l.subject, m.subject) as subject, annotation, body, IFNULL(mem.realName, mem.memberName) as realname, mem.memberName as author, b.name as boardname, b.ID_CAT, b.ID_BOARD, l.sticky, l.ID_MSG as fID, l.annotatedBy
                 FROM {$dbprefix}messages m
                 LEFT JOIN {$dbprefix}topics t ON m.ID_TOPIC = t.ID_TOPIC
                 LEFT JOIN {$dbprefix}boards b ON t.ID_BOARD = b.ID_BOARD
@@ -248,6 +248,7 @@ Class Render extends \Prodigy\Respond\Respond {
         }
         
         $this->service->sticky = $post['sticky'];
+        $post['reason'] = '';
         
         $redirect_url = "{$this->service->httphost}{$this->service->namespace}/{$post['ID_CAT']}/{$post['ID_BOARD']}/{$this->request->postid}/";
     
@@ -261,6 +262,7 @@ Class Render extends \Prodigy\Respond\Respond {
             return;
         }
         
+        // Is new article?
         if (is_null($post['fID'])) {
             $this->service->is_new_art = true;
             //// Try to create subject from content
@@ -269,11 +271,21 @@ Class Render extends \Prodigy\Respond\Respond {
                 $post['subject'] = "{$autosubject[0]} &#12299; {$autosubject[1]}";
             }
         }
+        else { // If editing
+            // Approved not by current user, require reason field
+            if ($this->app->user->id != $post['annotatedBy']) {
+                $this->service->reason_required = true;
+            }
+        }
         
         // CSRF token
         $this->service->sessid = $this->app->session->id;
         
         if($this->request->method() == 'POST') {
+            if ($this->service->reason_required) {
+                $this->service->validateParam('reason', $this->app->locale->txt('mdfrznerr'))->isLen(3, 256);
+            }
+            
             $this->service->validateParam('subject', 'Empty subject.')->isLen(1, 256);
             //$this->service->validateParam('annotation', 'Empty annotation.')->isLen(1, 256);
             $this->service->validateParam('sticky', 'Form not properly filled')->isInt();
@@ -282,6 +294,7 @@ Class Render extends \Prodigy\Respond\Respond {
                 //// Preview button pressed
                 $post['subject'] = $this->request->param('subject');
                 $post['annotation'] = $this->request->param('annotation', '');
+                $post['reason'] = $this->request->param('reason', '');
                 $this->service->sticky = $this->request->param('sticky');
                 $this->app->feedsrvc->build_menu();
             }
@@ -305,6 +318,13 @@ Class Render extends \Prodigy\Respond\Respond {
                     $this->app->user->id,
                 ));
                 $req = null;
+                
+                // Send notice to previous approver
+                if ($this->service->reason_required) {
+                    $notice_msg = "{$this->app->user->realName} обновил публикацию [url={$redirect_url}]".$this->request->param('subject')."[/url] в ленте, ранее подтверждённую тобой, по причине \"". $this->request->param('reason') . '"';
+                    $this->app->im->send_notice($post['annotatedBy'], 'Правки в ленте', $notice_msg);
+                }
+                
                 return $this->redirect($redirect_url);
             }
             elseif ($this->request->param('delete', false)) {
@@ -312,6 +332,13 @@ Class Render extends \Prodigy\Respond\Respond {
                 $req = $this->app->db->prepare("DELETE FROM {$dbprefix}feed WHERE ID_MSG = ?");
                 $req->execute(array($this->request->postid));
                 $req = null;
+                
+                // Send notice to previous approver
+                if ($this->service->reason_required) {
+                    $notice_msg = "{$this->app->user->realName} отменил публикацию \"".$this->request->param('subject')."\" в ленте, ранее подтверждённую тобой, по причине \"". $this->request->param('reason') . '"';
+                    $this->app->im->send_notice($post['annotatedBy'], 'Правки в ленте', $notice_msg);
+                }
+                
                 return $this->redirect($redirect_url);
             }
             else {
