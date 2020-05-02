@@ -21,6 +21,7 @@
     /*border: 1px dotted green;*/
     max-width: 25%;
     margin: 0;
+    padding-right: 0.5em;
     vertical-align: top;
     box-sizing: border-box;
   }
@@ -93,7 +94,7 @@
   
   section.posts-list > article {
       /*margin: 0.4em;*/
-      margin: 1em 0;
+      margin: 1em 0 4em 0;
       padding: 1px;
   }
   section.posts-list > article > h2 {
