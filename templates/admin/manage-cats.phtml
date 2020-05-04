@@ -1,0 +1,132 @@
+<script language="javascript" type="text/javascript">
+<!--
+function reqWin(desktopURL)
+{
+    desktop =window.open(desktopURL, "name", "toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=400,height=200,resizable=no");
+}
+function memberGroups(theForm)
+{
+    if (window.popup)
+        popup.close();
+    popup = window.open("", "membergroups", "toolbar=no,location=no,status=no,menubar=no,scrollbars=no,width=280,height=300,resizable=no");
+    popup.document.write("<html><head><title><?= $this->locale->txt[57] ?></title>\n");
+    popup.document.write("<script language=\"javascript\" type=\"text/javascript\">\n");
+    popup.document.write("function changeSelectedGroups(listObject) {\n");
+    popup.document.write("var newMemberGroups = \'\';\n");
+    popup.document.write("for (var i = 0; i < listObject.length; i++){\n");
+    popup.document.write("if (listObject.options[i].selected){\n");
+    popup.document.write("newMemberGroups += listObject.options[i].text +\',\';\n");
+    popup.document.write("}\n}\n");
+    popup.document.write("if (newMemberGroups.length > 0){\n");
+    popup.document.write("newMemberGroups=newMemberGroups.substr(0,newMemberGroups.length-1)");
+    popup.document.write("}\nwindow.opener.document."+theForm+".catgroups.value=newMemberGroups;\n}");
+    popup.document.write("\n<\/script>\n<\/head>\n<body>\n");
+    popup.document.write("<font face=\"verdana,arial\" size=\"2\"><b><?= $this->locale->txt[57] ?><\/b><br \/><?= $this->locale->txt['yse55'] ?>\n");
+    popup.document.write("<p align=\"center\"><form name=\"form1\"><select size=\"6\" name=\"myOptions\" multiple=\"multiple\" onchange=\"changeSelectedGroups(this)\">\n");
+    popup.document.write("<?= $this->membergrps ?>\n");
+    popup.document.write("<\/select><br \/> <br \/> <input type=\"button\" onclick=\"window.close()\" value=\"<?= $this->locale->txt[17] ?>\" /><\/form><\/p><\/font><\/body><\/html>");
+}
+// -->
+</script>
+
+<table border="0" cellspacing="1" cellpadding="4" bgcolor="<?= $this->color['bordercolor'] ?>" class="bordercolor" align="center" width="100%">
+    <tr>
+        <td class="titlebg" bgcolor="<?= $this->color['titlebg'] ?>" colspan="2">
+            <a href="javascript:reqWin('<?= $this->namespace ?>/help/0/')" class="help"><img src="<?= $this->imagesdir ?>/helptopics.gif" border="0" alt="<?= $this->locale->txt[119] ?>" /></a>
+            <font size="2" class="text1" color="<?= $this->color['titletext'] ?>">
+                <b><?= $this->locale->txt[52] ?></b>
+            </font>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" bgcolor="<?= $this->color['catbg'] ?>" class="catbg" height="25">
+            <font size="2">
+                <b><?= $this->locale->txt[56] ?></b>
+            </font>
+        </td>
+    </tr>
+    <tr>
+        <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" valign="top">
+            <!-- Begin Create Cat Code -->
+            <form action="./create/" method="post">
+                <table width="100%">
+                    <tr>
+                        <td>
+                            <font size="2">
+                                <b><?= $this->locale->txt[44] ?>:</b>
+                            </font>
+                            <br />
+                            <font size="1"><?= $this->locale->txt[672] ?></font>
+                        </td>
+                        <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" valign="top">
+                            <font size="2">
+                                <input type="text" size="40" name="catname" />
+                            </font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" valign="top" width="50%">
+                            <font size="2"><b><?= $this->locale->txt[57] ?>:</b></font>
+                            <br />
+                            <font size="1"><?= $this->locale->txt[673] ?></font>
+                        </td>
+                        <td class="windowbg" bgcolor="<?= $this->color['windowbg'] ?>" valign="top" width="50%">
+                            <font size="2"><input type="text" size="40" name="memgroup" /><br /></font>
+                            <font size="1">(<?= $this->locale->txt[58] ?>)</font>
+                            <br /><br />
+                            <input type="submit" value="<?= $this->locale->txt[59] ?>" />
+                        </td>
+                    </tr>
+                </table>
+                <input type="hidden" name="sc" value="<?= $this->sessionid ?>" />
+            </form>
+            <!-- Stop Create Cat Code -->
+        </td>
+    </tr>
+</table>
+
+<?php foreach ($this->cats as $curcat): ?>
+    <!-- Begin Modify Cat Code -->
+    <form name="cat<?= $curcat['ID_CAT'] ?>" action="." method="post">
+        <table border="0" cellspacing="1" cellpadding="4" bgcolor="<?= $this->color['bordercolor'] ?>" class="bordercolor" align="center" width="100%">
+            <tr>
+                <td colspan="2" valign="top" bgcolor="<?= $this->color['catbg'] ?>" class="catbg" height="25">
+                    <font size="2">
+                        <b><?= $this->locale->txt[44] ?>: <input type="text" value="<?= $curcat['name'] ?>" size="25" name="catname" />
+                        <input type="hidden" name="ID_CAT" value="<?= $curcat['ID_CAT'] ?>" /></b>
+                    </font>
+                </td>
+            </tr>
+            <tr>
+                <td bgcolor="<?= $this->color['windowbg2'] ?>" class="windowbg2" colspan="2">
+                    <table border="0" cellpadding="1" cellspacing="0" width="100%">
+                        <tr>
+                            <td valign="middle">
+                                <font size="2">
+                                    <?= $this->locale->txt[43] ?>:
+                                    <br />
+                                    <input type="text" value="<?= $curcat['catOrder'] ?>" size="5" name="catorder" />
+                                </font>
+                            </td>
+                            <td valign="middle">
+                                <font size="2">
+                                    <?= $this->locale->txt[57] ?>:
+                                    <br />
+                                    <input type="text" value="<?= $curcat['memberGroups'] ?>" size="40" name="catgroups" />
+                                    <a href="javascript:memberGroups('cat<?= $curcat['ID_CAT'] ?>');"><img src="<?= $this->imagesdir ?>/assist.gif" border="0" alt="" /></a>
+                                </font>
+                            </td>
+                            <td valign="middle">
+                                <input type="hidden" name="id" value="<?= $curcat['ID_CAT'] ?>" />
+                                <input type="hidden" name="moda" value="1" />
+                                <input type="button" value="<?= $this->locale->txt[17] ?>" onclick="cat<?= $curcat['ID_CAT'] ?>.moda.value='1'; submit();" />
+                                <input type="button" value="<?= $this->locale->txt[31] ?>" onclick="if (confirm('<?= $this->locale->txt['catConfirm'] ?>')) { cat<?= $curcat['ID_CAT'] ?>.moda.value='-1'; submit(); }" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <input type="hidden" name="sc" value="<?= $this->sessionid ?>" />
+    </form>
+<?php endforeach; ?>

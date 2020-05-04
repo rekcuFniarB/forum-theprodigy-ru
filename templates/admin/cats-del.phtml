@@ -1,0 +1,22 @@
+<?= $this->locale->txt[60] ?> <?= $this->ID_CAT ?><br>
+<?php foreach ($this->boards as $board): ?>
+    &nbsp;&nbsp;<?= $this->locale->txt[48] ?> <?= $board['ID_BOARD'] ?><br>
+    <?php foreach ($board['topics'] as $topic): ?>
+        &nbsp;&nbsp;&nbsp;&nbsp;<?= $this->locale->txt[50] ?> <?= $topic['ID_TOPIC'] ?><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?= $this->locale->txt[49] ?><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?= $this->locale->txt['advdel1'] ?><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<?= $this->locale->txt['advdel2'] ?><br>
+    <?php endforeach; ?>
+    &nbsp;&nbsp;&nbsp;&nbsp;<?= $this->locale->txt['advdel2'] ?><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<?= $this->locale->txt['advdel3'] ?><br>
+    &nbsp;&nbsp;<?= $this->locale->txt[51] ?><br>
+<?php endforeach; ?>
+
+<?= $this->locale->txt[51] ?>
+<br><br>
+<font size="2">
+    <a href="../"><?= $this->locale->txt[3] ?></a>
+    <br>
+    <a href="../../"><?= $this->locale->txt[208] ?></a>
+</font>
+<br>

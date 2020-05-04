@@ -86,7 +86,99 @@ Class Admin extends \Prodigy\Respond\Respond {
             $app->conf->modSet('agreement', $request->paramsPost()->agreement);
             return $this->redirect('/admin/');
         }
-    }
+    } // editagreement()
+    
+    public function manageCats($request, $response, $service, $app)
+    {
+        if (!$app->user->isAdmin())
+            return $this->error(null, 403);
+        
+        $db_prefix = $app->db->prefix;
+        $data = array('title' => $app->locale->txt(52));
+        $dbrq = $app->db->query("SELECT membergroup FROM {$db_prefix}membergroups WHERE (ID_GROUP=1 OR ID_GROUP > 7)");
+        $data['membergroups'] = $dbrq->fetchAll();
+        $dbrq = null;
+        $data['membergrps'] = '';
+        foreach ($data['membergroups'] as $grp) {
+            $data['membergrps'] .= "<option>" . trim($grp['membergroup']) . "</option>";
+        }
+        
+        
+        $dbrq = $app->db->query("SELECT name, ID_CAT, memberGroups, catOrder FROM {$db_prefix}categories WHERE 1 ORDER BY catOrder");
+        $data['cats'] = $dbrq->fetchAll();
+        $dbrq = null;
+        
+        if ($request->method('GET')) {
+            return $this->render('admin/manage-cats.phtml', $data);
+        }
+        elseif ($request->method('POST')) {
+            $app->session->check('post');
+            $POST = $request->paramsPost();
+            if ($POST->moda != '-1') 
+            {
+                $dbst = $app->db->prepare("UPDATE {$db_prefix}categories SET name = ?, memberGroups = ?, catOrder = ? WHERE ID_CAT= ?");
+                $dbst->execute(array($POST->catname, $POST->catgroups, $POST->catorder, $POST->ID_CAT));
+                return  $this->redirect('/admin/managecats/');
+            } // if moda -1
+            else {
+                $data = array('ID_CAT' => $POST->ID_CAT);
+                
+                // Deleting attachments
+                $dbst = $app->db->prepare("SELECT m.attachmentFilename FROM {$db_prefix}messages AS m, {$db_prefix}topics AS t, {$db_prefix}boards AS b WHERE (m.ID_TOPIC=t.ID_TOPIC AND t.ID_BOARD=b.ID_BOARD AND b.ID_CAT=? AND m.attachmentFilename IS NOT NULL)");
+                $dbst->execute(array($POST->ID_CAT));
+                $attachments = $dbst->fetchAll(); $dbst = null;
+                if (!empty($attachments)) {
+                    foreach ($attachments as $row) {
+                        unlink($app->conf->attachmentUploadDir . "/" . $row['attachmentFilename']);
+                    }
+                }
+                
+                $dbst = $app->db->prepare("DELETE FROM {$db_prefix}categories WHERE ID_CAT = ?");
+                $dbst->execute(array($POST->ID_CAT)); $dbst = null;
+                $dbst = $app->db->prepare("SELECT ID_BOARD FROM {$db_prefix}boards WHERE ID_CAT = ?");
+                $dbst->execute(array($POST->ID_CAT));
+                $data['boards'] = $dbst->fetchAll(); $dbst = null;
+                if (!empty($data['boards'])) {
+                    foreach($data['boards'] as $bk => $board) {
+                        $app->db->query("DELETE FROM {$db_prefix}boards WHERE ID_BOARD = {$board['ID_BOARD']}");
+                        $dbrq = $app->db->query("SELECT ID_TOPIC, ID_POLL FROM {$db_prefix}topics WHERE ID_BOARD = {$board['ID_BOARD']}");
+                        $topics = $dbrq->fetchAll(); $dbrq = null;
+                        $data[$bk]['topics'] = $topics;
+                        if (!empty($topics)) {
+                            foreach ($topics as $tk => $topic) {
+                                $app->db->query("DELETE FROM {$db_prefix}topics WHERE ID_TOPIC = {$topic['ID_TOPIC']}");
+                                $app->db->query("DELETE FROM {$db_prefix}messages WHERE ID_TOPIC = {$topic['ID_TOPIC']}");
+                                $app->db->query("DELETE FROM {$db_prefix}polls WHERE ID_POLL = {$topic['ID_POLL']}");
+                                $app->db->query("DELETE FROM {$db_prefix}log_topics WHERE ID_TOPIC = {$topic['ID_TOPIC']}");
+                            }
+                        }
+                        $app->db->query("DELETE FROM {$db_prefix}log_mark_read WHERE ID_BOARD = {$board['ID_BOARD']}");
+                        $app->db->query("DELETE FROM {$db_prefix}log_boards WHERE ID_BOARD = {$board['ID_BOARD']}");
+                        $app->db->query("DELETE FROM {$db_prefix}calendar WHERE id_board = {$board['ID_BOARD']}");
+                        
+                        $app->subs->updateStats('message');
+                        $app->subs->updateStats('topic');
+                    } // foreach board
+                }
+                
+                //return $this->render('admin/cats-del.phtml', $data);
+                return $this->redirect('/admin/managecats/');
+            } // If delete cat
+        } // if POST
+        
+    } // manageCats()
+    
+    public function createCat($request, $response, $service, $app) {
+        if (!$app->user->isAdmin())
+            return $this->error(null, 403);
+        
+        $app->session->check('post');
+        $POST = $request->paramsPost();
+        
+        $dbst = $app->db->prepare("INSERT INTO {$app->db->prefix}categories (name, memberGroups, catOrder) VALUES (?, ?, 0)");
+        $dbst->execute(array($POST->catname, $POST->memgroup));
+        return $this->redirect('/admin/managecats/');
+    } // createCat()
     
     // Bans list controller
     public function bans($request, $response, $service, $app)
