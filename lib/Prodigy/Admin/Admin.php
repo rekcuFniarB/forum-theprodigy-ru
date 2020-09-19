@@ -95,20 +95,19 @@ Class Admin extends \Prodigy\Respond\Respond {
         
         $db_prefix = $app->db->prefix;
         $data = array('title' => $app->locale->txt(52));
-        $dbrq = $app->db->query("SELECT membergroup FROM {$db_prefix}membergroups WHERE (ID_GROUP=1 OR ID_GROUP > 7)");
-        $data['membergroups'] = $dbrq->fetchAll();
-        $dbrq = null;
-        $data['membergrps'] = '';
-        foreach ($data['membergroups'] as $grp) {
-            $data['membergrps'] .= "<option>" . trim($grp['membergroup']) . "</option>";
-        }
-        
-        
-        $dbrq = $app->db->query("SELECT name, ID_CAT, memberGroups, catOrder FROM {$db_prefix}categories WHERE 1 ORDER BY catOrder");
-        $data['cats'] = $dbrq->fetchAll();
-        $dbrq = null;
-        
         if ($request->method('GET')) {
+            $dbrq = $app->db->query("SELECT membergroup FROM {$db_prefix}membergroups WHERE (ID_GROUP=1 OR ID_GROUP > 7)");
+            $data['membergroups'] = $dbrq->fetchAll();
+            $dbrq = null;
+            $data['membergrps'] = '';
+            foreach ($data['membergroups'] as $grp) {
+                $data['membergrps'] .= "<option>" . trim($grp['membergroup']) . "</option>";
+            }
+            
+            $dbrq = $app->db->query("SELECT name, ID_CAT, memberGroups, catOrder FROM {$db_prefix}categories WHERE 1 ORDER BY catOrder");
+            $data['cats'] = $dbrq->fetchAll();
+            $dbrq = null;
+        
             return $this->render('admin/manage-cats.phtml', $data);
         }
         elseif ($request->method('POST')) {
@@ -120,7 +119,8 @@ Class Admin extends \Prodigy\Respond\Respond {
                 $dbst->execute(array($POST->catname, $POST->catgroups, $POST->catorder, $POST->ID_CAT));
                 return  $this->redirect('/admin/managecats/');
             } // if moda -1
-            else {
+            else
+            {
                 $data = array('ID_CAT' => $POST->ID_CAT);
                 
                 // Deleting attachments
@@ -167,6 +167,10 @@ Class Admin extends \Prodigy\Respond\Respond {
         } // if POST
         
     } // manageCats()
+    
+    public function manageBoards($request, $response. $service, $app) {
+    
+    } // manageBoards()
     
     public function createCat($request, $response, $service, $app) {
         if (!$app->user->isAdmin())
