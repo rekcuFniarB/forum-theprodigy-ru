@@ -131,7 +131,11 @@ ytopt = {
         '-k',
         '7M',
         '-U',
-        'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0'],
+        'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:80.0) Gecko/20100101 Firefox/80.0',
+        ## Force stop download after 15 minutes.
+        '--stop',
+        '900',
+    ],
     ## run function on file downloaded
     'progress_hooks': [yt_hook],
     ## ignore errors
