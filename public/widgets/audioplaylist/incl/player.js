@@ -47,7 +47,7 @@ var Player = function (uiSelector, options) {
         
     // events handlers
     this.on = new function() {
-        var _this = this;
+        var player = this;
         // paused event handler
         this.paused = function() {
             parent.ui.btnPause.hide();
@@ -83,7 +83,7 @@ var Player = function (uiSelector, options) {
         
         // source error handler
         this.sourceError = function () {
-            _this.ended();
+            player.ended();
         };
         
         // playback duration change event
@@ -198,8 +198,17 @@ var Player = function (uiSelector, options) {
      * Set title of current playing track
      * @param text string title
      */
-    this.title = function(text) {
-        this.ui.title.text(text);
+    this.title = function(item) {
+        if (typeof item.title != 'undefined') {
+                text = item.title;
+        } else {
+            text = item;
+        }
+        if (typeof item.url != 'undefined') {
+            this.ui.title.html('<a href="'+item.url+'" target="_blank">'+text+'</a>');
+        } else {
+            this.ui.title.text(text);
+        }
         document.title = text;
     }; // set title
     
@@ -249,7 +258,7 @@ var Player = function (uiSelector, options) {
     this.playPlaylistItem = function (id) {
         var item = this.currentPlaylist[id];
         this.currentTrack = id;
-        this.title(item.title);
+        this.title(item);
         this.play(item.src);
         this.setThumbnail(item.thumbnail);
         // mark current track in playlist
@@ -328,7 +337,7 @@ var Player = function (uiSelector, options) {
         this.audio[0].addEventListener('ended', this.on.ended, false);
         this.audio[0].addEventListener('error', this.on.ended, false);
         this.audio[0].addEventListener('durationchange', this.on.durationChange, false);
-        this.audio[0].addEventListener('timeupdate', function(){_this.on.timeUpdate();}, false);
+        this.audio[0].addEventListener('timeupdate', function(){player.on.timeUpdate();}, false);
         
         this.audio.source = $('<source/>', {src: this.blank}).appendTo(this.audio);
         this.audio.source[0].addEventListener('error', this.on.sourceError, false);
@@ -357,7 +366,9 @@ var Player = function (uiSelector, options) {
                 item.title = data[i][1];
                 item.thumbnail = 'https://img.youtube.com/vi/NO_THUMBNAIL/mqdefault.jpg';
             }
-            item.author = data[i][3];
+            if (typeof data[i][3] != 'undefined') {
+                item.author = data[i][3];
+            }
             parsed.push(item);
         }
         return parsed;
@@ -401,21 +412,23 @@ var Player = function (uiSelector, options) {
     this.loadPlaylist = function(list, name, id, type) {
         if (typeof type === 'undefined') var type = 1;
         if (typeof list === 'string') {
-            $.ajax({
+            player.title('Loading playlist...');
+            This.ajax({
                 url: list,
-                timeout: 5000,
+                timeout: 90000,
                 dataType: 'json',
                 cache: false,
                 //context: this,
                 success: function(media){
+                    player.title('');
                     if (type == 2) {
-                        _this.buildPlaylist(_this.parsePlaylist(media), name, id);
+                        player.buildPlaylist(player.parsePlaylist(media), name, id);
                     } else {
-                        _this.buildPlaylist(media, name, id);
+                        player.buildPlaylist(media, name, id);
                     }
-                    //if (_this.do == 'play') {
+                    //if (player.do == 'play') {
                     //    // start playback
-                    //    _this.playPlaylistItem(0);
+                    //    player.playPlaylistItem(0);
                     //}
                 }
             }); // ajax
@@ -443,13 +456,15 @@ var Player = function (uiSelector, options) {
         }
         else if (typeof playlist === 'string') {
             // it's probably an url, load remote playlist
-            $.ajax({
+            player.title('Loading playlist...');
+            This.ajax({
                 url: playlist,
                 dataType: 'json',
-                timeout: 5000,
+                timeout: 90000,
                 cache: false,
                 success: function(media) {
-                    _this._initPlaylist(media);
+                    player._initPlaylist(media);
+                    player.title('');
                 } // ajax success
             }); // ajax
         } else {
@@ -499,6 +514,23 @@ var Player = function (uiSelector, options) {
         //this.ui.playlists.show();
     }; // showPlaylists()
     
+    this.ajax = function(params) {
+        This.ui.progress.time.addClass('progress-loading');
+        var onComplete = [
+            function() {This.ui.progress.time.removeClass('progress-loading');}
+        ];
+        window.ajOnComplete = onComplete;
+        if (typeof params.complete != 'undefined') {
+            onComplete.push(params.complete);
+        }
+        params.complete = function() {
+            for (var i=0; i<onComplete.length; i++) {
+                onComplete[i]();
+            }
+        }
+        $.ajax(params);
+    };
+    
     /**
      * change options on the fly
      * @param opts dict: options
@@ -512,8 +544,9 @@ var Player = function (uiSelector, options) {
      */
     if (typeof options !== 'undefined') $.extend(this.options, options);
     
-    var _this = this;
+    var player = this;
     var parent = this;
+    var This = this;
     this.ui = {};
     this.ui.selector = uiSelector;
     this.ui.container = $(uiSelector);
@@ -544,31 +577,31 @@ var Player = function (uiSelector, options) {
      * Bindings
      */
     this.ui.btnPlay.on('click', function() {
-        _this.play();
+        player.play();
     });
     this.ui.btnPause.on('click', function() {
-        _this.pause();
+        player.pause();
     });
     this.ui.btnPrev.on('click', function() {
-        _this.playPrev();
+        player.playPrev();
     });
     this.ui.btnNext.on('click', function() {
-        _this.playNext();
+        player.playNext();
     });
     //this.ui.playlist.on('click', 'li', function(e) {
-    //    _this.playlistClick(e);
+    //    player.playlistClick(e);
     //});
     this.ui.playlists.on('click', 'li', function(e) {
-        _this.playlistsClick(e);
+        player.playlistsClick(e);
     });
     this.ui.progress.touch.on('click', function(e) {
-        _this.on.touch(e);
+        player.on.touch(e);
     });
     //this.ui.playlistName.on('click', function() {
-    //    _this.ui.playlists.hide();
-    //    _this.ui.playlist.show();
+    //    player.ui.playlists.hide();
+    //    player.ui.playlist.show();
     //});
 //     this.ui.playlistsBtn.on('click', function() {
-//         _this.showPlaylists();
+//         player.showPlaylists();
 //     });
 }

@@ -2,6 +2,10 @@
  * Player style
  */
 
+a:link, a:visited, a:hover {
+    color: #aaaaff;
+}
+
 div.audioplaylists-player {
     position: relative;
     width: 100%;
@@ -50,7 +54,7 @@ div.audioplaylists-player .player-btn:active {
 div.audioplaylists-player .player-playlists {
     overflow-y: auto;
     position: absolute;
-    top: 90px;
+    top: 100px;
     bottom: 0;
     width: 100%;
 }
@@ -149,6 +153,7 @@ div.audioplaylists-player div.player-playback-progress {
     position: relative;
     box-sizing: border-box;
     height: 1.2em;
+    margin-bottom: 10px;
 }
 div.audioplaylists-player div.player-playback-progress > div {
     position: absolute;
@@ -170,3 +175,9 @@ div.audioplaylists-player div.player-playback-time {
 /*div.audioplaylists-player div.player-playback-touch {
     width: 100%;
 }*/
+.progress-loading {
+    background-image: url(img/loading.gif);
+    background-repeat: no-repeat;
+    background-size: 100% 50%;
+    background-position: center;
+}
