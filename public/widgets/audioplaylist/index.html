@@ -27,10 +27,24 @@ html, body {
           <div class="player-playback-touch"></div>
         </div>
         <div class="player-control">
-            <div class="player-btn prev">&#9666;&#9666;</div>
-            <div class="player-btn play">&#9654;</div>
-            <div class="player-btn pause">&#9646;&#9646;</div>
-            <div class="player-btn next">&#9656;&#9656;</div>
+            <div class="player-btn prev">
+                <div class="svg-icon-wrap">
+                    <svg class="icon"><use xlink:href="./incl/img/mejs-controls.svg#icon-play"/></svg>
+                    <svg class="icon"><use xlink:href="./incl/img/mejs-controls.svg#icon-play"/></svg>
+                </div>
+            </div>
+            <div class="player-btn play"><!--&#9654;--><!--<span class="icon icon-play"></span>-->
+                <svg class="icon"><use xlink:href="./incl/img/mejs-controls.svg#icon-play"/></svg>
+            </div>
+            <div class="player-btn pause"><!--&#9646;&#9646;-->
+                <svg class="icon"><use xlink:href="./incl/img/mejs-controls.svg#icon-pause"/></svg>
+            </div>
+            <div class="player-btn next">
+                <div class="svg-icon-wrap">
+                    <svg class="icon"><use xlink:href="./incl/img/mejs-controls.svg#icon-play"/></svg>
+                    <svg class="icon"><use xlink:href="./incl/img/mejs-controls.svg#icon-play"/></svg>
+                </div>
+            </div>
         </div>
         <div class="player-status"></div>
       </td>

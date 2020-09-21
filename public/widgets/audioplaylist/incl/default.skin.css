@@ -2,6 +2,10 @@
  * Player style
  */
 
+body {
+    font-family: "Ubuntu Mono", "Droid Sans Mono", "Lucida Console", "Monospace";
+}
+
 a:link, a:visited, a:hover {
     color: #aaaaff;
 }
@@ -181,3 +185,20 @@ div.audioplaylists-player div.player-playback-time {
     background-size: 100% 50%;
     background-position: center;
 }
+/* BEGIN ICONS */
+.player-btn {
+    padding: 5px;
+}
+svg.icon {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+}
+.svg-icon-wrap {
+    display: flex;
+    height: 100%;
+}
+.player-btn.prev .svg-icon-wrap {
+    transform: rotate(180deg);
+}
+/* END ICONS */
